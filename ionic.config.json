@@ -1,0 +1,7 @@
+{
+  "name": "AppCasaBlanca",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
