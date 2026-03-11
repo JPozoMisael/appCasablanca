@@ -1,0 +1,142 @@
+<div class="rg-shell">
+  <div class="rg-grid">
+    <!-- Branding -->
+    <section class="rg-brand">
+      <div class="brand-card">
+        <div class="logo">CB</div>
+
+        <div class="brand-text">
+          <h1>Crear cuenta</h1>
+          <p>Regístrate para reservar más rápido y gestionar tus solicitudes.</p>
+        </div>
+
+        <div class="brand-bullets">
+          <div class="b">✔ Reservas rápidas</div>
+          <div class="b">✔ Historial de reservas</div>
+          <div class="b">✔ Datos guardados</div>
+        </div>
+
+        <a class="back" routerLink="/inicio">← Volver al inicio</a>
+      </div>
+    </section>
+
+    <!-- Formulario -->
+    <section class="rg-form">
+      <div class="form-card">
+        <div class="form-head">
+          <h2>Registro</h2>
+          <p>Completa tus datos</p>
+        </div>
+
+        <div class="alert error" *ngIf="errorMsg">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <span>{{ errorMsg }}</span>
+        </div>
+
+        <div class="alert ok" *ngIf="successMsg">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>{{ successMsg }}</span>
+        </div>
+
+        <form (ngSubmit)="onSubmit()" autocomplete="on">
+          <div class="field">
+            <label>Nombre completo</label>
+            <div class="input two">
+              <ion-icon name="person-outline"></ion-icon>
+              <input
+                type="text"
+                [(ngModel)]="fullName"
+                name="fullName"
+                placeholder="Ej: Juan Pérez"
+                autocomplete="name"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Correo</label>
+            <div class="input two">
+              <ion-icon name="mail-outline"></ion-icon>
+              <input
+                type="email"
+                [(ngModel)]="email"
+                name="email"
+                placeholder="correo@ejemplo.com"
+                autocomplete="email"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Teléfono (opcional)</label>
+            <div class="input two">
+              <ion-icon name="call-outline"></ion-icon>
+              <input
+                type="tel"
+                [(ngModel)]="phone"
+                name="phone"
+                placeholder="Ej: 0999999999"
+                autocomplete="tel"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Contraseña</label>
+            <div class="input three">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <input
+                [type]="showPass ? 'text' : 'password'"
+                [(ngModel)]="password"
+                name="password"
+                placeholder="••••••••"
+                autocomplete="new-password"
+              />
+              <button type="button" class="eye" (click)="togglePass()">
+                <ion-icon [name]="showPass ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Confirmar contraseña</label>
+            <div class="input three">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <input
+                [type]="showConfirm ? 'text' : 'password'"
+                [(ngModel)]="confirmPassword"
+                name="confirmPassword"
+                placeholder="••••••••"
+                autocomplete="new-password"
+              />
+              <button type="button" class="eye" (click)="toggleConfirm()">
+                <ion-icon [name]="showConfirm ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="checks">
+            <label class="check">
+              <input type="checkbox" [(ngModel)]="acceptTerms" name="acceptTerms" />
+              <span>Acepto términos y condiciones</span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" [(ngModel)]="marketing" name="marketing" />
+              <span>Quiero recibir novedades (opcional)</span>
+            </label>
+          </div>
+
+          <ion-button class="submit" type="submit" expand="block" [disabled]="loading">
+            {{ loading ? 'Creando cuenta...' : 'Crear cuenta' }}
+          </ion-button>
+
+          <div class="foot">
+            <span>¿Ya tienes cuenta?</span>
+            <a routerLink="/login">Inicia sesión</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>

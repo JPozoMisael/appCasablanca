@@ -1,0 +1,202 @@
+<div class="rp">
+  <!-- Top -->
+  <div class="rp-top">
+    <div class="title">
+      <h2>Reportes</h2>
+      <p>Resumen operativo y financiero con exportación rápida.</p>
+    </div>
+
+    <div class="actions">
+      <ion-button class="btn soft" fill="outline" (click)="exportResumenCSV()">
+        <ion-icon slot="start" name="downloadOutline"></ion-icon>
+        Exportar resumen
+      </ion-button>
+
+      <ion-button class="btn" (click)="exportTopCSV()">
+        <ion-icon slot="start" name="downloadOutline"></ion-icon>
+        Exportar top
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Period chips -->
+  <div class="period">
+    <div class="p-title">
+      <ion-icon name="calendarOutline"></ion-icon>
+      <span>Período</span>
+    </div>
+
+    <div class="p-chips">
+      <button class="chip" [class.active]="periodo() === 'hoy'" (click)="setPeriodo('hoy')">
+        <ion-icon name="timeOutline"></ion-icon> Hoy
+      </button>
+      <button class="chip" [class.active]="periodo() === '7d'" (click)="setPeriodo('7d')">
+        7 días
+      </button>
+      <button class="chip" [class.active]="periodo() === '30d'" (click)="setPeriodo('30d')">
+        30 días
+      </button>
+      <button class="chip" [class.active]="periodo() === 'mes'" (click)="setPeriodo('mes')">
+        Mes
+      </button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Ingresos</span>
+        <ion-icon name="cashOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">\${{ kpi().ingresos }}</div>
+      <div class="kpi-sub">Total período</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Ocupación</span>
+        <ion-icon name="bedOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ kpi().ocupacion }}%</div>
+      <div class="kpi-sub">Promedio período</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Reservas</span>
+        <ion-icon name="clipboardOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ kpi().reservas }}</div>
+      <div class="kpi-sub">Cantidad</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Ticket prom.</span>
+        <ion-icon name="trendingUpOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">\${{ kpi().ticket }}</div>
+      <div class="kpi-sub">Ingresos / reservas</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <ion-segment [value]="tab()" (ionChange)="setTab($event.detail.value)">
+      <ion-segment-button value="general">
+        <ion-label>General</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="ingresos">
+        <ion-label>Ingresos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="ocupacion">
+        <ion-label>Ocupación</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <!-- Content -->
+  <div class="grid">
+    <!-- Left card -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>{{ tab() === 'general' ? 'Resumen' : (tab() === 'ingresos' ? 'Ingresos' : 'Ocupación') }}</h3>
+          <p>Vista rápida para decisiones operativas</p>
+        </div>
+      </div>
+
+      <!-- GENERAL -->
+      <div class="body" *ngIf="tab() === 'general'">
+        <div class="summary">
+          <div class="srow" *ngFor="let r of resumen()">
+            <span class="k">{{ r.label }}</span>
+            <span class="v">{{ r.value }}</span>
+          </div>
+        </div>
+
+        <div class="note">
+          <ion-icon name="analyticsOutline"></ion-icon>
+          <span>Este módulo está listo para conectar a tu API (reservas/ingresos/ocupación).</span>
+        </div>
+      </div>
+
+      <!-- INGRESOS -->
+      <div class="body" *ngIf="tab() === 'ingresos'">
+        <div class="mini">
+          <div class="mini-head">
+            <strong>Ingresos por período</strong>
+            <span>barritas (mock)</span>
+          </div>
+
+          <div class="bars">
+            <div
+              class="bar"
+              *ngFor="let p of ingresosSerie()"
+              [style.height.%]="pct(p.value, maxSerie(ingresosSerie()))"
+              title="{{ p.label }}: ${{ p.value }}"
+            ></div>
+          </div>
+
+          <div class="labels">
+            <span *ngFor="let p of ingresosSerie()">{{ p.label }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- OCUPACION -->
+      <div class="body" *ngIf="tab() === 'ocupacion'">
+        <div class="mini">
+          <div class="mini-head">
+            <strong>Ocupación (%)</strong>
+            <span>barritas (mock)</span>
+          </div>
+
+          <div class="bars">
+            <div
+              class="bar"
+              *ngFor="let p of ocupacionSerie()"
+              [style.height.%]="pct(p.value, maxSerie(ocupacionSerie()))"
+              title="{{ p.label }}: {{ p.value }}%"
+            ></div>
+          </div>
+
+          <div class="labels">
+            <span *ngFor="let p of ocupacionSerie()">{{ p.label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right card -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>Top habitaciones</h3>
+          <p>Mejores ingresos en el período</p>
+        </div>
+
+        <ion-button class="btn-sm" fill="outline" (click)="exportTopCSV()">
+          <ion-icon slot="start" name="downloadOutline"></ion-icon>
+          CSV
+        </ion-button>
+      </div>
+
+      <div class="body">
+        <div class="top">
+          <div class="trow" *ngFor="let t of topHabitaciones()">
+            <div class="left">
+              <strong>{{ t.name }}</strong>
+              <span>Ingresos estimados</span>
+            </div>
+            <div class="right">
+              <span class="money">\${{ t.value }}</span>
+              <ion-chip color="primary">TOP</ion-chip>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

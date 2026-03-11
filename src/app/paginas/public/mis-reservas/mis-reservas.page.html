@@ -1,0 +1,103 @@
+  <div class="container">
+
+    <header class="top">
+      <div class="title">
+        <div class="h1">Mis reservas</div>
+        <div class="sub">Revisa, gestiona y consulta tus reservas</div>
+      </div>
+
+      <div class="actions">
+        <ion-button fill="outline" class="btn" (click)="filtro='todas'">Todas</ion-button>
+        <ion-button fill="outline" class="btn" (click)="filtro='CONFIRMADA'">Confirmadas</ion-button>
+        <ion-button fill="outline" class="btn" (click)="filtro='PENDIENTE'">Pendientes</ion-button>
+        <ion-button fill="outline" class="btn" (click)="filtro='CANCELADA'">Canceladas</ion-button>
+      </div>
+    </header>
+
+    <!-- LOADING -->
+    <section *ngIf="loading" class="loading">
+      <div class="skeleton line"></div>
+      <div class="skeleton card"></div>
+      <div class="skeleton card"></div>
+    </section>
+
+    <!-- VACÍO -->
+    <section *ngIf="!loading && filtradas.length === 0" class="empty">
+      <div class="empty-box">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <h2>No tienes reservas</h2>
+        <p>Cuando reserves una habitación, aparecerá aquí.</p>
+        <ion-button routerLink="/habitaciones" class="go">Buscar habitaciones</ion-button>
+      </div>
+    </section>
+
+    <!-- LISTA -->
+    <section *ngIf="!loading && filtradas.length > 0" class="list">
+      <article class="card" *ngFor="let r of filtradas; trackBy: trackById">
+        <div class="card-head">
+          <div class="code">
+            <div class="k">Código</div>
+            <div class="v">{{ r.codigo }}</div>
+          </div>
+
+          <div class="estado" [class.ok]="r.estado==='CONFIRMADA'" [class.warn]="r.estado==='PENDIENTE'" [class.bad]="r.estado==='CANCELADA'">
+            <ion-icon *ngIf="r.estado==='CONFIRMADA'" name="checkmark-circle-outline"></ion-icon>
+            <ion-icon *ngIf="r.estado==='PENDIENTE'" name="time-outline"></ion-icon>
+            <ion-icon *ngIf="r.estado==='CANCELADA'" name="close-circle-outline"></ion-icon>
+            {{ etiquetaEstado(r.estado) }}
+          </div>
+        </div>
+
+        <div class="body">
+          <div class="row">
+            <ion-icon name="bed-outline"></ion-icon>
+            <div>
+              <div class="main">{{ r.habitacion }}</div>
+              <div class="muted">{{ r.hotel }}</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <ion-icon name="location-outline"></ion-icon>
+            <div class="muted">{{ r.ubicacion }}</div>
+          </div>
+
+          <div class="row">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <div class="muted">
+              {{ r.checkIn }} → {{ r.checkOut }} · {{ noches(r) }} noche(s)
+            </div>
+          </div>
+
+          <div class="meta">
+            <span>{{ r.adultos }} adulto(s)</span>
+            <span *ngIf="r.ninos > 0">· {{ r.ninos }} niño(s)</span>
+            <span>· {{ r.habitaciones }} habitación(es)</span>
+          </div>
+        </div>
+
+        <div class="foot">
+          <div class="total">
+            <div class="k">Total</div>
+            <div class="v">${{ r.total }}</div>
+          </div>
+
+          <div class="btns">
+            <ion-button fill="clear" class="link" (click)="verDetalle(r)">
+              Ver detalle <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
+            </ion-button>
+
+            <ion-button
+              *ngIf="r.estado !== 'CANCELADA'"
+              color="danger"
+              fill="outline"
+              class="cancel"
+              (click)="cancelar(r)">
+              Cancelar
+            </ion-button>
+          </div>
+        </div>
+      </article>
+    </section>
+
+  </div>

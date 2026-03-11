@@ -1,0 +1,155 @@
+@use "../../../styles/tokens" as *;
+
+:host {
+  display: block;
+}
+
+/* helper local para reemplazar el mixin container() */
+$container-pad: 16px;
+
+.public-shell {
+  --padding-top: 0;
+  --padding-bottom: 0px;
+}
+
+.public-toolbar {
+  --background: transparent;
+  --color: #fff;
+  padding: 0;
+}
+
+.public-header {
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+  backdrop-filter: saturate(140%) blur(10px);
+}
+
+.public-toolbar {
+  background: linear-gradient(90deg, #003580 0%, #005fcf 48%, #006ce4 100%);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.14);
+}
+
+.header-inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 12px $container-pad;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 260px;
+}
+
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--brand-primary);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.brand-title {
+  font-weight: 900;
+  letter-spacing: -0.2px;
+  font-size: 16px;
+  line-height: 1.1;
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.link-btn {
+  --color: rgba(255, 255, 255, 0.92);
+  --background: transparent;
+  --border-radius: 999px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+
+  &:hover {
+    --background: rgba(255, 255, 255, 0.10);
+  }
+}
+
+.primary-btn {
+  --background: var(--brand-accent);
+  --background-hover: #ff3b40;
+  --border-radius: 999px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  box-shadow: 0 14px 26px rgba(255, 90, 95, 0.26);
+}
+
+.public-container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 16px $container-pad 24px;
+}
+
+.public-footer {
+  margin-top: 28px;
+  background: #0b1220;
+  color: #fff;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 18px $container-pad;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.footer-title {
+  font-weight: 900;
+  letter-spacing: -0.2px;
+}
+
+.footer-subtitle,
+.footer-meta {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .brand {
+    min-width: auto;
+  }
+
+  .brand-title {
+    font-size: 15px;
+  }
+
+  .header-actions {
+    gap: 8px;
+  }
+}

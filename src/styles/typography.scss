@@ -1,0 +1,42 @@
+/* src/styles/typography.scss
+   Tipografía global (títulos, párrafos, utilidades).
+*/
+
+:root {
+  --h1: 34px;
+  --h2: 24px;
+  --h3: 18px;
+  --body: 14px;
+  --small: 12px;
+
+  --lh-tight: 1.15;
+  --lh: 1.45;
+}
+
+body {
+  font-size: var(--body);
+  line-height: var(--lh);
+  font-weight: 500;
+}
+
+h1, h2, h3, h4 {
+  line-height: var(--lh-tight);
+  letter-spacing: -0.2px;
+  margin: 0;
+}
+
+h1 { font-size: var(--h1); font-weight: 900; }
+h2 { font-size: var(--h2); font-weight: 900; }
+h3 { font-size: var(--h3); font-weight: 900; }
+
+p {
+  margin: 0;
+  color: var(--muted-2);
+}
+
+.muted { color: var(--muted-2); }
+.strong { font-weight: 900; color: var(--text); }
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}

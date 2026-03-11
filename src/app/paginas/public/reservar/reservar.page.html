@@ -1,0 +1,143 @@
+  <div class="rb-container">
+    <header class="rb-top">
+      <div class="rb-title">
+        <ion-icon name="card-outline"></ion-icon>
+        <div>
+          <div class="h1">Confirmar reserva</div>
+          <div class="sub">
+            <span *ngIf="checkIn && checkOut">{{ checkIn }} — {{ checkOut }}</span>
+            <span class="dot">·</span>
+            <span>{{ guestsLabel }}</span>
+            <span class="dot">·</span>
+            <span>{{ nights }} noche(s)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rb-actions">
+        <ion-button fill="outline" class="btn" (click)="backToRooms()">
+          Volver a habitaciones
+        </ion-button>
+      </div>
+    </header>
+
+    <section class="rb-grid">
+      <!-- LEFT: Form -->
+      <main class="rb-main">
+        <div class="box">
+          <div class="box-title">
+            <ion-icon name="people-outline"></ion-icon>
+            Datos del huésped
+          </div>
+
+          <div class="form">
+            <div class="row">
+              <div class="field">
+                <label>Nombres</label>
+                <input [(ngModel)]="guest.nombres" placeholder="Ej: Juan" />
+              </div>
+              <div class="field">
+                <label>Apellidos</label>
+                <input [(ngModel)]="guest.apellidos" placeholder="Ej: Pérez" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label>Email</label>
+                <input [(ngModel)]="guest.email" type="email" placeholder="correo@ejemplo.com" />
+              </div>
+              <div class="field">
+                <label>Teléfono</label>
+                <input [(ngModel)]="guest.telefono" placeholder="Ej: 0999999999" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label>Cédula / Pasaporte</label>
+                <input [(ngModel)]="guest.cedulaPasaporte" placeholder="Opcional" />
+              </div>
+              <div class="field">
+                <label>Notas (opcional)</label>
+                <input [(ngModel)]="guest.notas" placeholder="Hora de llegada, solicitudes..." />
+              </div>
+            </div>
+
+            <div class="terms">
+              <label class="check">
+                <input type="checkbox" [(ngModel)]="acceptingTerms" />
+                <span>Acepto términos y condiciones</span>
+              </label>
+              <div class="hint">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                Tus datos se usarán únicamente para gestionar tu reserva.
+              </div>
+            </div>
+
+            <ion-button class="confirm" (click)="confirmBooking()" [disabled]="submitting">
+              <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+              {{ submitting ? 'Enviando...' : 'Confirmar reserva' }}
+            </ion-button>
+          </div>
+        </div>
+      </main>
+
+      <!-- RIGHT: Summary -->
+      <aside class="rb-side" *ngIf="room as r">
+        <div class="summary">
+          <div class="sum-head">
+            <div class="sum-title">
+              <ion-icon name="bed-outline"></ion-icon>
+              Resumen
+            </div>
+          </div>
+
+          <div class="sum-room">
+            <div class="img">
+              <img [src]="r.image" [alt]="r.name" />
+            </div>
+            <div class="info">
+              <div class="name">{{ r.name }}</div>
+              <div class="loc">
+                <ion-icon name="location-outline"></ion-icon>
+                {{ r.location }}
+              </div>
+              <div class="meta">
+                <ion-icon name="calendar-outline"></ion-icon>
+                {{ checkIn }} — {{ checkOut }}
+              </div>
+              <div class="meta">
+                <ion-icon name="people-outline"></ion-icon>
+                {{ guestsLabel }}
+              </div>
+            </div>
+          </div>
+
+          <div class="sum-breakdown">
+            <div class="line">
+              <span>Precio por noche</span>
+              <strong>${{ r.pricePerNight }}</strong>
+            </div>
+            <div class="line">
+              <span>Noches</span>
+              <strong>{{ nights }}</strong>
+            </div>
+            <div class="line">
+              <span>Subtotal</span>
+              <strong>${{ subtotal }}</strong>
+            </div>
+            <div class="line">
+              <span>Impuestos (12%)</span>
+              <strong>${{ taxes }}</strong>
+            </div>
+
+            <div class="total">
+              <span>Total</span>
+              <strong>${{ total }}</strong>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </div>

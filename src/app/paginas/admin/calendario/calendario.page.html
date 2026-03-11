@@ -1,0 +1,93 @@
+<div class="cal">
+  <div class="cal-top">
+    <div class="title">
+      <h2>Calendario</h2>
+      <p>Vista mensual por habitación (ocupación y reservas).</p>
+    </div>
+
+    <div class="controls">
+      <ion-button class="btn" fill="outline" (click)="prevMonth()">
+        <ion-icon slot="icon-only" name="chevronBackOutline"></ion-icon>
+      </ion-button>
+
+      <div class="month">
+        <ion-icon name="calendarOutline"></ion-icon>
+        <span>{{ monthLabel() }}</span>
+      </div>
+
+      <ion-button class="btn" fill="outline" (click)="nextMonth()">
+        <ion-icon slot="icon-only" name="chevronForwardOutline"></ion-icon>
+      </ion-button>
+
+      <ion-button class="btn today" (click)="goToday()">
+        <ion-icon slot="start" name="todayOutline"></ion-icon>
+        Hoy
+      </ion-button>
+
+      <ion-button class="btn create" routerLink="/admin/reservas">
+        <ion-icon slot="start" name="addCircleOutline"></ion-icon>
+        Nueva reserva
+      </ion-button>
+    </div>
+  </div>
+
+  <div class="timeline-card">
+    <!-- Scroll horizontal -->
+    <div class="timeline-scroll">
+      <!-- Header -->
+      <div class="tl-head" [style.gridTemplateColumns]="gridTemplate()">
+        <div class="h-room">Habitación</div>
+        <div
+          class="h-day"
+          *ngFor="let d of days()"
+          [class.today]="d.isToday"
+          title="{{ d.iso }}"
+        >
+          {{ d.day }}
+        </div>
+      </div>
+
+      <!-- Rows -->
+      <div class="tl-body">
+        <div
+          class="tl-row"
+          *ngFor="let room of habitaciones()"
+          [style.gridTemplateColumns]="gridTemplate()"
+        >
+          <div class="room">
+            <div class="code">{{ room.codigo }}</div>
+            <div class="meta">{{ room.tipo }} · Piso {{ room.piso || '-' }}</div>
+          </div>
+
+          <!-- background cells (para líneas) -->
+          <div class="cell" *ngFor="let d of days()" [class.today]="d.isToday"></div>
+
+          <!-- bars -->
+          <div
+            class="bar"
+            *ngFor="let b of barsForRoom(room.id)"
+            [style.gridColumn]="(b.colStart + 1) + ' / ' + (b.colEnd + 1)"
+            [class.selected]="isSelected(b.reserva.id)"
+            [class.clipL]="b.clippedLeft"
+            [class.clipR]="b.clippedRight"
+            (click)="selectReserva(b.reserva.id)"
+          >
+            <div class="bar-inner" [attr.data-state]="b.reserva.estado">
+              <span class="txt">
+                #{{ b.reserva.id }} · {{ b.reserva.huesped }}
+              </span>
+              <ion-chip class="st" [color]="colorEstado(b.reserva.estado)">
+                {{ b.reserva.estado }}
+              </ion-chip>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hint -->
+    <div class="hint">
+      Tip: haz clic en una reserva para seleccionarla (luego podemos abrir un drawer con editar / check-in / checkout).
+    </div>
+  </div>
+</div>

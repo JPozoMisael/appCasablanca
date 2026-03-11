@@ -1,0 +1,246 @@
+.mis-reservas {
+  background: #f6f7f9;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: 16px;
+
+  .title {
+    .h1 {
+      font-size: 26px;
+      font-weight: 900;
+      color: #0f172a;
+    }
+    .sub {
+      color: #475569;
+      margin-top: 4px;
+      font-size: 13px;
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    .btn {
+      --border-radius: 999px;
+    }
+  }
+}
+
+/* LISTA */
+.list {
+  display: grid;
+  gap: 14px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+
+    .code {
+      .k {
+        font-size: 11px;
+        font-weight: 800;
+        color: #64748b;
+      }
+      .v {
+        font-size: 14px;
+        font-weight: 900;
+        color: #0f172a;
+      }
+    }
+
+    .estado {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 12px;
+
+      &.ok {
+        background: rgba(0, 128, 9, 0.12);
+        color: #008009;
+      }
+      &.warn {
+        background: rgba(255, 160, 0, 0.14);
+        color: #b45309;
+      }
+      &.bad {
+        background: rgba(255, 90, 95, 0.14);
+        color: #ff5a5f;
+      }
+    }
+  }
+
+  .body {
+    padding: 14px 16px;
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+
+      ion-icon {
+        font-size: 18px;
+        color: #003580;
+        margin-top: 2px;
+      }
+
+      .main {
+        font-weight: 900;
+        color: #0f172a;
+      }
+
+      .muted {
+        color: #475569;
+        font-size: 13px;
+      }
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 6px;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 700;
+    }
+  }
+
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border-top: 1px solid rgba(15, 23, 42, 0.06);
+
+    .total {
+      .k {
+        font-size: 11px;
+        font-weight: 800;
+        color: #64748b;
+      }
+      .v {
+        font-size: 18px;
+        font-weight: 900;
+        color: #003580;
+      }
+    }
+
+    .btns {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+
+      .link {
+        font-weight: 900;
+      }
+
+      .cancel {
+        --border-radius: 12px;
+      }
+    }
+  }
+}
+
+/* EMPTY */
+.empty {
+  display: grid;
+  place-items: center;
+  margin-top: 30px;
+
+  .empty-box {
+    width: min(520px, 100%);
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 18px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    padding: 22px;
+    text-align: center;
+
+    ion-icon {
+      font-size: 34px;
+      color: #003580;
+    }
+
+    h2 {
+      margin: 10px 0 6px;
+      color: #0f172a;
+      font-weight: 900;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .go {
+      --border-radius: 12px;
+    }
+  }
+}
+
+/* LOADING */
+.loading {
+  .skeleton {
+    background: linear-gradient(90deg, #e9eef5 25%, #f5f7fb 50%, #e9eef5 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: 16px;
+
+    &.line {
+      height: 22px;
+      width: 55%;
+      margin-bottom: 12px;
+    }
+
+    &.card {
+      height: 160px;
+      margin-bottom: 12px;
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 760px) {
+  .foot {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+}

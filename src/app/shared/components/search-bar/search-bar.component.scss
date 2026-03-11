@@ -1,0 +1,264 @@
+:host {
+  display: block;
+}
+
+/* Wrapper */
+.bk-search {
+  width: 100%;
+}
+
+.bk-search.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Barra principal */
+.bk-bar {
+  background: #fff;
+  border: 3px solid #febb02;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 1.25fr 0px 1fr 0px 220px;
+  align-items: stretch;
+  overflow: visible;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.bk-sep {
+  width: 0;
+  border-left: 1px solid #e6e6e6;
+}
+
+/* Cada bloque clickeable */
+.bk-item {
+  position: relative;
+  padding: 10px 12px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  min-height: 64px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.bk-item:active {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.bk-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #5a5a5a;
+  font-weight: 700;
+
+  ion-icon {
+    font-size: 16px;
+    color: #003580;
+  }
+}
+
+.bk-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bk-value-main {
+  font-weight: 800;
+  color: #1f1f1f;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+/* ✅ Popover (se muestra con *ngIf, NO con hover) */
+.bk-pop {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: min(560px, calc(100vw - 24px));
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 14px;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.14);
+  padding: 12px;
+  z-index: 30; /* encima del contenido */
+}
+
+/* Flecha tipo Booking */
+.bk-pop::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 18px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-left: 1px solid #e6e6e6;
+  border-top: 1px solid #e6e6e6;
+  transform: rotate(45deg);
+}
+
+/* Acciones abajo del pop */
+.bk-pop-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* ✅ Backdrop: cierra al hacer click fuera */
+.bk-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.12);
+  z-index: 20; /* debajo del popover, encima de todo lo demás */
+}
+
+/* Panel de huéspedes */
+.guest-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.guest-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: #f6f7f9;
+  border: 1px solid #e6e6e6;
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+.meta .name {
+  font-weight: 900;
+  color: #1f1f1f;
+}
+
+.meta .desc {
+  font-size: 12px;
+  color: #6b6b6b;
+  margin-top: 2px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.step {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid #e6e6e6;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 18px;
+    color: #003580;
+  }
+}
+
+.step:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.val {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 900;
+  color: #1f1f1f;
+}
+
+.pets {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #e6e6e6;
+  background: #fff;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.pill {
+  font-weight: 900;
+  font-size: 12px;
+  background: rgba(0, 108, 228, 0.1);
+  border: 1px solid rgba(0, 108, 228, 0.15);
+  color: #003580;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.pill.on {
+  background: rgba(0, 128, 9, 0.12);
+  border-color: rgba(0, 128, 9, 0.2);
+  color: #006b1a;
+}
+
+/* Acción (botón buscar) */
+.bk-action {
+  padding: 10px;
+  display: grid;
+  align-items: center;
+}
+
+.bk-btn {
+  --background: #0071c2;
+  --background-hover: #005fa3;
+  --border-radius: 10px;
+  height: 50px;
+  font-weight: 900;
+}
+
+/* ✅ Responsive: en móvil se apila y el popover se vuelve “sheet” centrado */
+@media (max-width: 900px) {
+  .bk-bar {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .bk-sep {
+    display: none;
+  }
+
+  .bk-item {
+    border: 1px solid #e6e6e6;
+    border-radius: 12px;
+  }
+
+  .bk-pop {
+    position: fixed;
+    left: 50%;
+    top: auto;
+    bottom: 14px;
+    transform: translateX(-50%);
+    width: min(560px, calc(100vw - 24px));
+    max-height: calc(100vh - 120px);
+    overflow: auto;
+    border-radius: 16px;
+  }
+
+  .bk-pop::before {
+    display: none;
+  }
+
+  .bk-backdrop {
+    background: rgba(0, 0, 0, 0.24);
+  }
+}

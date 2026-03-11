@@ -1,0 +1,36 @@
+.ftr {
+  background: #333;
+  color: #fff;
+  margin-top: 36px;
+}
+
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 22px 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.col h4,
+.col h5 {
+  margin: 0 0 10px;
+}
+
+.col p {
+  margin: 6px 0;
+  color: #d6d6d6;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bottom {
+  background: #222;
+  color: #bdbdbd;
+  text-align: center;
+  padding: 12px;
+  border-top: 1px solid #444;
+  font-size: 13px;
+}

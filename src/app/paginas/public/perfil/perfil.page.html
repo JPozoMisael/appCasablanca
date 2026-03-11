@@ -1,0 +1,123 @@
+  <div class="container">
+
+    <!-- HEADER -->
+    <header class="top">
+      <div class="title">
+        <div class="h1">Mi perfil</div>
+        <div class="sub">Gestiona tu información personal</div>
+      </div>
+
+      <div class="actions" *ngIf="!loading">
+        <ion-button
+          *ngIf="!editando"
+          fill="outline"
+          class="btn"
+          (click)="activarEdicion()">
+          <ion-icon slot="start" name="pencil-outline"></ion-icon>
+          Editar
+        </ion-button>
+
+        <ion-button
+          *ngIf="editando"
+          fill="outline"
+          color="medium"
+          class="btn"
+          (click)="cancelarEdicion()">
+          Cancelar
+        </ion-button>
+
+        <ion-button
+          *ngIf="editando"
+          class="btn primary"
+          [disabled]="guardando"
+          (click)="guardar()">
+          <ion-icon slot="start" name="save-outline"></ion-icon>
+          {{ guardando ? 'Guardando...' : 'Guardar' }}
+        </ion-button>
+      </div>
+    </header>
+
+    <!-- LOADING -->
+    <section *ngIf="loading" class="loading">
+      <div class="skeleton hero"></div>
+      <div class="skeleton line"></div>
+      <div class="skeleton line short"></div>
+      <div class="skeleton card"></div>
+    </section>
+
+    <!-- PERFIL -->
+    <section *ngIf="!loading" class="grid">
+      <!-- CARD IZQ -->
+      <div class="card perfil-card">
+        <div class="avatar">
+          <ion-icon name="person-circle-outline"></ion-icon>
+        </div>
+
+        <div class="name">
+          <div class="big">{{ perfil.nombres }} {{ perfil.apellidos }}</div>
+          <div class="role">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+            {{ rolLabel }}
+          </div>
+        </div>
+
+        <div class="mini">
+          <div class="mini-row">
+            <ion-icon name="mail-outline"></ion-icon>
+            <span>{{ perfil.email }}</span>
+          </div>
+          <div class="mini-row">
+            <ion-icon name="call-outline"></ion-icon>
+            <span>{{ perfil.telefono || 'Sin teléfono' }}</span>
+          </div>
+        </div>
+
+        <ion-button fill="outline" color="danger" class="logout" (click)="cerrarSesion()">
+          <ion-icon slot="start" name="log-out-outline"></ion-icon>
+          Cerrar sesión
+        </ion-button>
+      </div>
+
+      <!-- FORM -->
+      <div class="card form-card">
+        <h2>Datos personales</h2>
+
+        <div class="form">
+          <div class="field">
+            <label>Nombres</label>
+            <input type="text" [(ngModel)]="perfil.nombres" [disabled]="!editando" />
+          </div>
+
+          <div class="field">
+            <label>Apellidos</label>
+            <input type="text" [(ngModel)]="perfil.apellidos" [disabled]="!editando" />
+          </div>
+
+          <div class="field">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="perfil.email" [disabled]="true" />
+            <div class="hint">El email se usa para iniciar sesión y no se edita aquí.</div>
+          </div>
+
+          <div class="field">
+            <label>Teléfono</label>
+            <input type="tel" [(ngModel)]="perfil.telefono" [disabled]="!editando" placeholder="Ej: 0999999999" />
+          </div>
+
+          <div class="field">
+            <label>Cédula</label>
+            <div class="with-icon">
+              <ion-icon name="id-card-outline"></ion-icon>
+              <input type="text" [(ngModel)]="perfil.cedula" [disabled]="!editando" placeholder="Ej: 0900000000" />
+            </div>
+          </div>
+
+          <div class="note">
+            * Luego conectamos esto al backend para que se guarde en tu base de datos.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+

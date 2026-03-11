@@ -1,0 +1,242 @@
+<div class="hb">
+  <!-- Top -->
+  <div class="hb-top">
+    <div class="title">
+      <h2>Habitaciones</h2>
+      <p>Administra estados, tarifas y disponibilidad.</p>
+    </div>
+
+    <div class="actions">
+      <ion-button class="btn" (click)="openCreate()">
+        <ion-icon slot="start" name="addCircleOutline"></ion-icon>
+        Nueva habitación
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Total</span>
+        <ion-icon name="bedOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ total() }}</div>
+      <div class="kpi-sub">Habitaciones registradas</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Disponibles</span>
+        <ion-icon name="checkmarkCircleOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ disponibles() }}</div>
+      <div class="kpi-sub">Listas para reservar</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Ocupadas</span>
+        <ion-icon name="pauseCircleOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ ocupadas() }}</div>
+      <div class="kpi-sub">En uso actualmente</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Operación</span>
+        <ion-icon name="constructOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ mantenimiento() }}</div>
+      <div class="kpi-sub">Limpieza / mantenimiento</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="search">
+      <ion-icon name="searchOutline"></ion-icon>
+      <input
+        type="text"
+        placeholder="Buscar por código, tipo, piso o estado…"
+        [value]="q()"
+        (input)="q.set(($any($event.target).value || ''))"
+      />
+    </div>
+
+    <div class="select">
+      <label>Estado</label>
+      <select [value]="fEstado()" (change)="setEstadoFilter(($any($event.target).value))">
+        <option value="TODOS">Todos</option>
+        <option value="DISPONIBLE">Disponible</option>
+        <option value="OCUPADA">Ocupada</option>
+        <option value="LIMPIEZA">Limpieza</option>
+        <option value="MANTENIMIENTO">Mantenimiento</option>
+      </select>
+    </div>
+
+    <div class="select">
+      <label>Tipo</label>
+      <select [value]="fTipo()" (change)="setTipoFilter(($any($event.target).value))">
+        <option value="TODOS">Todos</option>
+        <option value="SIMPLE">Simple</option>
+        <option value="DOBLE">Doble</option>
+        <option value="TRIPLE">Triple</option>
+        <option value="SUITE">Suite</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h3>Listado</h3>
+        <p>{{ filtradas().length }} resultado(s)</p>
+      </div>
+    </div>
+
+    <div class="table">
+      <div class="thead">
+        <div>Código</div>
+        <div>Tipo</div>
+        <div>Piso</div>
+        <div>Cap.</div>
+        <div>Tarifa</div>
+        <div>Estado</div>
+        <div class="end">Acciones</div>
+      </div>
+
+      <div class="trow" *ngFor="let h of filtradas()">
+        <div class="strong">{{ h.codigo }}</div>
+        <div>{{ h.tipo }}</div>
+        <div>{{ h.piso }}</div>
+        <div>{{ h.capacidad }}</div>
+        <div class="money">\${{ h.tarifa }}</div>
+        <div>
+          <ion-chip [color]="estadoColor(h.estado)">{{ h.estado }}</ion-chip>
+        </div>
+
+        <div class="end actions">
+          <button class="icon" type="button" title="Ver">
+            <ion-icon name="eyeOutline"></ion-icon>
+          </button>
+
+          <button class="icon" type="button" title="Editar" (click)="openEdit(h)">
+            <ion-icon name="createOutline"></ion-icon>
+          </button>
+
+          <button class="icon" type="button" title="Cambiar estado" (click)="cycleEstado(h)">
+            <ion-icon name="optionsOutline"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-backdrop" *ngIf="modalOpen()" (click)="closeModal()"></div>
+
+  <div class="modal" *ngIf="modalOpen()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="m-head">
+        <div>
+          <h3>{{ modalMode() === 'create' ? 'Nueva habitación' : 'Editar habitación' }}</h3>
+          <p>Completa los datos principales</p>
+        </div>
+
+        <button class="close" type="button" (click)="closeModal()">
+          <ion-icon name="closeOutline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="m-body">
+        <div class="grid">
+          <div class="field">
+            <label>Código</label>
+            <input
+              type="text"
+              placeholder="Ej: 204"
+              [value]="form().codigo"
+              (input)="patch('codigo', ($any($event.target).value || ''))"
+            />
+          </div>
+
+          <div class="field">
+            <label>Piso</label>
+            <input
+              type="number"
+              min="1"
+              [value]="form().piso"
+              (input)="patch('piso', +($any($event.target).value || 1))"
+            />
+          </div>
+
+          <div class="field">
+            <label>Tipo</label>
+            <select
+              [value]="form().tipo"
+              (change)="patch('tipo', $any($event.target).value)"
+            >
+              <option value="SIMPLE">Simple</option>
+              <option value="DOBLE">Doble</option>
+              <option value="TRIPLE">Triple</option>
+              <option value="SUITE">Suite</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Capacidad</label>
+            <input
+              type="number"
+              min="1"
+              [value]="form().capacidad"
+              (input)="patch('capacidad', +($any($event.target).value || 1))"
+            />
+          </div>
+
+          <div class="field">
+            <label>Tarifa (noche)</label>
+            <input
+              type="number"
+              min="0"
+              [value]="form().tarifa"
+              (input)="patch('tarifa', +($any($event.target).value || 0))"
+            />
+          </div>
+
+          <div class="field">
+            <label>Estado</label>
+            <select
+              [value]="form().estado"
+              (change)="patch('estado', $any($event.target).value)"
+            >
+              <option value="DISPONIBLE">Disponible</option>
+              <option value="OCUPADA">Ocupada</option>
+              <option value="LIMPIEZA">Limpieza</option>
+              <option value="MANTENIMIENTO">Mantenimiento</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <label>Notas</label>
+            <textarea
+              rows="3"
+              placeholder="Ej: Aire acondicionado en revisión"
+              [value]="form().notas || ''"
+              (input)="patch('notas', ($any($event.target).value || ''))"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="m-foot">
+        <ion-button class="btn" fill="outline" (click)="closeModal()">Cancelar</ion-button>
+        <ion-button class="btn" (click)="save()">
+          {{ modalMode() === 'create' ? 'Crear' : 'Guardar cambios' }}
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+/* src/styles/variables.scss
+   Variables globales + puente para Ionic (ion-color-*).
+*/
+
+@import './_tokens.scss';
+
+/* Base global */
+:root {
+  color-scheme: light;
+
+  /* Ionic base background/text */
+  --ion-background-color: var(--bg);
+  --ion-text-color: var(--text);
+
+  --ion-font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+
+  /* Ionic colors */
+  --ion-color-primary: var(--brand-primary);
+  --ion-color-primary-rgb: 0, 53, 128;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #002f70;
+  --ion-color-primary-tint: #1a4a90;
+
+  --ion-color-secondary: var(--brand-primary-2);
+  --ion-color-secondary-rgb: 0, 108, 228;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #005fc9;
+  --ion-color-secondary-tint: #1a79ea;
+
+  --ion-color-success: var(--brand-success);
+  --ion-color-success-rgb: 0, 128, 9;
+
+  --ion-color-warning: #f59e0b;
+  --ion-color-warning-rgb: 245, 158, 11;
+
+  --ion-color-danger: var(--brand-accent);
+  --ion-color-danger-rgb: 255, 90, 95;
+
+  --ion-color-medium: #94a3b8;
+  --ion-color-medium-rgb: 148, 163, 184;
+
+  /* Cards / surfaces */
+  --app-card-bg: var(--surface);
+  --app-card-border: var(--border-2);
+  --app-card-shadow: var(--shadow-sm);
+
+  /* Inputs */
+  --app-input-bg: #fff;
+  --app-input-border: rgba(15, 23, 42, 0.14);
+  --app-input-radius: var(--radius-sm);
+}
+
+/* Reset suave */
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+  border-radius: 10px;
+}

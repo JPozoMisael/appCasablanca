@@ -1,0 +1,117 @@
+ <div class="hb-container">
+    <header class="top">
+      <div class="top-left">
+        <div class="title">
+          <ion-icon name="bed-outline"></ion-icon>
+          <div>
+            <div class="h1">Habitaciones disponibles</div>
+            <div class="sub">
+              <span *ngIf="checkIn && checkOut">{{ checkIn }} — {{ checkOut }}</span>
+              <span *ngIf="!checkIn || !checkOut">Fechas no seleccionadas</span>
+              <span class="dot">·</span>
+              <span>{{ guestsLabel }}</span>
+              <span class="dot">·</span>
+              <span *ngIf="nights > 0">{{ nights }} noche(s)</span>
+              <span *ngIf="nights === 0">0 noches</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="top-right">
+        <ion-button fill="outline" class="btn" (click)="clearFilters()">
+          <ion-icon slot="start" name="options-outline"></ion-icon>
+          Limpiar
+        </ion-button>
+
+        <ion-button routerLink="/inicio" fill="solid" class="btn primary">
+          Cambiar búsqueda
+        </ion-button>
+      </div>
+    </header>
+
+    <section class="grid">
+      <aside class="filters">
+        <div class="box">
+          <div class="box-title">
+            <ion-icon name="funnel-outline"></ion-icon>
+            Filtros
+          </div>
+
+          <div class="field">
+            <label>Precio mínimo</label>
+            <input type="number" [(ngModel)]="minPrice" placeholder="Ej: 80" />
+          </div>
+
+          <div class="field">
+            <label>Precio máximo</label>
+            <input type="number" [(ngModel)]="maxPrice" placeholder="Ej: 160" />
+          </div>
+
+          <div class="sort">
+            <div class="sort-title">Ordenar por</div>
+            <button class="chip" [class.on]="sort==='recomendado'" (click)="setSort('recomendado')">Recomendado</button>
+            <button class="chip" [class.on]="sort==='precio_asc'" (click)="setSort('precio_asc')">Precio ↑</button>
+            <button class="chip" [class.on]="sort==='precio_desc'" (click)="setSort('precio_desc')">Precio ↓</button>
+            <button class="chip" [class.on]="sort==='rating_desc'" (click)="setSort('rating_desc')">Rating</button>
+          </div>
+        </div>
+
+        <div class="box map">
+          <div class="map-ph">
+            <ion-icon name="location-outline"></ion-icon>
+            Mapa (placeholder)
+          </div>
+        </div>
+      </aside>
+
+      <main class="list">
+        <div class="meta">
+          <div class="count">{{ results.length }} opciones</div>
+        </div>
+
+        <article class="card" *ngFor="let r of results; trackBy: trackById">
+          <div class="img">
+            <img [src]="r.image" [alt]="r.name" />
+          </div>
+
+          <div class="info">
+            <div class="row1">
+              <div class="name">{{ r.name }}</div>
+              <div class="rating">
+                <span class="pill">{{ r.rating }}</span>
+                <span class="rev">{{ r.reviews }} comentarios</span>
+              </div>
+            </div>
+
+            <div class="loc">
+              <ion-icon name="location-outline"></ion-icon>
+              {{ r.location }}
+            </div>
+
+            <div class="badges">
+              <span class="b" *ngFor="let b of r.badges">{{ b }}</span>
+            </div>
+
+            <div class="features">
+              <span class="f" *ngFor="let f of r.features">
+                <ion-icon [name]="f"></ion-icon>
+              </span>
+            </div>
+          </div>
+
+          <div class="price">
+            <div class="old" *ngIf="r.oldPricePerNight">${{ r.oldPricePerNight }}</div>
+            <div class="now">${{ r.pricePerNight }}<span>/noche</span></div>
+            <div class="total">Total: ${{ totalFor(r) }}</div>
+
+           <ion-button class="pick" (click)="verOpcion(r)">
+              Ver habitación
+            </ion-button>
+
+
+          </div>
+        </article>
+      </main>
+    </section>
+  </div>

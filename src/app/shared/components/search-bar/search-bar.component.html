@@ -1,0 +1,123 @@
+<div class="bk-search" [class.disabled]="disabled">
+  <div class="bk-bar">
+    <!-- FECHAS -->
+    <div class="bk-item" (click)="toggleDates($event)">
+      <div class="bk-label">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>Fechas</span>
+      </div>
+
+      <div class="bk-value">
+        <span class="bk-value-main">
+          {{
+            checkIn && checkOut
+              ? (checkIn | date : 'dd/MM/yyyy') + ' — ' + (checkOut | date : 'dd/MM/yyyy')
+              : 'Fecha de entrada — Fecha de salida'
+          }}
+        </span>
+      </div>
+
+      <!-- Popover fechas -->
+      <div class="bk-pop" *ngIf="datesOpen" (click)="$event.stopPropagation()">
+        <app-calendar-picker
+          [checkIn]="checkIn"
+          [checkOut]="checkOut"
+          (rangeChange)="onRangeChange($event)"
+        ></app-calendar-picker>
+
+        <div class="bk-pop-actions">
+          <ion-button size="small" fill="clear" (click)="closeAll()">Listo</ion-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bk-sep"></div>
+
+    <!-- HUESPEDES -->
+    <div class="bk-item" (click)="toggleGuests($event)">
+      <div class="bk-label">
+        <ion-icon name="people-outline"></ion-icon>
+        <span>Huéspedes</span>
+      </div>
+
+      <div class="bk-value">
+        <span class="bk-value-main">{{ getGuestsText() }}</span>
+      </div>
+
+      <!-- Popover huéspedes -->
+      <div class="bk-pop" *ngIf="guestsOpen" (click)="$event.stopPropagation()">
+        <div class="guest-panel">
+          <div class="guest-row">
+            <div class="meta">
+              <div class="name">Adultos</div>
+              <div class="desc">Mayores de 18</div>
+            </div>
+            <div class="actions">
+              <button class="step" type="button" (click)="dec('adults')" [disabled]="disabled">
+                <ion-icon name="remove-outline"></ion-icon>
+              </button>
+              <div class="val">{{ adults }}</div>
+              <button class="step" type="button" (click)="inc('adults')" [disabled]="disabled">
+                <ion-icon name="add-outline"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="guest-row">
+            <div class="meta">
+              <div class="name">Niños</div>
+              <div class="desc">0 a 17</div>
+            </div>
+            <div class="actions">
+              <button class="step" type="button" (click)="dec('children')" [disabled]="disabled">
+                <ion-icon name="remove-outline"></ion-icon>
+              </button>
+              <div class="val">{{ children }}</div>
+              <button class="step" type="button" (click)="inc('children')" [disabled]="disabled">
+                <ion-icon name="add-outline"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="guest-row">
+            <div class="meta">
+              <div class="name">Habitaciones</div>
+              <div class="desc">Cantidad</div>
+            </div>
+            <div class="actions">
+              <button class="step" type="button" (click)="dec('rooms')" [disabled]="disabled">
+                <ion-icon name="remove-outline"></ion-icon>
+              </button>
+              <div class="val">{{ rooms }}</div>
+              <button class="step" type="button" (click)="inc('rooms')" [disabled]="disabled">
+                <ion-icon name="add-outline"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <button class="pets" type="button" (click)="togglePets()" [disabled]="disabled">
+            <span>Viajo con mascotas</span>
+            <span class="pill" [class.on]="withPets">{{ withPets ? 'Sí' : 'No' }}</span>
+          </button>
+
+          <div class="bk-pop-actions">
+            <ion-button size="small" fill="clear" (click)="closeAll()">Listo</ion-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bk-sep"></div>
+
+    <!-- BOTÓN BUSCAR -->
+    <div class="bk-action">
+      <ion-button class="bk-btn" expand="block" (click)="onSubmit()" [disabled]="disabled">
+        <ion-icon slot="start" name="search-outline"></ion-icon>
+        {{ buttonText }}
+      </ion-button>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop para cerrar al hacer click fuera -->
+<div class="bk-backdrop" *ngIf="datesOpen || guestsOpen" (click)="closeAll()"></div>

@@ -1,0 +1,38 @@
+<header class="bhdr" [class.hide]="hiddenOnScroll">
+  <div class="wrap">
+    <div class="row">
+      <!-- Brand -->
+      <a class="brand" routerLink="/inicio">
+        <div class="logo">{{ logoText }}</div>
+        <div class="txt">
+          <div class="t">{{ title }}</div>
+          <div class="s">
+            <ion-icon name="location-outline"></ion-icon>
+            {{ subtitle }}
+          </div>
+        </div>
+      </a>
+
+      <!-- Nav -->
+      <nav class="nav">
+        <a class="link" routerLink="/inicio" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <ion-icon name="home-outline"></ion-icon>
+          <span>Inicio</span>
+        </a>
+
+        <a class="link" routerLink="/habitaciones" routerLinkActive="active">
+          <ion-icon name="bed-outline"></ion-icon>
+          <span>Habitaciones</span>
+        </a>
+      </nav>
+
+      <!-- Actions -->
+      <div class="actions">
+        <a class="btn" routerLink="/login">
+          <ion-icon name="person-outline"></ion-icon>
+          <span>Iniciar sesión</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>

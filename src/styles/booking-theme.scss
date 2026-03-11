@@ -1,0 +1,158 @@
+/* src/styles/booking-theme.scss
+   Estilos globales tipo Booking/PMS: cards, tablas, chips, botones, inputs.
+*/
+
+@import './_tokens.scss';
+
+/* Layout helpers */
+.page-shell {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Buttons (HTML normal) */
+.btn-ghost,
+.btn-outline,
+.btn-solid {
+  height: 40px;
+  border-radius: 12px;
+  padding: 0 14px;
+  font-weight: 900;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform var(--t-fast) ease, box-shadow var(--t-fast) ease, border-color var(--t-fast) ease;
+}
+
+.btn-solid {
+  background: var(--brand-primary);
+  color: #fff;
+  border-color: rgba(0, 53, 128, 0.30);
+}
+.btn-solid:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+
+.btn-outline {
+  background: #fff;
+  color: var(--brand-primary);
+  border-color: rgba(15, 23, 42, 0.14);
+}
+.btn-outline:hover { transform: translateY(-1px); border-color: rgba(0, 53, 128, 0.25); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border-color: transparent;
+}
+
+/* Inputs (HTML normal) */
+.input, select, textarea, input[type="text"], input[type="email"], input[type="password"], input[type="date"], input[type="number"] {
+  border: 1px solid var(--app-input-border);
+  background: var(--app-input-bg);
+  border-radius: var(--app-input-radius);
+  padding: 10px 10px;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+/* Tables (tipo admin listados) */
+.table-like {
+  width: 100%;
+  overflow: auto;
+}
+
+.table-head,
+.table-row {
+  display: grid;
+  gap: 10px;
+  align-items: center;
+}
+
+.table-head {
+  padding: 10px 8px;
+  color: var(--muted-2);
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.table-row {
+  padding: 12px 8px;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  background: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform var(--t-fast) ease, border-color var(--t-fast) ease;
+}
+.icon-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0, 53, 128, 0.25);
+}
+
+/* Ionic tweaks (si los usas) */
+ion-button {
+  --border-radius: 12px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  font-weight: 900;
+}
+
+ion-chip {
+  border-radius: 999px;
+  font-weight: 900;
+}
+
+/* ion-segment (reportes) */
+ion-segment {
+  --background: transparent;
+  --indicator-color: rgba(0, 53, 128, 0.10);
+  --color: var(--muted);
+  --color-checked: var(--brand-primary);
+}
+ion-segment-button {
+  --border-radius: 12px;
+}
+
+/* Modal base (por si lo reutilizas) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 40;
+}
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+.modal-card {
+  width: min(920px, 100%);
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}

@@ -1,0 +1,89 @@
+<div class="lg-shell">
+  <div class="lg-grid">
+    <!-- Izquierda: branding -->
+    <section class="lg-brand">
+      <div class="brand-card">
+        <div class="logo">CB</div>
+
+        <div class="brand-text">
+          <h1>Hotel Casa Blanca</h1>
+          <p>Accede para administrar reservas, habitaciones y reportes.</p>
+        </div>
+
+        <div class="brand-bullets">
+          <div class="b">✔ Gestión de reservas</div>
+          <div class="b">✔ Control de habitaciones</div>
+          <div class="b">✔ Reportes y estadísticas</div>
+        </div>
+
+        <a class="back" routerLink="/inicio">← Volver al inicio</a>
+      </div>
+    </section>
+
+    <!-- Derecha: formulario -->
+    <section class="lg-form">
+      <div class="form-card">
+        <div class="form-head">
+          <h2>Iniciar sesión</h2>
+          <p>Usa tu cuenta para continuar</p>
+        </div>
+
+        <div class="alert" *ngIf="errorMsg">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <span>{{ errorMsg }}</span>
+        </div>
+
+        <form (ngSubmit)="onSubmit()" autocomplete="on">
+          <div class="field">
+            <label>Correo</label>
+            <div class="input">
+              <ion-icon name="mail-outline"></ion-icon>
+              <input
+                type="email"
+                [(ngModel)]="email"
+                name="email"
+                placeholder="correo@hotel.com"
+                autocomplete="email"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Contraseña</label>
+            <div class="input">
+              <ion-icon name="lock-closed-outline"></ion-icon>
+              <input
+                [type]="showPass ? 'text' : 'password'"
+                [(ngModel)]="password"
+                name="password"
+                placeholder="••••••••"
+                autocomplete="current-password"
+              />
+              <button type="button" class="eye" (click)="toggleShowPass()">
+                <ion-icon [name]="showPass ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="row">
+            <label class="check">
+              <input type="checkbox" [(ngModel)]="remember" name="remember" />
+              <span>Recordarme</span>
+            </label>
+
+            <a class="link" routerLink="/recuperar">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <ion-button class="submit" type="submit" expand="block" [disabled]="loading">
+            {{ loading ? 'Ingresando...' : 'Entrar' }}
+          </ion-button>
+
+          <div class="foot">
+            <span>¿No tienes cuenta?</span>
+            <a routerLink="/registro">Crear cuenta</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>

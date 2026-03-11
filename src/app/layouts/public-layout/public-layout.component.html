@@ -1,0 +1,31 @@
+<ion-app>
+  <app-header
+    title="Hotel Casa Blanca"
+    subtitle="Salinas, Santa Elena"
+    logoText="CB"
+    [hiddenOnScroll]="headerHidden">
+  </app-header>
+
+  <ion-content
+    class="public-shell"
+    scrollEvents="true"
+    (ionScroll)="onScroll($event)">
+
+    <div class="public-container">
+      <router-outlet></router-outlet>
+    </div>
+
+    <footer class="public-footer">
+      <div class="footer-inner">
+        <div class="footer-left">
+          <div class="footer-title">Hotel Casa Blanca</div>
+          <div class="footer-subtitle">Tu mejor opción en Salinas</div>
+        </div>
+
+        <div class="footer-right">
+          <div class="footer-meta">© {{ currentYear }} Todos los derechos reservados</div>
+        </div>
+      </div>
+    </footer>
+  </ion-content>
+</ion-app>

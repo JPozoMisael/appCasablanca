@@ -1,0 +1,35 @@
+.es {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 16px;
+  padding: 22px 14px;
+  text-align: center;
+}
+
+.icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 10px;
+  border-radius: 16px;
+  background: rgba(0, 108, 228, 0.1);
+  border: 1px solid rgba(0, 108, 228, 0.16);
+  display: grid;
+  place-items: center;
+
+  ion-icon {
+    font-size: 26px;
+    color: #003580;
+  }
+}
+
+h3 {
+  margin: 8px 0 6px;
+  font-weight: 1000;
+  color: #222;
+}
+
+p {
+  margin: 0;
+  color: #666;
+  font-weight: 700;
+}

@@ -1,0 +1,24 @@
+<div class="cal">
+  <div class="row">
+    <label class="field">
+      <span class="label">
+        <ion-icon name="calendar-outline"></ion-icon>
+        Check-in
+      </span>
+      <input type="date" [ngModel]="checkInStr" (ngModelChange)="onCheckIn($event)" />
+    </label>
+
+    <label class="field">
+      <span class="label">
+        <ion-icon name="calendar-outline"></ion-icon>
+        Check-out
+      </span>
+      <input type="date" [ngModel]="checkOutStr" (ngModelChange)="onCheckOut($event)" />
+    </label>
+  </div>
+
+  <button type="button" class="clear" (click)="onClear()">
+    <ion-icon name="close-outline"></ion-icon>
+    Limpiar
+  </button>
+</div>

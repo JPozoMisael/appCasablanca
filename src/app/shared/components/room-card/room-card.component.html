@@ -1,0 +1,46 @@
+<div class="rc" [class.disabled]="!data.available">
+  <div class="img">
+    <img [src]="data.imageUrl" [alt]="data.name" />
+    <div class="tag" *ngIf="data.breakfastIncluded">
+      <ion-icon name="restaurant-outline"></ion-icon>
+      <span>Desayuno incluido</span>
+    </div>
+    <div class="tag bad" *ngIf="!data.available">
+      <span>No disponible</span>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="head">
+      <h3>{{ data.name }}</h3>
+      <div class="cap">Máx. {{ data.maxGuests }} huéspedes</div>
+    </div>
+
+    <p class="desc">{{ data.description }}</p>
+
+    <div class="features" *ngIf="data.features?.length">
+      <span class="f" *ngFor="let f of data.features">
+        <ion-icon [name]="f"></ion-icon>
+        {{ getFeatureLabel(f) }}
+      </span>
+    </div>
+
+    <div class="price">
+      <div class="left">
+        <div class="old" *ngIf="data.oldPricePerNight && discountPerNight > 0">
+          ${{ data.oldPricePerNight }}
+        </div>
+        <div class="now">
+          ${{ data.pricePerNight }} <span>/ noche</span>
+        </div>
+        <div class="tot" *ngIf="nights > 0">Total: ${{ total }}</div>
+      </div>
+
+      <div class="right">
+        <ion-button class="btn" expand="block" [disabled]="!data.available" (click)="onSelect()">
+          Seleccionar
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,129 @@
+<div class="db">
+  <!-- Top -->
+  <div class="db-top">
+    <div class="title">
+      <h2>Dashboard</h2>
+      <p>Resumen del día y accesos rápidos a la operación del hotel.</p>
+    </div>
+
+    <div class="actions">
+      <ion-button class="btn" routerLink="/admin/reservas">
+        <ion-icon slot="start" name="addCircleOutline"></ion-icon>
+        Nueva reserva
+      </ion-button>
+
+      <ion-button class="btn soft" fill="outline" routerLink="/admin/calendario">
+        <ion-icon slot="start" name="calendarOutline"></ion-icon>
+        Ver calendario
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Ocupación hoy</span>
+        <ion-icon name="bedOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ ocupacionPorcentaje() }}%</div>
+      <div class="kpi-sub">
+        {{ habitacionesOcupadas() }} ocupadas / {{ totalHabitaciones() }} total
+      </div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Reservas hoy</span>
+        <ion-icon name="clipboardOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ reservasHoyCount() }}</div>
+      <div class="kpi-sub">Entradas y salidas programadas</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Disponibles</span>
+        <ion-icon name="peopleOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ habitacionesDisponibles() }}</div>
+      <div class="kpi-sub">Habitaciones libres hoy</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Ingresos (mes)</span>
+        <ion-icon name="cashOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">\${{ ingresosMes() }}</div>
+      <div class="kpi-sub">Facturación acumulada del mes</div>
+    </div>
+  </div>
+
+  <!-- Quick cards -->
+  <div class="quick">
+    <a class="qcard" routerLink="/admin/habitaciones">
+      <div class="qleft">
+        <strong>Gestionar habitaciones</strong>
+        <span>Estados, tarifas y mantenimiento</span>
+      </div>
+      <ion-icon class="go" name="chevronForwardOutline"></ion-icon>
+    </a>
+
+    <a class="qcard" routerLink="/admin/huespedes">
+      <div class="qleft">
+        <strong>Huéspedes</strong>
+        <span>Registro e historial de estadías</span>
+      </div>
+      <ion-icon class="go" name="chevronForwardOutline"></ion-icon>
+    </a>
+
+    <a class="qcard" routerLink="/admin/reportes">
+      <div class="qleft">
+        <strong>Reportes</strong>
+        <span>Ocupación, ingresos, exportaciones</span>
+      </div>
+      <ion-icon class="go" name="chevronForwardOutline"></ion-icon>
+    </a>
+  </div>
+
+  <!-- Reservas de hoy -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h3>Reservas de hoy</h3>
+        <p>Últimos movimientos del día</p>
+      </div>
+
+      <a class="link" routerLink="/admin/reservas">
+        Ver todas
+        <ion-icon name="chevronForwardOutline"></ion-icon>
+      </a>
+    </div>
+
+    <div class="table">
+      <div class="thead">
+        <div>ID</div>
+        <div>Huésped</div>
+        <div>Habitación</div>
+        <div>Fechas</div>
+        <div>Total</div>
+        <div>Estado</div>
+      </div>
+
+      <div class="trow" *ngFor="let r of reservasHoy()">
+        <div class="mono">#{{ r.id }}</div>
+        <div class="strong">{{ r.huesped }}</div>
+        <div>{{ r.habitacion }}</div>
+        <div class="dates">
+          <ion-icon name="timeOutline"></ion-icon>
+          <span>{{ formatoFechaCorta(r.entrada) }} → {{ formatoFechaCorta(r.salida) }}</span>
+        </div>
+        <div class="money">\${{ r.total }}</div>
+        <div>
+          <ion-chip [color]="colorEstado(r.estado)">{{ r.estado }}</ion-chip>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

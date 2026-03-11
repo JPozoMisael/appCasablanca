@@ -1,0 +1,37 @@
+<div class="sum">
+  <div class="row">
+    <span>Tu estadía ({{ nights }} noches)</span>
+    <span>${{ oldTotal }}</span>
+  </div>
+
+  <div class="row discount" *ngIf="discount > 0">
+    <span>Descuento</span>
+    <span>- ${{ discount }}</span>
+  </div>
+
+  <div class="row total">
+    <strong>Total</strong>
+    <strong>${{ total }}</strong>
+  </div>
+
+  <div class="tax">Impuestos incluidos</div>
+
+  <ion-button
+    expand="block"
+    class="cta"
+    [routerLink]="ctaLink"
+    [queryParams]="ctaQueryParams || {}"
+  >
+    {{ ctaText }}
+  </ion-button>
+
+  <div class="secure">
+    <ion-icon name="lock-closed-outline"></ion-icon>
+    Reserva segura · Sin cargos
+  </div>
+
+  <div class="badge">
+    <ion-icon name="shield-checkmark-outline"></ion-icon>
+    Igualamos el precio
+  </div>
+</div>

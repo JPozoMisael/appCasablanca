@@ -1,0 +1,84 @@
+<ion-app>
+  <div class="admin-shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sb-brand">
+        <div class="logo">CB</div>
+        <div class="txt">
+          <strong>Hotel Casa Blanca</strong>
+          <span>Panel administrativo</span>
+        </div>
+      </div>
+
+      <nav class="sb-nav">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <ion-icon name="gridOutline"></ion-icon>
+          <span>Dashboard</span>
+        </a>
+
+        <a routerLink="/admin/calendario" routerLinkActive="active">
+          <ion-icon name="calendarOutline"></ion-icon>
+          <span>Calendario</span>
+        </a>
+
+        <a routerLink="/admin/reservas" routerLinkActive="active">
+          <ion-icon name="clipboardOutline"></ion-icon>
+          <span>Reservas</span>
+        </a>
+
+        <a routerLink="/admin/habitaciones" routerLinkActive="active">
+          <ion-icon name="bedOutline"></ion-icon>
+          <span>Habitaciones</span>
+        </a>
+
+        <a routerLink="/admin/huespedes" routerLinkActive="active">
+          <ion-icon name="peopleOutline"></ion-icon>
+          <span>Huéspedes</span>
+        </a>
+
+        <a routerLink="/admin/reportes" routerLinkActive="active">
+          <ion-icon name="analyticsOutline"></ion-icon>
+          <span>Reportes</span>
+        </a>
+
+        <a routerLink="/admin/usuarios" routerLinkActive="active">
+          <ion-icon name="shieldCheckmarkOutline"></ion-icon>
+          <span>Usuarios</span>
+        </a>
+      </nav>
+
+      <div class="sb-foot">
+        <ion-button class="btn-logout" fill="clear" (click)="logout()">
+          <ion-icon slot="start" name="logOutOutline"></ion-icon>
+          Cerrar sesión
+        </ion-button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <section class="main">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="tb-left">
+          <h1>Administración</h1>
+          <p>Gestión de reservas, habitaciones y reportes</p>
+        </div>
+
+        <div class="tb-right">
+          <div class="user">
+            <ion-icon name="personCircleOutline"></ion-icon>
+            <div class="u-txt">
+              <strong>Administrador</strong>
+              <span>Hotel Casa Blanca</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <main class="content">
+        <router-outlet></router-outlet>
+      </main>
+    </section>
+  </div>
+</ion-app>

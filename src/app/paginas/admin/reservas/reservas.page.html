@@ -1,0 +1,275 @@
+<div class="rv">
+  <!-- Top -->
+  <div class="rv-top">
+    <div class="title">
+      <h2>Reservas</h2>
+      <p>Crear, editar y controlar estados (pendiente, confirmada, check-in, check-out).</p>
+    </div>
+
+    <div class="actions">
+      <ion-button class="btn" (click)="openCreate()">
+        <ion-icon slot="start" name="addCircleOutline"></ion-icon>
+        Nueva reserva
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Hoy</span>
+        <ion-icon name="calendarOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ reservasHoy() }}</div>
+      <div class="kpi-sub">Movimientos de hoy</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Check-in</span>
+        <ion-icon name="logInOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ checkinHoy() }}</div>
+      <div class="kpi-sub">Entradas hoy</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Check-out</span>
+        <ion-icon name="logOutOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ checkoutHoy() }}</div>
+      <div class="kpi-sub">Salidas hoy</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-head">
+        <span class="label">Próximas</span>
+        <ion-icon name="timeOutline"></ion-icon>
+      </div>
+      <div class="kpi-value">{{ proximas() }}</div>
+      <div class="kpi-sub">Entradas futuras</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="search">
+      <ion-icon name="searchOutline"></ion-icon>
+      <input
+        type="text"
+        placeholder="Buscar: código, huésped, documento, habitación…"
+        [value]="q()"
+        (input)="q.set(($any($event.target).value || ''))"
+      />
+    </div>
+
+    <div class="select">
+      <label>Estado</label>
+      <select [value]="fEstado()" (change)="setEstadoFilter(($any($event.target).value))">
+        <option value="TODOS">Todos</option>
+        <option value="PENDIENTE">Pendiente</option>
+        <option value="CONFIRMADA">Confirmada</option>
+        <option value="CHECKIN">Check-in</option>
+        <option value="CHECKOUT">Check-out</option>
+        <option value="CANCELADA">Cancelada</option>
+      </select>
+    </div>
+
+    <div class="date">
+      <label>Desde</label>
+      <input type="date" [value]="fDesde()" (input)="fDesde.set(($any($event.target).value || ''))" />
+    </div>
+
+    <div class="date">
+      <label>Hasta</label>
+      <input type="date" [value]="fHasta()" (input)="fHasta.set(($any($event.target).value || ''))" />
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h3>Listado</h3>
+        <p>{{ filtradas().length }} resultado(s)</p>
+      </div>
+    </div>
+
+    <div class="table">
+      <div class="thead">
+        <div>Código</div>
+        <div>Huésped</div>
+        <div>Habitación</div>
+        <div>Fechas</div>
+        <div>Total</div>
+        <div>Estado</div>
+        <div class="end">Acciones</div>
+      </div>
+
+      <div class="trow" *ngFor="let r of filtradas()">
+        <div class="mono">{{ r.codigo || ('#' + r.id) }}</div>
+
+        <div class="strong">
+          <div class="name">
+            <ion-icon name="personOutline"></ion-icon>
+            <span>{{ r.huesped }}</span>
+          </div>
+          <div class="sub" *ngIf="r.documento">{{ r.documento }}</div>
+        </div>
+
+        <div class="room">
+          <ion-icon name="bedOutline"></ion-icon>
+          <span>{{ r.habitacion }}</span>
+        </div>
+
+        <div class="dates">
+          <ion-icon name="calendarOutline"></ion-icon>
+          <span>{{ short(r.fechaEntrada) }} → {{ short(r.fechaSalida) }}</span>
+        </div>
+
+        <div class="money">\${{ r.total }}</div>
+
+        <div>
+          <ion-chip [color]="estadoColor(r.estado)">{{ r.estado }}</ion-chip>
+        </div>
+
+        <div class="end actions">
+          <button class="icon" type="button" title="Ver">
+            <ion-icon name="eyeOutline"></ion-icon>
+          </button>
+
+          <button class="icon" type="button" title="Editar" (click)="openEdit(r)">
+            <ion-icon name="createOutline"></ion-icon>
+          </button>
+
+          <button class="icon" type="button" title="Cambiar estado" (click)="cycleEstado(r)">
+            <ion-icon name="optionsOutline"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-backdrop" *ngIf="modalOpen()" (click)="closeModal()"></div>
+
+  <div class="modal" *ngIf="modalOpen()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="m-head">
+        <div>
+          <h3>{{ modalMode() === 'create' ? 'Nueva reserva' : 'Editar reserva' }}</h3>
+          <p>Datos principales de la reserva</p>
+        </div>
+
+        <button class="close" type="button" (click)="closeModal()">
+          <ion-icon name="closeOutline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="m-body">
+        <div class="grid">
+          <div class="field">
+            <label>Huésped</label>
+            <input
+              type="text"
+              placeholder="Nombre completo"
+              [value]="form().huesped"
+              (input)="patch('huesped', ($any($event.target).value || ''))"
+            />
+          </div>
+
+          <div class="field">
+            <label>Documento</label>
+            <input
+              type="text"
+              placeholder="Cédula / pasaporte"
+              [value]="form().documento || ''"
+              (input)="patch('documento', ($any($event.target).value || ''))"
+            />
+          </div>
+
+          <div class="field">
+            <label>Habitación</label>
+            <select
+              [value]="form().habitacion"
+              (change)="patch('habitacion', $any($event.target).value)"
+            >
+              <option *ngFor="let h of habitaciones()" [value]="h">{{ h }}</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Estado</label>
+            <select
+              [value]="form().estado"
+              (change)="patch('estado', $any($event.target).value)"
+            >
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="CONFIRMADA">Confirmada</option>
+              <option value="CHECKIN">Check-in</option>
+              <option value="CHECKOUT">Check-out</option>
+              <option value="CANCELADA">Cancelada</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Entrada</label>
+            <input
+              type="date"
+              [value]="form().fechaEntrada"
+              (input)="patch('fechaEntrada', ($any($event.target).value || ''))"
+            />
+          </div>
+
+          <div class="field">
+            <label>Salida</label>
+            <input
+              type="date"
+              [value]="form().fechaSalida"
+              (input)="patch('fechaSalida', ($any($event.target).value || ''))"
+            />
+          </div>
+
+          <div class="field">
+            <label>Total</label>
+            <input
+              type="number"
+              min="0"
+              [value]="form().total"
+              (input)="patch('total', +($any($event.target).value || 0))"
+            />
+          </div>
+
+          <div class="field">
+            <label>Anticipo</label>
+            <input
+              type="number"
+              min="0"
+              [value]="form().anticipo || 0"
+              (input)="patch('anticipo', +($any($event.target).value || 0))"
+            />
+          </div>
+
+          <div class="field full">
+            <label>Notas</label>
+            <textarea
+              rows="3"
+              placeholder="Observaciones..."
+              [value]="form().notas || ''"
+              (input)="patch('notas', ($any($event.target).value || ''))"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="m-foot">
+        <ion-button class="btn" fill="outline" (click)="closeModal()">Cancelar</ion-button>
+        <ion-button class="btn" (click)="save()">
+          {{ modalMode() === 'create' ? 'Crear' : 'Guardar cambios' }}
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</div>

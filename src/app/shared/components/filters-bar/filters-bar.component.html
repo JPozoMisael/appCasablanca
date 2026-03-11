@@ -1,0 +1,63 @@
+<div class="fb">
+  <div class="head">
+    <div class="t">
+      <ion-icon name="filter-outline"></ion-icon>
+      <span>Filtros</span>
+    </div>
+
+    <button class="clear" type="button" (click)="onClear()">
+      <ion-icon name="close-outline"></ion-icon>
+      Limpiar
+    </button>
+  </div>
+
+  <div class="grid">
+    <label class="field">
+      <span>Precio mín.</span>
+      <input
+        type="number"
+        [ngModel]="value.minPrice"
+        (ngModelChange)="update('minPrice', $event === '' ? null : $event)"
+        placeholder="0"
+      />
+    </label>
+
+    <label class="field">
+      <span>Precio máx.</span>
+      <input
+        type="number"
+        [ngModel]="value.maxPrice"
+        (ngModelChange)="update('maxPrice', $event === '' ? null : $event)"
+        placeholder="300"
+      />
+    </label>
+
+    <label class="field">
+      <span>Huéspedes</span>
+      <input
+        type="number"
+        [ngModel]="value.guests"
+        (ngModelChange)="update('guests', $event === '' ? null : $event)"
+        placeholder="2"
+      />
+    </label>
+
+    <label class="check">
+      <input
+        type="checkbox"
+        [ngModel]="value.onlyAvailable"
+        (ngModelChange)="update('onlyAvailable', $event)"
+      />
+      <span>Solo disponibles</span>
+    </label>
+
+    <label class="check">
+      <input
+        type="checkbox"
+        [ngModel]="value.withBreakfast"
+        (ngModelChange)="update('withBreakfast', $event)"
+      />
+      <span>Desayuno incluido</span>
+    </label>
+  </div>
+</div>

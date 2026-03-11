@@ -1,0 +1,360 @@
+.rp {
+  display: grid;
+  gap: 16px;
+}
+
+/* Top */
+.rp-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+
+  .title {
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #0f172a;
+    }
+    p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    .btn {
+      --border-radius: 12px;
+      --padding-start: 14px;
+      --padding-end: 14px;
+    }
+    .soft {
+      --border-color: rgba(15, 23, 42, 0.14);
+    }
+  }
+}
+
+/* Period */
+.period {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+
+  .p-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #0f172a;
+    font-weight: 900;
+
+    ion-icon {
+      font-size: 18px;
+      color: #003580;
+    }
+  }
+
+  .p-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    .chip {
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.14);
+      background: #fff;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #475569;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+
+      ion-icon {
+        font-size: 16px;
+      }
+
+      &.active {
+        border-color: rgba(0, 53, 128, 0.35);
+        background: rgba(0, 53, 128, 0.06);
+        color: #003580;
+      }
+    }
+  }
+}
+
+/* KPIs */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+
+  .kpi {
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+
+    .kpi-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .label {
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 700;
+      }
+
+      ion-icon {
+        font-size: 18px;
+        color: #003580;
+      }
+    }
+
+    .kpi-value {
+      margin-top: 10px;
+      font-size: 26px;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .kpi-sub {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #64748b;
+    }
+  }
+}
+
+/* Tabs */
+.tabs {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+
+  ion-segment {
+    --background: transparent;
+  }
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 14px;
+}
+
+/* Card */
+.card {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+
+  .card-head {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #0f172a;
+    }
+
+    p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .btn-sm {
+      --border-radius: 12px;
+      --padding-start: 12px;
+      --padding-end: 12px;
+      --border-color: rgba(15, 23, 42, 0.14);
+    }
+  }
+
+  .body {
+    padding: 14px 16px;
+  }
+}
+
+/* Summary */
+.summary {
+  display: grid;
+  gap: 10px;
+
+  .srow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: rgba(15, 23, 42, 0.02);
+
+    .k {
+      color: #64748b;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .v {
+      color: #0f172a;
+      font-weight: 900;
+      font-size: 13px;
+    }
+  }
+}
+
+.note {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 53, 128, 0.18);
+  background: rgba(0, 53, 128, 0.06);
+  color: #0f172a;
+
+  ion-icon {
+    font-size: 18px;
+    color: #003580;
+  }
+
+  span {
+    font-size: 12px;
+    color: #475569;
+    font-weight: 700;
+  }
+}
+
+/* Mini bars */
+.mini {
+  .mini-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+
+    strong {
+      color: #0f172a;
+    }
+
+    span {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 700;
+    }
+  }
+
+  .bars {
+    margin-top: 12px;
+    height: 140px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    align-items: end;
+
+    .bar {
+      border-radius: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      background: rgba(0, 53, 128, 0.12);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+    }
+  }
+
+  .labels {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+
+    span {
+      font-size: 11px;
+      color: #64748b;
+      text-align: center;
+      font-weight: 800;
+    }
+  }
+}
+
+/* Top list */
+.top {
+  display: grid;
+  gap: 10px;
+
+  .trow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: rgba(15, 23, 42, 0.02);
+
+    .left {
+      display: grid;
+      gap: 3px;
+
+      strong {
+        color: #0f172a;
+        font-size: 13px;
+      }
+
+      span {
+        color: #64748b;
+        font-size: 12px;
+      }
+    }
+
+    .right {
+      display: grid;
+      justify-items: end;
+      gap: 6px;
+
+      .money {
+        font-weight: 900;
+        color: #0f172a;
+      }
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

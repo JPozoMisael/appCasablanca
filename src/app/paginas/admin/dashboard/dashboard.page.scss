@@ -1,0 +1,242 @@
+.db {
+  display: grid;
+  gap: 18px;
+}
+
+/* Top */
+.db-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  .title {
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #0f172a;
+    }
+    p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+
+    .btn {
+      --border-radius: 12px;
+      --padding-start: 14px;
+      --padding-end: 14px;
+    }
+
+    .soft {
+      --border-color: rgba(15, 23, 42, 0.14);
+    }
+  }
+}
+
+/* KPIs */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+
+  .kpi {
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 16px;
+    padding: 14px;
+
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+
+    .kpi-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .label {
+        font-size: 12px;
+        color: #64748b;
+      }
+
+      ion-icon {
+        font-size: 18px;
+        color: #003580;
+      }
+    }
+
+    .kpi-value {
+      margin-top: 10px;
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .kpi-sub {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #64748b;
+    }
+  }
+}
+
+/* Quick cards */
+.quick {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+
+  .qcard {
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 16px;
+    padding: 14px;
+    text-decoration: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+
+    strong {
+      color: #0f172a;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    span {
+      color: #64748b;
+      font-size: 12px;
+    }
+
+    .go {
+      font-size: 18px;
+      color: #64748b;
+    }
+
+    &:hover {
+      border-color: rgba(0, 53, 128, 0.25);
+      transform: translateY(-1px);
+      transition: 150ms ease;
+    }
+  }
+}
+
+/* Main card */
+.card {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+
+  .card-head {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #0f172a;
+    }
+
+    p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #003580;
+      font-size: 13px;
+      text-decoration: none;
+
+      ion-icon {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+/* Table */
+.table {
+  padding: 10px 12px 14px;
+
+  .thead {
+    display: grid;
+    grid-template-columns: 90px 1.2fr 1fr 1fr 120px 140px;
+    gap: 10px;
+    padding: 10px 8px;
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  .trow {
+    display: grid;
+    grid-template-columns: 90px 1.2fr 1fr 1fr 120px 140px;
+    gap: 10px;
+    padding: 12px 8px;
+    border-top: 1px solid rgba(15, 23, 42, 0.06);
+    align-items: center;
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+        'Courier New', monospace;
+      color: #475569;
+      font-size: 13px;
+    }
+
+    .strong {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .dates {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #475569;
+
+      ion-icon {
+        font-size: 16px;
+        opacity: 0.75;
+      }
+    }
+
+    .money {
+      font-weight: 700;
+      color: #0f172a;
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .quick {
+    grid-template-columns: 1fr;
+  }
+  .table {
+    overflow: auto;
+
+    .thead,
+    .trow {
+      min-width: 860px;
+    }
+  }
+}

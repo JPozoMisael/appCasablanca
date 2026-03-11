@@ -1,0 +1,303 @@
+
+  <div class="booking-shell">
+    <section class="main-search-integradao">
+      <div class="search-container-integrado">
+        <div class="search-header">
+          <h2 class="search-title">Encuentra tu estadía ideal en Salinas</h2>
+          <p class="search-subtitle">
+            Habitaciones cómodas a minutos de la playa, con atención personalizada
+          </p>
+        </div>
+
+        <div class="search-card-integrada">
+          <div class="search-components-grid">
+            <div class="search-component-col">
+              <app-search-bar
+                [checkIn]="checkInDate"
+                [checkOut]="checkOutDate"
+                [adults]="adults"
+                [children]="children"
+                [rooms]="rooms"
+                [withPets]="withPets"
+                [buttonText]="'Buscar habitaciones disponibles'"
+                (valueChange)="onSearchValueChange($event)"
+                (submit)="onSearchSubmit($event)"
+              ></app-search-bar>
+            </div>
+
+            <div class="search-component-col">
+              <div class="promo-card">
+                <div class="promo-title">
+                  <ion-icon name="flash-outline"></ion-icon>
+                  <span>Oferta del día</span>
+                </div>
+
+                <div class="promo-body">
+                  <div class="promo-line">
+                    Reserva hoy: <strong>15% de descuento + Desayuno incluido</strong>
+                  </div>
+                  <div class="promo-sub">Sujeto a disponibilidad. Aplica para reservas directas.</div>
+                </div>
+
+                <div class="promo-bullets">
+                  <div class="b">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    <span>Cancelación gratuita</span>
+                  </div>
+                  <div class="b">
+                    <ion-icon name="shield-checkmark-outline"></ion-icon>
+                    <span>Mejor precio garantizado</span>
+                  </div>
+                </div>
+
+                <ion-button
+                  expand="block"
+                  class="promo-btn"
+                  [routerLink]="['/habitaciones']"
+                  [queryParams]="getSearchParams()"
+                >
+                  Ver disponibilidad
+                </ion-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="main-container">
+      <nav class="breadcrumbs">
+        <a routerLink="/inicio">Inicio</a>
+        <span class="sep">›</span>
+        <a routerLink="/habitaciones">Hoteles</a>
+        <span class="sep">›</span>
+        <span>Ecuador</span>
+        <span class="sep">›</span>
+        <span>Salinas</span>
+        <span class="sep">›</span>
+        <span class="current">Hotel Casa Blanca Salinas</span>
+      </nav>
+
+      <section class="hotel-top">
+        <div class="hotel-top-left">
+          <div class="chip">
+            <ion-icon name="sunny-outline"></ion-icon>
+            Frente a la playa
+          </div>
+
+          <h1 class="hotel-title">Hotel Casa Blanca Salinas</h1>
+
+          <div class="hotel-subline">
+            <ion-icon name="location-outline"></ion-icon>
+            Avenida Malecón de Salinas, EC241550 Salinas, Ecuador
+            <a href="#" class="map-link" (click)="openMap($event)">Ubicación excelente - Ver mapa</a>
+          </div>
+        </div>
+
+        <div class="hotel-top-right">
+          <div class="right-actions">
+            <button class="icon-btn" type="button">
+              <ion-icon name="heart-outline"></ion-icon>
+            </button>
+            <button class="icon-btn" type="button">
+              <ion-icon name="share-social-outline"></ion-icon>
+            </button>
+
+            <ion-button class="reserve-cta" [routerLink]="['/reservar']" [queryParams]="getBookingParams()">
+              Reserva ahora
+            </ion-button>
+          </div>
+
+          <div class="price-badge">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+            Igualamos el precio
+          </div>
+        </div>
+      </section>
+
+      <section class="detail-grid">
+        <div class="detail-left">
+          <section class="gallery booking-gallery">
+            <div class="gallery-grid">
+              <button class="g g1" type="button">
+                <img src="assets/img/1.PNG" alt="Foto principal" />
+              </button>
+
+              <button class="g g2" type="button">
+                <img src="assets/img/4.PNG" alt="Foto 2" />
+              </button>
+
+              <button class="g g3" type="button">
+                <img src="assets/img/9.PNG" alt="Foto 3" />
+              </button>
+
+              <button class="g g4 more" type="button">
+                <img src="assets/img/8.PNG" alt="Más fotos" />
+                <span class="more-badge">16 fotos más</span>
+              </button>
+            </div>
+
+            <div class="thumb-row">
+              <button class="thumb" type="button">
+                <img src="assets/img/3.PNG" alt="thumb" />
+              </button>
+              <button class="thumb" type="button">
+                <img src="assets/img/4.PNG" alt="thumb" />
+              </button>
+              <button class="thumb" type="button">
+                <img src="assets/img/9.PNG" alt="thumb" />
+              </button>
+              <button class="thumb" type="button">
+                <img src="assets/img/8.PNG" alt="thumb" />
+              </button>
+              <button class="thumb" type="button">
+                <img src="assets/img/1.PNG" alt="thumb" />
+              </button>
+              <button class="thumb" type="button">
+                <img src="assets/img/4.PNG" alt="thumb" />
+              </button>
+            </div>
+          </section>
+
+          <nav class="page-tabs booking-tabs">
+            <a class="page-tab active" (click)="scrollToSection('overview')">Vista general</a>
+            <a class="page-tab" (click)="scrollToSection('prices')">Info y precios</a>
+            <a class="page-tab" (click)="scrollToSection('services')">Servicios</a>
+            <a class="page-tab" (click)="scrollToSection('rules')">Normas de la casa</a>
+            <a class="page-tab" [routerLink]="['/reviews']">
+              Comentarios de clientes <span class="badge">652</span>
+            </a>
+          </nav>
+
+          <section class="content-section" id="overview">
+            <h2 class="section-title">Descripción</h2>
+            <p>
+              El Hotel Casa Blanca Salinas está situado en Salinas, frente a la playa, y ofrece habitaciones con Wi-Fi
+              gratuita y aire acondicionado. El establecimiento cuenta con piscina y estacionamiento.
+            </p>
+          </section>
+
+          <section class="content-section" id="services">
+            <h3 class="section-subtitle">Servicios más populares</h3>
+
+            <div class="services-grid">
+              <div class="service-item" *ngFor="let service of services">
+                <ion-icon [name]="service.icon"></ion-icon>
+                <span>{{ service.name }}</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="content-section" id="rules">
+            <h3 class="section-subtitle">Normas de la casa</h3>
+            <p>Check-in desde las 14:00 · Check-out hasta las 12:00 · No fumar en habitaciones.</p>
+          </section>
+        </div>
+
+        <aside class="detail-right">
+          <div class="score-card">
+            <div class="score-head">
+              <div class="score-left">
+                <div class="score-title">Fabuloso</div>
+                <div class="score-sub">642 comentarios</div>
+              </div>
+              <div class="score-pill">8,8</div>
+            </div>
+
+            <div class="score-body">
+              <div class="score-mini-title">Lo que más gustó a quienes se alojaron aquí</div>
+              <div class="quote">
+                “El hotel tiene muy buena ubicación y está frente al mar. Las habitaciones son cómodas y limpias.”
+              </div>
+            </div>
+          </div>
+
+          <div class="map-card booking-map" (click)="openMap()" role="button" tabindex="0">
+  <iframe
+    class="map-iframe"
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade"
+    [src]="mapEmbedUrl"
+  ></iframe>
+
+  <!-- Capa para que se vea tipo Booking (y para que el click sea al card, no al iframe) -->
+  <div class="map-overlay" aria-hidden="true"></div>
+
+  <!-- Pin -->
+  <div class="map-pin" aria-hidden="true"></div>
+
+  <!-- Botón centrado -->
+  <button class="map-cta" type="button" (click)="openMap(); $event.stopPropagation()">
+    Ver en el mapa
+  </button>
+</div>
+
+
+          <div class="strengths-card">
+            <div class="strength-title">Puntos fuertes del alojamiento</div>
+
+            <ul class="strength-list">
+              <li>La mejor ubicación. Puntuación alta</li>
+              <li>Parking privado disponible</li>
+              <li>WiFi gratis</li>
+            </ul>
+
+            <ion-button
+              expand="block"
+              class="reserve-cta"
+              [routerLink]="['/reservar']"
+              [queryParams]="getBookingParams()"
+            >
+              Reserva ahora
+            </ion-button>
+          </div>
+
+          <div class="booking-widget">
+            <div class="widget-header">
+              <h3>Reserva ahora</h3>
+              <div class="price-match">
+                <ion-icon name="shield-checkmark-outline"></ion-icon>
+                Igualamos el precio
+              </div>
+            </div>
+
+            <div
+              *ngFor="let room of roomsData; trackBy: trackById"
+              class="room-card"
+              [class.selected]="room.selected"
+              (click)="selectRoom(room.id)"
+            >
+              <div class="room-details">
+                <h4>{{ room.name }}</h4>
+                <p>{{ room.description }}</p>
+                <div class="room-features">
+                  <span *ngFor="let feature of room.features">
+                    <ion-icon [name]="feature"></ion-icon>
+                    {{ getFeatureName(feature) }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="room-price">
+                <div class="old-price">${{ room.oldPrice }}</div>
+                <div class="current-price">${{ room.price }}/noche</div>
+                <div class="total-price">Total: ${{ room.price * calculateNights() }}</div>
+              </div>
+            </div>
+
+            <!----<app-booking-summary
+              [nights]="calculateNights()"
+              [oldTotal]="calculateOldTotal()"
+              [total]="calculateTotal()"
+              [ctaText]="'Reservar ahora'"
+              [ctaLink]="['/reservar']"
+              [ctaQueryParams]="getBookingParams()"
+            ></app-booking-summary>-->
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <!--<app-footer></app-footer> --->
+  </div>
+
