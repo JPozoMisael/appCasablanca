@@ -1,42 +1,221 @@
 /*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
+ * GLOBAL STYLES — CASA BLANCA APP
+ * Responsive foundation for entire application
  */
 
-/* Core CSS required for Ionic components to work properly */
-@import "@ionic/angular/css/core.css";
+/* =========================================================
+    IONIC CORE (NO TOCAR)
+========================================================= */
 
-/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/core.css";
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
-/* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+/* Dark mode automático del sistema */
 @import '@ionic/angular/css/palettes/dark.system.css';
-@import "./styles/tokens";
-@import './styles/variables.scss';
-@import './styles/typography.scss';
-@import './styles/booking-theme.scss';
 
+/* Tus estilos personalizados */
+@import "./styles/tokens";
+@import "./styles/variables.scss";
+@import "./styles/typography.scss";
+@import "./styles/booking-theme.scss";
+
+
+/* =========================================================
+   📱 BREAKPOINTS UNIVERSALES
+========================================================= */
+
+$bp-desktop: 1200px;
+$bp-tablet: 1024px;
+$bp-mobile: 768px;
+$bp-small: 480px;
+
+
+/* =========================================================
+   🌐 BASE GLOBAL
+========================================================= */
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #f6f7f9;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden; // evita scroll lateral
+}
+
+
+/* =========================================================
+   📦 CONTENEDORES UNIVERSALES
+========================================================= */
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 16px;
+}
+
+.container-wide {
+  max-width: 1400px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+.section {
+  padding: 60px 0;
+}
+
+@media (max-width: $bp-mobile) {
+  .section {
+    padding: 40px 0;
+  }
+}
+
+
+/* =========================================================
+   🔤 TIPOGRAFÍA RESPONSIVE
+========================================================= */
+
+h1 {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 600;
+}
+
+h3 {
+  font-size: clamp(18px, 2.5vw, 26px);
+}
+
+p {
+  font-size: clamp(14px, 1.6vw, 18px);
+  line-height: 1.5;
+  color: #555;
+}
+
+
+/* =========================================================
+   🖼️ IMÁGENES SEGURAS
+========================================================= */
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+
+/* =========================================================
+   🧱 GRID RESPONSIVE UNIVERSAL
+========================================================= */
+
+.grid-auto {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+
+/* =========================================================
+   🧩 UTILIDADES GENERALES
+========================================================= */
+
+.full-width {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.hidden-mobile {
+  @media (max-width: $bp-mobile) {
+    display: none !important;
+  }
+}
+
+.hidden-desktop {
+  @media (min-width: #{$bp-mobile + 1}) {
+    display: none !important;
+  }
+}
+
+
+
+/* =========================================================
+   👆 BOTONES TOUCH-FRIENDLY
+========================================================= */
+
+button,
+ion-button {
+  min-height: 44px;
+}
+
+
+/* =========================================================
+   🌊 SCROLL HORIZONTAL CONTROLADO
+========================================================= */
+
+.scroll-x {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+
+/* =========================================================
+   🏨 CARDS BASE (muy útil en hotelería)
+========================================================= */
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.08);
+  overflow: hidden;
+}
+
+.card-body {
+  padding: 18px;
+}
+
+
+/* =========================================================
+   🧭 HEADER UTILIDAD
+========================================================= */
+
+.bk-search {
+  position: relative;
+  z-index: 50;
+}
+
+
+/* =========================================================
+   📱 AJUSTES MÓVIL GENERALES
+========================================================= */
+
+@media (max-width: $bp-mobile) {
+
+  body {
+    font-size: 15px;
+  }
+
+  .container,
+  .container-wide {
+    padding: 0 14px;
+  }
+
+}

@@ -1,0 +1,122 @@
+<div class="rc-container" *ngIf="room; else noData">
+
+  <!-- HEADER SUCCESS -->
+  <section class="rc-header">
+    <ion-icon name="checkmark-circle-outline" class="ok"></ion-icon>
+
+    <h1>¡Reserva confirmada!</h1>
+    <p>Tu habitación ha sido reservada exitosamente</p>
+
+    <div class="code">
+      Código de reserva: <strong>{{ reservationCode }}</strong>
+    </div>
+  </section>
+
+  <!-- DETALLE -->
+  <section class="rc-grid">
+
+    <!-- LEFT -->
+    <main class="rc-main">
+
+      <div class="box">
+        <div class="box-title">Datos de la reserva</div>
+
+        <div class="line">
+          <span>Check-in</span>
+          <strong>{{ checkIn }}</strong>
+        </div>
+
+        <div class="line">
+          <span>Check-out</span>
+          <strong>{{ checkOut }}</strong>
+        </div>
+
+        <div class="line">
+          <span>Noches</span>
+          <strong>{{ nights }}</strong>
+        </div>
+
+        <div class="line">
+          <span>Huéspedes</span>
+          <strong>{{ guestsLabel }}</strong>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-title">Datos del huésped</div>
+
+        <div class="line">
+          <span>Nombre</span>
+          <strong>{{ guestName }}</strong>
+        </div>
+
+        <div class="line">
+          <span>Email</span>
+          <strong>{{ guestEmail }}</strong>
+        </div>
+
+        <div class="line" *ngIf="guestPhone">
+          <span>Teléfono</span>
+          <strong>{{ guestPhone }}</strong>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- RIGHT -->
+    <aside class="rc-side">
+
+      <div class="summary">
+
+        <div class="sum-room">
+          <img [src]="room.image" [alt]="room.name" />
+
+          <div class="info">
+            <div class="name">{{ room.name }}</div>
+            <div class="loc">{{ room.location }}</div>
+          </div>
+        </div>
+
+        <div class="sum-price">
+
+          <div class="line">
+            <span>Precio por noche</span>
+            <strong>${{ room.pricePerNight }}</strong>
+          </div>
+
+          <div class="line">
+            <span>Noches</span>
+            <strong>{{ nights }}</strong>
+          </div>
+
+          <div class="line total">
+            <span>Total pagado</span>
+            <strong>${{ total }}</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="actions">
+        <ion-button expand="block" routerLink="/mis-reservas">
+          Ver mis reservas
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" routerLink="/inicio">
+          Volver al inicio
+        </ion-button>
+      </div>
+
+    </aside>
+
+  </section>
+
+</div>
+
+<ng-template #noData>
+  <div class="rc-container">
+    <h2>No hay datos de reserva</h2>
+    <ion-button routerLink="/inicio">Ir al inicio</ion-button>
+  </div>
+</ng-template>

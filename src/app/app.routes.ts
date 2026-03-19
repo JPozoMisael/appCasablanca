@@ -6,66 +6,81 @@ import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
 
-  // PUBLIC LAYOUT
+  // ================= PUBLIC =================
   {
     path: '',
     loadComponent: () =>
       import('./layouts/public-layout/public-layout.component')
-        .then((m) => m.PublicLayoutComponent),
+        .then(m => m.PublicLayoutComponent),
 
     children: [
 
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
 
+      // ================= INICIO =================
       {
         path: 'inicio',
         loadComponent: () =>
           import('./paginas/public/inicio/inicio.page')
-            .then((m) => m.InicioPage),
+            .then(m => m.InicioPage),
       },
 
+      // ================= HOTEL (DINÁMICO) =================
+      // Página principal del hotel
       {
-        path: 'habitaciones',
+        path: 'hotel/:slug',
+        loadComponent: () =>
+          import('./paginas/public/hotel/hotel.page')
+            .then(m => m.HotelPage),
+      },
+
+      // Habitaciones de un hotel
+      {
+        path: 'hotel/:slug/habitaciones',
         loadComponent: () =>
           import('./paginas/public/habitaciones/habitaciones.page')
-            .then((m) => m.HabitacionesPage),
+            .then(m => m.HabitacionesPage),
       },
 
+      // Detalle de habitación dentro del hotel
       {
-        path: 'habitacion-detalle/:id',
+        path: 'hotel/:slug/habitacion/:id',
         loadComponent: () =>
           import('./paginas/public/habitacion-detalle/habitacion-detalle.page')
-            .then((m) => m.HabitacionDetallePage),
+            .then(m => m.HabitacionDetallePage),
       },
 
+      // ================= CHECKOUT =================
+      {
+        path: 'reservar',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./paginas/public/reservar/reservar.page')
+            .then(m => m.ReservarPage),
+      },
+
+      // ================= AUTH =================
       {
         path: 'login',
         loadComponent: () =>
           import('./paginas/public/login/login.page')
-            .then((m) => m.LoginPage),
+            .then(m => m.LoginPage),
       },
 
       {
         path: 'registro',
         loadComponent: () =>
           import('./paginas/public/registro/registro.page')
-            .then((m) => m.RegistroPage),
+            .then(m => m.RegistroPage),
       },
 
-      {
-        path: 'reservar',
-        canActivate: [authGuard],
-        loadComponent: () =>
-          import('./paginas/public/reservar/reservar.page')
-            .then((m) => m.ReservarPage),
-      },
-
+      // ================= USUARIO =================
       {
         path: 'mis-reservas',
         canActivate: [authGuard],
         loadComponent: () =>
           import('./paginas/public/mis-reservas/mis-reservas.page')
-            .then((m) => m.MisReservasPage),
+            .then(m => m.MisReservasPage),
       },
 
       {
@@ -73,18 +88,19 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () =>
           import('./paginas/public/perfil/perfil.page')
-            .then((m) => m.PerfilPage),
+            .then(m => m.PerfilPage),
       },
 
     ],
   },
 
+  // ================= ADMIN =================
   {
     path: 'admin',
     canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./layouts/admin-layout/admin-layout.component')
-        .then((m) => m.AdminLayoutComponent),
+        .then(m => m.AdminLayoutComponent),
 
     children: [
 
@@ -94,60 +110,68 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () =>
           import('./paginas/admin/dashboard/dashboard.page')
-            .then((m) => m.DashboardPage),
+            .then(m => m.DashboardPage),
       },
 
       {
         path: 'calendario',
         loadComponent: () =>
           import('./paginas/admin/calendario/calendario.page')
-            .then((m) => m.CalendarioPage),
+            .then(m => m.CalendarioPage),
       },
 
       {
         path: 'habitaciones',
         loadComponent: () =>
           import('./paginas/admin/habitaciones/habitaciones.page')
-            .then((m) => m.AdminHabitacionesPage),
+            .then(m => m.AdminHabitacionesPage),
       },
 
       {
         path: 'huespedes',
         loadComponent: () =>
           import('./paginas/admin/huespedes/huespedes.page')
-            .then((m) => m.AdminHuespedesPage),
+            .then(m => m.AdminHuespedesPage),
       },
 
       {
         path: 'reservas',
         loadComponent: () =>
           import('./paginas/admin/reservas/reservas.page')
-            .then((m) => m.AdminReservasPage),
+            .then(m => m.AdminReservasPage),
       },
 
-      // 🔑 SOLO ADMIN Y GERENCIA
       {
         path: 'usuarios',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN', 'GERENCIA'] },
         loadComponent: () =>
           import('./paginas/admin/usuarios/usuarios.page')
-            .then((m) => m.AdminUsuariosPage),
+            .then(m => m.AdminUsuariosPage),
       },
 
       {
         path: 'reportes',
         loadComponent: () =>
           import('./paginas/admin/reportes/reportes.page')
-            .then((m) => m.ReportesPage),
+            .then(m => m.ReportesPage),
       },
 
     ],
   },
 
+  // ================= CONFIRMACIÓN =================
+  {
+    path: 'reserva-confirmada',
+    loadComponent: () =>
+      import('./paginas/public/reserva-confirmada/reserva-confirmada.page')
+        .then(m => m.ReservaConfirmadaPage),
+  },
+
+  // ================= FALLBACK =================
   {
     path: '**',
     redirectTo: 'inicio',
   },
-
+ 
 ];

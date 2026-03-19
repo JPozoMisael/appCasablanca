@@ -24,6 +24,7 @@ interface HabitacionDetalle {
   styleUrls: ['./habitacion-detalle.page.scss'],
 })
 export class HabitacionDetallePage implements OnInit {
+
   roomId = 0;
 
   checkIn = '';
@@ -35,18 +36,18 @@ export class HabitacionDetallePage implements OnInit {
 
   habitacion: HabitacionDetalle | null = null;
 
-  // esto es lo que usarás en el iframe
   mapUrlSafe: SafeResourceUrl | null = null;
 
+  // ===== MOCK (luego API) =====
   private mock: HabitacionDetalle[] = [
     {
       id: 1,
       nombre: 'Habitación Doble Deluxe',
       descripcion:
-        'Habitación cómoda con acabados modernos, ideal para parejas. Incluye Wi-Fi, aire acondicionado y TV por cable.',
+        'Habitación cómoda con acabados modernos, ideal para parejas.',
       precio: 102,
       capacidad: '2 adultos · 1 cama queen',
-      servicios: ['Wi-Fi', 'Aire acondicionado', 'TV', 'Baño privado', 'Desayuno'],
+      servicios: ['Wi-Fi', 'Aire acondicionado', 'TV', 'Baño privado'],
       lat: -2.2149,
       lng: -80.951,
       imagen: 'assets/img/1.PNG',
@@ -55,10 +56,10 @@ export class HabitacionDetallePage implements OnInit {
       id: 2,
       nombre: 'Habitación Familiar',
       descripcion:
-        'Espaciosa, pensada para familia. Excelente ubicación y comodidad para una estancia tranquila.',
+        'Espaciosa y confortable, perfecta para familias.',
       precio: 119,
       capacidad: '4 adultos · 2 camas',
-      servicios: ['Wi-Fi', 'Aire acondicionado', 'Estacionamiento', 'TV', 'Baño privado'],
+      servicios: ['Wi-Fi', 'Estacionamiento', 'TV', 'Baño privado'],
       lat: -2.2149,
       lng: -80.951,
       imagen: 'assets/img/4.PNG',
@@ -67,10 +68,10 @@ export class HabitacionDetallePage implements OnInit {
       id: 3,
       nombre: 'Suite con Vista al Mar',
       descripcion:
-        'Suite premium con vista panorámica al mar. Perfecta para una experiencia más exclusiva.',
+        'Suite premium con vista panorámica al océano.',
       precio: 149,
-      capacidad: '2 adultos · 1 cama king · Vista al mar',
-      servicios: ['Wi-Fi', 'Jacuzzi', 'Restaurante', 'TV', 'Baño privado'],
+      capacidad: '2 adultos · 1 cama king',
+      servicios: ['Wi-Fi', 'Jacuzzi', 'Restaurante', 'TV'],
       lat: -2.2149,
       lng: -80.951,
       imagen: 'assets/img/9.PNG',
@@ -84,30 +85,22 @@ export class HabitacionDetallePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    // 1) leer :id y cargar habitación
+
+    // ===== PARAM :id =====
     this.route.paramMap.subscribe((pm) => {
-      const idStr = pm.get('id');
-      this.roomId = Number(idStr);
+      this.roomId = Number(pm.get('id'));
 
-      console.log('[HabitacionDetalle] param id:', idStr, '->', this.roomId);
+      this.habitacion =
+        this.mock.find((x) => x.id === this.roomId) ?? null;
 
-      this.habitacion = this.mock.find((x) => x.id === this.roomId) ?? null;
-      console.log('[HabitacionDetalle] habitacion cargada:', this.habitacion);
+      if (!this.habitacion) return;
 
-      if (!this.habitacion) {
-        console.warn('[HabitacionDetalle] No se encontró habitación para id:', this.roomId);
-        this.mapUrlSafe = null;
-        return;
-      }
-
-      //  2) construir mapa seguro (arregla NG0904)
       const url = `https://www.google.com/maps?q=${this.habitacion.lat},${this.habitacion.lng}&output=embed`;
-      this.mapUrlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-
-      console.log('[HabitacionDetalle] map url:', url);
+      this.mapUrlSafe =
+        this.sanitizer.bypassSecurityTrustResourceUrl(url);
     });
 
-    // 3) leer query params
+    // ===== QUERY PARAMS =====
     this.route.queryParamMap.subscribe((qp) => {
       this.checkIn = qp.get('checkIn') ?? '';
       this.checkOut = qp.get('checkOut') ?? '';
@@ -115,17 +108,30 @@ export class HabitacionDetallePage implements OnInit {
       this.children = this.toNum(qp.get('children'), 0);
       this.rooms = this.toNum(qp.get('rooms'), 1);
       this.withPets = this.toNum(qp.get('withPets'), 0);
-
-      console.log('[HabitacionDetalle] queryParams:', {
-        checkIn: this.checkIn,
-        checkOut: this.checkOut,
-        adults: this.adults,
-        children: this.children,
-        rooms: this.rooms,
-        withPets: this.withPets,
-      });
     });
   }
+
+  // ===== CALCULOS =====
+
+  get nights(): number {
+    if (!this.checkIn || !this.checkOut) return 0;
+
+    const a = new Date(this.checkIn + 'T00:00:00').getTime();
+    const b = new Date(this.checkOut + 'T00:00:00').getTime();
+
+    const diff = b - a;
+    if (diff <= 0) return 0;
+
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+
+  get total(): number {
+    if (!this.habitacion) return 0;
+    const n = this.nights || 1;
+    return this.habitacion.precio * n;
+  }
+
+  // ===== RESERVA =====
 
   reservar() {
     if (!this.habitacion) return;
@@ -140,11 +146,10 @@ export class HabitacionDetallePage implements OnInit {
       withPets: this.withPets,
     };
 
-    console.log('[HabitacionDetalle] Reservar -> /reservar con:', queryParams);
-
-    // OJO: /reservar tiene authGuard, si no estás logueado te va a redirigir
     this.router.navigate(['/reservar'], { queryParams });
   }
+
+  // ===== UTILS =====
 
   private toNum(v: string | null, fallback: number): number {
     const n = Number(v);

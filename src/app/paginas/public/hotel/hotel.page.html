@@ -1,0 +1,188 @@
+<div class="hotel-page" *ngIf="hotel">
+
+  <!-- HERO FULL WIDTH -->
+
+  <section class="hero-full">
+
+    <img [src]="hotel.heroImage" />
+
+    <div class="hero-content">
+
+      <div class="hero-info">
+        <h1>{{ hotel.name }}</h1>
+
+        <div class="location">
+          <ion-icon name="location-outline"></ion-icon>
+          {{ hotel.location }}
+        </div>
+
+        <p>{{ hotel.description }}</p>
+      </div>
+
+      <div class="hero-booking">
+
+        <div class="price">Desde $85 / noche</div>
+
+        <ion-button
+          expand="block"
+          [routerLink]="['/hotel', slug, 'habitaciones']">
+          Ver disponibilidad
+        </ion-button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+<!-- ================= BUSCADOR DISPONIBILIDAD ================= -->
+
+<!-- ================= AVAILABILITY BAR PREMIUM ================= -->
+
+<section class="availability-bar">
+
+  <div class="bar-container">
+
+    <!-- SUCURSAL -->
+
+    <div class="bar-item branch" (click)="toggleBranchMenu()">
+      <ion-icon name="location-outline"></ion-icon>
+
+      <div>
+        <span class="label">Sucursal</span>
+        <strong>{{ hotel.name }}</strong>
+      </div>
+
+      <ion-icon name="chevron-down-outline"></ion-icon>
+    </div>
+
+    <!-- FECHAS -->
+
+    <div class="bar-item">
+      <ion-icon name="calendar-outline"></ion-icon>
+
+      <div>
+        <span class="label">Fechas</span>
+        <strong>Entrada — Salida</strong>
+      </div>
+    </div>
+
+    <!-- HUESPEDES -->
+
+    <div class="bar-item">
+      <ion-icon name="people-outline"></ion-icon>
+
+      <div>
+        <span class="label">Huéspedes</span>
+        <strong>2 adultos · 1 habitación</strong>
+      </div>
+    </div>
+
+    <!-- BOTON -->
+
+    <button class="search-btn" (click)="goToAvailability()">
+      <ion-icon name="search-outline"></ion-icon>
+      Buscar habitaciones
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- ================= HABITACIONES DESTACADAS ================= -->
+
+<section class="featured-rooms">
+
+  <h2>Habitaciones destacadas</h2>
+
+  <div class="rooms-grid">
+
+    <div class="room-card" *ngFor="let r of featuredRooms">
+
+      <img [src]="r.image" />
+
+      <div class="info">
+
+        <h3>{{ r.name }}</h3>
+
+        <p>{{ r.desc }}</p>
+
+        <div class="price">
+          Desde <strong>${{ r.price }}</strong> / noche
+        </div>
+
+        <ion-button
+          expand="block"
+          [routerLink]="['/hotel', slug, 'habitaciones']">
+
+          Ver disponibilidad
+
+        </ion-button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+  <!-- CONTENIDO PRINCIPAL -->
+
+  <div class="content-wrapper">
+
+    <!-- GALERÍA HORIZONTAL -->
+
+    <section class="gallery-horizontal">
+
+      <h2>Galería</h2>
+
+      <div class="gallery-scroll">
+
+        <img *ngFor="let img of hotel.gallery" [src]="img" />
+
+      </div>
+
+    </section>
+
+
+    <!-- SERVICIOS DETALLADOS -->
+
+    <section class="services-detailed">
+
+      <h2>Servicios destacados</h2>
+
+      <div class="services-grid">
+
+        <div class="service">
+          <ion-icon name="wifi-outline"></ion-icon>
+          WiFi gratis
+        </div>
+
+        <div class="service">
+          <ion-icon name="water-outline"></ion-icon>
+          Piscina
+        </div>
+
+        <div class="service">
+          <ion-icon name="restaurant-outline"></ion-icon>
+          Desayuno incluido
+        </div>
+
+        <div class="service">
+          <ion-icon name="snow-outline"></ion-icon>
+          Aire acondicionado
+        </div>
+
+        <div class="service">
+          <ion-icon name="sunny-outline"></ion-icon>
+          Frente al mar
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</div>

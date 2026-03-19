@@ -1,38 +1,82 @@
 <header class="bhdr" [class.hide]="hiddenOnScroll">
+
   <div class="wrap">
-    <div class="row">
-      <!-- Brand -->
-      <a class="brand" routerLink="/inicio">
-        <div class="logo">{{ logoText }}</div>
-        <div class="txt">
-          <div class="t">{{ title }}</div>
-          <div class="s">
-            <ion-icon name="location-outline"></ion-icon>
-            {{ subtitle }}
-          </div>
+
+    <!-- MOBILE MENU BUTTON -->
+    <button class="menu-btn" (click)="toggleMenu()">
+      <ion-icon name="menu-outline"></ion-icon>
+    </button>
+
+    <!-- BRAND -->
+    <a class="brand" routerLink="/inicio">
+
+      <div class="logo">{{ logoText }}</div>
+
+      <div class="txt">
+        <div class="t">{{ title }}</div>
+        <div class="s">
+          <ion-icon name="location-outline"></ion-icon>
+          {{ subtitle }}
         </div>
+      </div>
+
+    </a>
+
+    <!-- NAV DESKTOP -->
+    <nav class="nav">
+
+      <a routerLink="/inicio"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }">
+        Inicio
       </a>
 
-      <!-- Nav -->
-      <nav class="nav">
-        <a class="link" routerLink="/inicio" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-          <ion-icon name="home-outline"></ion-icon>
-          <span>Inicio</span>
-        </a>
+      <a routerLink="/inicio#sucursales">
+        Sucursales
+      </a>
 
-        <a class="link" routerLink="/habitaciones" routerLinkActive="active">
-          <ion-icon name="bed-outline"></ion-icon>
-          <span>Habitaciones</span>
-        </a>
-      </nav>
+      <a routerLink="/ofertas">
+        Ofertas
+      </a>
 
-      <!-- Actions -->
-      <div class="actions">
-        <a class="btn" routerLink="/login">
-          <ion-icon name="person-outline"></ion-icon>
-          <span>Iniciar sesión</span>
-        </a>
-      </div>
+    </nav>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+
+      <a class="reserve-btn" routerLink="/inicio">
+        Reservar ahora
+      </a>
+
+      <a class="login-btn" routerLink="/login">
+        <ion-icon name="person-outline"></ion-icon>
+        Iniciar sesión
+      </a>
+
     </div>
+
   </div>
+
 </header>
+
+
+<!-- MOBILE DRAWER -->
+<div class="drawer" [class.open]="menuOpen">
+
+  <div class="drawer-content">
+
+    <a routerLink="/inicio" (click)="closeMenu()">Inicio</a>
+
+    <a routerLink="/inicio#sucursales" (click)="closeMenu()">
+      Sucursales
+    </a>
+
+    <a routerLink="/ofertas" (click)="closeMenu()">Ofertas</a>
+
+    <a routerLink="/login" (click)="closeMenu()">
+      Iniciar sesión
+    </a>
+
+  </div>
+
+</div>
