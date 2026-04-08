@@ -1,117 +1,132 @@
- <div class="hb-container">
-    <header class="top">
-      <div class="top-left">
-        <div class="title">
-          <ion-icon name="bed-outline"></ion-icon>
-          <div>
-            <div class="h1">Habitaciones disponibles</div>
-            <div class="sub">
-              <span *ngIf="checkIn && checkOut">{{ checkIn }} — {{ checkOut }}</span>
-              <span *ngIf="!checkIn || !checkOut">Fechas no seleccionadas</span>
-              <span class="dot">·</span>
-              <span>{{ guestsLabel }}</span>
-              <span class="dot">·</span>
-              <span *ngIf="nights > 0">{{ nights }} noche(s)</span>
-              <span *ngIf="nights === 0">0 noches</span>
+<div class="hb-container">
+
+  <!-- ================= HEADER ================= -->
+  <header class="top">
+
+    <div class="top-left">
+      <div class="title">
+        <ion-icon name="bed-outline"></ion-icon>
+
+        <div>
+          <div class="h1">Habitaciones disponibles</div>
+
+          <div class="sub">
+            <span *ngIf="checkIn && checkOut">
+              {{ checkIn }} — {{ checkOut }}
+            </span>
+
+            <span *ngIf="!checkIn || !checkOut">
+              Fechas no seleccionadas
+            </span>
+
+            <span class="dot">·</span>
+            <span>{{ guestsLabel }}</span>
+
+            <span class="dot">·</span>
+            <span>{{ nights }} noche(s)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="top-right">
+      <ion-button fill="outline" class="btn" (click)="clearFilters()">
+        <ion-icon slot="start" name="options-outline"></ion-icon>
+        Limpiar
+      </ion-button>
+
+      <ion-button class="btn primary" (click)="openFilters()">
+        <ion-icon slot="start" name="filter-outline"></ion-icon>
+        Filtros
+      </ion-button>
+    </div>
+
+  </header>
+
+  <!-- ================= LISTA ================= -->
+  <div class="list">
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando habitaciones...</p>
+    </div>
+
+    <!-- VACÍO -->
+    <div *ngIf="!loading && habitaciones.length === 0" class="empty">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>No hay habitaciones disponibles</p>
+    </div>
+
+    <!-- TARJETAS -->
+    <div *ngIf="!loading && habitaciones.length > 0">
+
+      <div class="card"
+           *ngFor="let h of habitaciones; trackBy: trackById"
+           (click)="goToDetalle(h)">
+
+        <!-- IMAGEN -->
+        <div class="img">
+          <img [src]="h.imagen || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'" />
+        </div>
+
+        <!-- INFO -->
+        <div class="info">
+
+          <div class="row1">
+            <div class="name">
+              Habitación {{ h.numero }}
+            </div>
+
+            <div class="rating">
+              <div class="pill">9.2</div>
+              <div class="rev">Excelente</div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="top-right">
-        <ion-button fill="outline" class="btn" (click)="clearFilters()">
-          <ion-icon slot="start" name="options-outline"></ion-icon>
-          Limpiar
-        </ion-button>
-
-        <ion-button routerLink="/inicio" fill="solid" class="btn primary">
-          Cambiar búsqueda
-        </ion-button>
-      </div>
-    </header>
-
-    <section class="grid">
-      <aside class="filters">
-        <div class="box">
-          <div class="box-title">
-            <ion-icon name="funnel-outline"></ion-icon>
-            Filtros
-          </div>
-
-          <div class="field">
-            <label>Precio mínimo</label>
-            <input type="number" [(ngModel)]="minPrice" placeholder="Ej: 80" />
-          </div>
-
-          <div class="field">
-            <label>Precio máximo</label>
-            <input type="number" [(ngModel)]="maxPrice" placeholder="Ej: 160" />
-          </div>
-
-          <div class="sort">
-            <div class="sort-title">Ordenar por</div>
-            <button class="chip" [class.on]="sort==='recomendado'" (click)="setSort('recomendado')">Recomendado</button>
-            <button class="chip" [class.on]="sort==='precio_asc'" (click)="setSort('precio_asc')">Precio ↑</button>
-            <button class="chip" [class.on]="sort==='precio_desc'" (click)="setSort('precio_desc')">Precio ↓</button>
-            <button class="chip" [class.on]="sort==='rating_desc'" (click)="setSort('rating_desc')">Rating</button>
-          </div>
-        </div>
-
-        <div class="box map">
-          <div class="map-ph">
+          <div class="loc">
             <ion-icon name="location-outline"></ion-icon>
-            Mapa (placeholder)
+            Casa Blanca · Piso {{ h.numero }}
           </div>
+
+          <div class="badges">
+            <span class="b">Disponible</span>
+            <span class="b">Cancelación gratis</span>
+          </div>
+
+          <div class="features">
+            <div class="f"><ion-icon name="people-outline"></ion-icon></div>
+            <div class="f"><ion-icon name="bed-outline"></ion-icon></div>
+            <div class="f"><ion-icon name="water-outline"></ion-icon></div>
+            <div class="f"><ion-icon name="wifi-outline"></ion-icon></div>
+          </div>
+
         </div>
-      </aside>
 
-      <main class="list">
-        <div class="meta">
-          <div class="count">{{ results.length }} opciones</div>
+        <!-- PRECIO -->
+        <div class="price">
+
+          <div class="old">$120</div>
+
+          <div class="now">
+            ${{ h.precio }}
+            <span>/ noche</span>
+          </div>
+
+          <div class="total">
+            Precio por 1 noche
+          </div>
+
+          <ion-button expand="block" class="pick">
+            Ver disponibilidad
+          </ion-button>
+
         </div>
 
-        <article class="card" *ngFor="let r of results; trackBy: trackById">
-          <div class="img">
-            <img [src]="r.image" [alt]="r.name" />
-          </div>
+      </div>
 
-          <div class="info">
-            <div class="row1">
-              <div class="name">{{ r.name }}</div>
-              <div class="rating">
-                <span class="pill">{{ r.rating }}</span>
-                <span class="rev">{{ r.reviews }} comentarios</span>
-              </div>
-            </div>
+    </div>
 
-            <div class="loc">
-              <ion-icon name="location-outline"></ion-icon>
-              {{ r.location }}
-            </div>
-
-            <div class="badges">
-              <span class="b" *ngFor="let b of r.badges">{{ b }}</span>
-            </div>
-
-            <div class="features">
-              <span class="f" *ngFor="let f of r.features">
-                <ion-icon [name]="f"></ion-icon>
-              </span>
-            </div>
-          </div>
-
-          <div class="price">
-            <div class="old" *ngIf="r.oldPricePerNight">${{ r.oldPricePerNight }}</div>
-            <div class="now">${{ r.pricePerNight }}<span>/noche</span></div>
-            <div class="total">Total: ${{ totalFor(r) }}</div>
-
-           <ion-button class="pick" (click)="verOpcion(r)">
-              Ver habitación
-            </ion-button>
-
-
-          </div>
-        </article>
-      </main>
-    </section>
   </div>
+
+</div>

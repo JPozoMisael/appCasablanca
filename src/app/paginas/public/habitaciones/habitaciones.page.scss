@@ -18,62 +18,45 @@
   --container: 1200px;
 }
 
-/* ================= CONTENEDOR ================= */
-
+/* CONTENEDOR */
 .hb-container {
   width: min(var(--container), calc(100% - 28px));
   margin: 20px auto 30px;
-  color: var(--text);
 }
 
-/* ================= HEADER ================= */
-
+/* HEADER */
 .top {
   display: flex;
   justify-content: space-between;
-  gap: 14px;
   align-items: center;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .title {
   display: flex;
   gap: 12px;
-  align-items: flex-start;
 
   ion-icon {
     font-size: 26px;
     color: var(--brand-primary);
-    margin-top: 2px;
   }
 }
 
 .h1 {
   font-weight: 900;
   font-size: 24px;
-  letter-spacing: -0.3px;
 }
 
 .sub {
   color: var(--muted);
-  font-weight: 700;
   font-size: 13px;
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  align-items: center;
 }
 
-.top-right {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
+/* BOTONES */
 .btn {
   --border-radius: 12px;
-  height: 40px;
   font-weight: 800;
 }
 
@@ -81,124 +64,34 @@
   --background: var(--brand-primary-2);
 }
 
-/* ================= GRID ================= */
-
-.grid {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 18px;
-
-  @media (max-width: 980px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ================= FILTROS ================= */
-
-.filters {
-  display: grid;
-  gap: 14px;
-}
-
-.box {
-  background: var(--surface);
-  border-radius: var(--r16);
-  box-shadow: var(--shadow);
-  padding: 16px;
-}
-
-.box-title {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  font-weight: 900;
-  margin-bottom: 12px;
-
-  ion-icon {
-    color: var(--brand-primary);
-  }
-}
-
-.field {
-  display: grid;
-  gap: 6px;
-  margin-bottom: 12px;
-
-  label {
-    font-size: 12px;
-    font-weight: 800;
-    color: var(--muted);
-  }
-
-  input {
-    height: 42px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    padding: 0 12px;
-    font-weight: 700;
-    background: #fff;
-  }
-}
-
-.sort {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.chip {
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 8px 12px;
-  background: #fff;
-  font-weight: 800;
-  cursor: pointer;
-  color: var(--muted);
-  transition: 0.2s;
-}
-
-.chip.on {
-  background: rgba(0,108,228,0.12);
-  border-color: rgba(0,108,228,0.25);
-  color: var(--brand-primary);
-}
-
-/* ================= LISTA ================= */
-
+/* LISTA */
 .list {
   display: grid;
   gap: 16px;
 }
 
-.meta .count {
-  font-weight: 900;
-  color: var(--muted);
-}
-
-/* ================= TARJETA HABITACIÓN ================= */
-
+/* CARD */
 .card {
   display: grid;
   grid-template-columns: 260px 1fr 220px;
-  gap: 0;
   background: #fff;
   border-radius: var(--r16);
   box-shadow: var(--shadow);
   overflow: hidden;
-  transition: transform .18s ease, box-shadow .18s ease;
+  cursor: pointer;
+  transition: 0.2s;
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 16px 36px rgba(15,23,42,0.18);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.15);
   }
 
-  @media (max-width: 980px) {
+  @media (max-width: 900px) {
     grid-template-columns: 1fr;
   }
 }
 
-/* ================= IMAGEN ================= */
-
+/* IMAGEN */
 .img {
   height: 200px;
 
@@ -207,25 +100,19 @@
     height: 100%;
     object-fit: cover;
   }
-
-  @media (max-width: 980px) {
-    height: 220px;
-  }
 }
 
-/* ================= INFO ================= */
-
+/* INFO */
 .info {
   padding: 16px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
 .row1 {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
 }
 
 .name {
@@ -233,94 +120,71 @@
   font-size: 18px;
 }
 
-/* Rating */
-
+/* RATING */
 .rating {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .pill {
   background: var(--brand-primary);
-  color: #fff;
-  border-radius: 10px;
-  padding: 6px 10px;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 8px;
   font-weight: 900;
-  font-size: 12px;
 }
 
 .rev {
   font-size: 12px;
   color: var(--muted);
-  font-weight: 700;
 }
 
-/* Ubicación */
-
+/* UBICACION */
 .loc {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  gap: 6px;
   color: var(--muted);
-  font-weight: 700;
-
-  ion-icon {
-    color: var(--brand-primary-2);
-  }
 }
 
-/* Badges */
-
+/* BADGES */
 .badges {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .b {
   background: #e8f6ec;
   color: #006b1a;
+  padding: 4px 8px;
   border-radius: 999px;
-  padding: 6px 10px;
-  font-weight: 800;
   font-size: 12px;
 }
 
-/* Features */
-
+/* FEATURES */
 .features {
   display: flex;
   gap: 8px;
-  margin-top: 4px;
 }
 
 .f {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 34px;
+  height: 34px;
   border: 1px solid var(--border);
+  border-radius: 10px;
   display: grid;
   place-items: center;
-  background: #fff;
-
-  ion-icon {
-    color: var(--brand-primary);
-    font-size: 18px;
-  }
 }
 
-/* ================= PRECIO ================= */
-
+/* PRECIO */
 .price {
-  padding: 18px;
+  padding: 16px;
   border-left: 1px solid var(--border);
-  display: grid;
-  align-content: center;
-  gap: 8px;
   text-align: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
-  @media (max-width: 980px) {
+  @media (max-width: 900px) {
     border-left: none;
     border-top: 1px solid var(--border);
     text-align: left;
@@ -328,35 +192,36 @@
 }
 
 .old {
-  color: #94a3b8;
   text-decoration: line-through;
-  font-weight: 800;
   font-size: 12px;
+  color: #94a3b8;
 }
 
 .now {
+  font-size: 24px;
   font-weight: 900;
-  font-size: 26px;
 
   span {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--muted);
-    margin-left: 4px;
   }
 }
 
 .total {
-  font-weight: 800;
+  font-size: 12px;
   color: var(--muted);
-  font-size: 13px;
 }
 
-/* BOTÓN PRINCIPAL */
-
+/* BOTON */
 .pick {
   --background: var(--brand-accent);
   --border-radius: 12px;
-  height: 46px;
-  font-weight: 900;
   margin-top: 10px;
+}
+
+/* LOADING / EMPTY */
+.loading, .empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--muted);
 }
