@@ -9,6 +9,9 @@ type Params = Record<string, any>;
 })
 export class ApiService {
 
+  // 🔥 TU API REAL (CAMBIA ESTO)
+  private baseUrl = 'https://TU_API_DOCKPLOY.com';
+
   constructor(private http: HttpClient) {}
 
   /*
@@ -16,7 +19,12 @@ export class ApiService {
   | GET
   |--------------------------------------------------------------------------
   */
-  get<T>(url: string, params?: Params): Observable<T> {
+  get<T>(endpoint: string, params?: Params): Observable<T> {
+
+    const url = this.buildUrl(endpoint);
+
+    console.log('🌍 GET URL:', url);
+
     return this.http.get<T>(url, {
       params: this.buildParams(params),
       headers: this.buildHeaders(),
@@ -28,7 +36,10 @@ export class ApiService {
   | POST
   |--------------------------------------------------------------------------
   */
-  post<T>(url: string, body?: any, params?: Params): Observable<T> {
+  post<T>(endpoint: string, body?: any, params?: Params): Observable<T> {
+
+    const url = this.buildUrl(endpoint);
+
     return this.http.post<T>(url, body ?? {}, {
       params: this.buildParams(params),
       headers: this.buildHeaders(),
@@ -40,20 +51,11 @@ export class ApiService {
   | PUT
   |--------------------------------------------------------------------------
   */
-  put<T>(url: string, body?: any, params?: Params): Observable<T> {
-    return this.http.put<T>(url, body ?? {}, {
-      params: this.buildParams(params),
-      headers: this.buildHeaders(),
-    });
-  }
+  put<T>(endpoint: string, body?: any, params?: Params): Observable<T> {
 
-  /*
-  |--------------------------------------------------------------------------
-  | PATCH
-  |--------------------------------------------------------------------------
-  */
-  patch<T>(url: string, body?: any, params?: Params): Observable<T> {
-    return this.http.patch<T>(url, body ?? {}, {
+    const url = this.buildUrl(endpoint);
+
+    return this.http.put<T>(url, body ?? {}, {
       params: this.buildParams(params),
       headers: this.buildHeaders(),
     });
@@ -64,11 +66,27 @@ export class ApiService {
   | DELETE
   |--------------------------------------------------------------------------
   */
-  delete<T>(url: string, params?: Params): Observable<T> {
+  delete<T>(endpoint: string, params?: Params): Observable<T> {
+
+    const url = this.buildUrl(endpoint);
+
     return this.http.delete<T>(url, {
       params: this.buildParams(params),
       headers: this.buildHeaders(),
     });
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | URL BUILDER (🔥 CLAVE)
+  |--------------------------------------------------------------------------
+  */
+  private buildUrl(endpoint: string): string {
+
+    // Si ya es URL completa, la usa
+    if (endpoint.startsWith('http')) return endpoint;
+
+    return `${this.baseUrl}${endpoint}`;
   }
 
   /*

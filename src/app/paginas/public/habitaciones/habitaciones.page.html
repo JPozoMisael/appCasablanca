@@ -1,128 +1,42 @@
-<div class="hb-container">
+<div class="page">
 
-  <!-- ================= HEADER ================= -->
-  <header class="top">
+  <div class="header">
+    <h1>Habitaciones disponibles</h1>
+    <p>Encuentra la mejor opción para tu estadía</p>
+  </div>
 
-    <div class="top-left">
-      <div class="title">
-        <ion-icon name="bed-outline"></ion-icon>
+  <div class="list">
 
-        <div>
-          <div class="h1">Habitaciones disponibles</div>
+    <div *ngFor="let h of habitaciones" class="card">
 
-          <div class="sub">
-            <span *ngIf="checkIn && checkOut">
-              {{ checkIn }} — {{ checkOut }}
-            </span>
+      <div class="img">
+        <img [src]="h.imagen">
+      </div>
 
-            <span *ngIf="!checkIn || !checkOut">
-              Fechas no seleccionadas
-            </span>
+      <div class="info">
+        <h2>Habitación {{ h.numero }}</h2>
 
-            <span class="dot">·</span>
-            <span>{{ guestsLabel }}</span>
+        <div class="features">
+          <div class="feature">
+            <ion-icon name="people-outline"></ion-icon>
+            {{ h.capacidad }}
+          </div>
 
-            <span class="dot">·</span>
-            <span>{{ nights }} noche(s)</span>
+          <div class="feature">
+            <ion-icon name="bed-outline"></ion-icon>
+            {{ h.camas }}
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="top-right">
-      <ion-button fill="outline" class="btn" (click)="clearFilters()">
-        <ion-icon slot="start" name="options-outline"></ion-icon>
-        Limpiar
-      </ion-button>
-
-      <ion-button class="btn primary" (click)="openFilters()">
-        <ion-icon slot="start" name="filter-outline"></ion-icon>
-        Filtros
-      </ion-button>
-    </div>
-
-  </header>
-
-  <!-- ================= LISTA ================= -->
-  <div class="list">
-
-    <!-- LOADING -->
-    <div *ngIf="loading" class="loading">
-      <ion-spinner name="crescent"></ion-spinner>
-      <p>Cargando habitaciones...</p>
-    </div>
-
-    <!-- VACÍO -->
-    <div *ngIf="!loading && habitaciones.length === 0" class="empty">
-      <ion-icon name="alert-circle-outline"></ion-icon>
-      <p>No hay habitaciones disponibles</p>
-    </div>
-
-    <!-- TARJETAS -->
-    <div *ngIf="!loading && habitaciones.length > 0">
-
-      <div class="card"
-           *ngFor="let h of habitaciones; trackBy: trackById"
-           (click)="goToDetalle(h)">
-
-        <!-- IMAGEN -->
-        <div class="img">
-          <img [src]="h.imagen || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'" />
+      <div class="price">
+        <div class="amount">
+          ${{ h.precio }}
         </div>
 
-        <!-- INFO -->
-        <div class="info">
-
-          <div class="row1">
-            <div class="name">
-              Habitación {{ h.numero }}
-            </div>
-
-            <div class="rating">
-              <div class="pill">9.2</div>
-              <div class="rev">Excelente</div>
-            </div>
-          </div>
-
-          <div class="loc">
-            <ion-icon name="location-outline"></ion-icon>
-            Casa Blanca · Piso {{ h.numero }}
-          </div>
-
-          <div class="badges">
-            <span class="b">Disponible</span>
-            <span class="b">Cancelación gratis</span>
-          </div>
-
-          <div class="features">
-            <div class="f"><ion-icon name="people-outline"></ion-icon></div>
-            <div class="f"><ion-icon name="bed-outline"></ion-icon></div>
-            <div class="f"><ion-icon name="water-outline"></ion-icon></div>
-            <div class="f"><ion-icon name="wifi-outline"></ion-icon></div>
-          </div>
-
-        </div>
-
-        <!-- PRECIO -->
-        <div class="price">
-
-          <div class="old">$120</div>
-
-          <div class="now">
-            ${{ h.precio }}
-            <span>/ noche</span>
-          </div>
-
-          <div class="total">
-            Precio por 1 noche
-          </div>
-
-          <ion-button expand="block" class="pick">
-            Ver disponibilidad
-          </ion-button>
-
-        </div>
-
+        <ion-button>
+          Ver disponibilidad
+        </ion-button>
       </div>
 
     </div>

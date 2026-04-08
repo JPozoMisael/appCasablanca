@@ -10,4 +10,5 @@ export interface Habitacion {
   precioNoche: number;
   estado: EstadoHabitacion;
   imagenUrl?: string | null;
+  hotelSlug?: string | null;
 }

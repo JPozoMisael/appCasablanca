@@ -23,14 +23,18 @@ export const API_ENDPOINTS = {
   },
 
   // ================= ROOMS =================
-  habitaciones: {
-    list: `${API_BASE}/rooms`,
-    disponibles: `${API_BASE}/rooms/available`,
-    get: (id: number | string) => `${API_BASE}/rooms/${id}`,
-    create: `${API_BASE}/rooms`,
-    update: (id: number | string) => `${API_BASE}/rooms/${id}`,
-    delete: (id: number | string) => `${API_BASE}/rooms/${id}`,
-  },
+   habitaciones: {
+    list: '/habitaciones',
+    disponibles: '/habitaciones/disponibles',
+    get: (id: string | number) => `/habitaciones/${id}`,
+    create: '/habitaciones',
+    update: (id: string | number) => `/habitaciones/${id}`,
+    delete: (id: string | number) => `/habitaciones/${id}`,
+
+    // CLAVE
+    byHotel: (slug: string) => `/habitaciones/hotel/${slug}`
+  }
+,
 
   // ================= GUESTS =================
   huespedes: {

@@ -1,99 +1,57 @@
-:host {
-  --brand-primary: #003580;
-  --brand-primary-2: #006ce4;
-  --brand-accent: #ff5a5f;
-
-  --bg: #f5f7fa;
-  --surface: #ffffff;
-
-  --text: #0f172a;
-  --muted: #64748b;
-
-  --border: rgba(15, 23, 42, 0.08);
-  --shadow: 0 10px 26px rgba(15, 23, 42, 0.10);
-
-  --r12: 12px;
-  --r16: 16px;
-
-  --container: 1200px;
-}
-
 /* CONTENEDOR */
-.hb-container {
-  width: min(var(--container), calc(100% - 28px));
-  margin: 20px auto 30px;
+.container {
+  width: 100%;
+  padding: 20px 40px; /* 👈 margen lateral tipo web real */
 }
 
 /* HEADER */
-.top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.header {
   margin-bottom: 20px;
-}
 
-.title {
-  display: flex;
-  gap: 12px;
+  h1 {
+    font-size: 28px;
+    font-weight: 900;
+  }
 
-  ion-icon {
-    font-size: 26px;
-    color: var(--brand-primary);
+  p {
+    color: #64748b;
   }
 }
 
-.h1 {
-  font-weight: 900;
-  font-size: 24px;
-}
-
-.sub {
-  color: var(--muted);
-  font-size: 13px;
+/* NUEVO LAYOUT */
+.layout {
   display: flex;
-  gap: 8px;
-}
-
-/* BOTONES */
-.btn {
-  --border-radius: 12px;
-  font-weight: 800;
-}
-
-.primary {
-  --background: var(--brand-primary-2);
+  justify-content: flex-start; /* 👈 rompe el centrado */
 }
 
 /* LISTA */
 .list {
-  display: grid;
-  gap: 16px;
+  width: 100%;
+  max-width: 1100px; /* 👈 controla ancho sin centrar */
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 /* CARD */
 .card {
   display: grid;
   grid-template-columns: 260px 1fr 220px;
-  background: #fff;
-  border-radius: var(--r16);
-  box-shadow: var(--shadow);
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
   overflow: hidden;
-  cursor: pointer;
-  transition: 0.2s;
+  transition: 0.25s;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 16px 36px rgba(0,0,0,0.15);
-  }
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.15);
   }
 }
 
-/* IMAGEN */
+/* IMG */
 .img {
-  height: 200px;
+  height: 180px;
 
   img {
     width: 100%;
@@ -107,17 +65,17 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
-.row1 {
+.top {
   display: flex;
   justify-content: space-between;
 }
 
-.name {
-  font-weight: 900;
+.info h2 {
   font-size: 18px;
+  font-weight: 900;
 }
 
 /* RATING */
@@ -127,101 +85,73 @@
 }
 
 .pill {
-  background: var(--brand-primary);
+  background: #003580;
   color: white;
   padding: 4px 8px;
-  border-radius: 8px;
-  font-weight: 900;
+  border-radius: 6px;
+  font-size: 12px;
 }
 
 .rev {
   font-size: 12px;
-  color: var(--muted);
+  color: #64748b;
 }
 
-/* UBICACION */
-.loc {
-  display: flex;
-  gap: 6px;
-  color: var(--muted);
-}
-
-/* BADGES */
-.badges {
-  display: flex;
-  gap: 6px;
-}
-
-.b {
-  background: #e8f6ec;
-  color: #006b1a;
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 12px;
+/* DESC */
+.desc {
+  color: #64748b;
+  font-size: 14px;
 }
 
 /* FEATURES */
 .features {
   display: flex;
-  gap: 8px;
+  gap: 14px;
+  margin-top: 6px;
 }
 
-.f {
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-}
-
-/* PRECIO */
-.price {
-  padding: 16px;
-  border-left: 1px solid var(--border);
-  text-align: right;
+.feature {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
 
-  @media (max-width: 900px) {
-    border-left: none;
-    border-top: 1px solid var(--border);
-    text-align: left;
+  ion-icon {
+    font-size: 16px;
+    color: #006ce4;
   }
 }
 
-.old {
-  text-decoration: line-through;
-  font-size: 12px;
-  color: #94a3b8;
+/* PRICE */
+.price {
+  padding: 16px;
+  border-left: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
 }
 
-.now {
-  font-size: 24px;
+.amount {
+  font-size: 28px;
   font-weight: 900;
 
   span {
     font-size: 12px;
-    color: var(--muted);
+    color: #64748b;
   }
 }
 
-.total {
-  font-size: 12px;
-  color: var(--muted);
-}
-
 /* BOTON */
-.pick {
-  --background: var(--brand-accent);
-  --border-radius: 12px;
+.btn {
   margin-top: 10px;
+  --background: linear-gradient(135deg, #ff5a5f, #ff2d2f);
+  font-weight: 800;
 }
 
-/* LOADING / EMPTY */
-.loading, .empty {
+/* STATES */
+.state {
   text-align: center;
   padding: 40px;
-  color: var(--muted);
+  color: #64748b;
 }

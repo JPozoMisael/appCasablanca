@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { HabitacionesService } from '@app/core/services/habitaciones.service';
 
@@ -15,115 +15,65 @@ import { HabitacionesService } from '@app/core/services/habitaciones.service';
 })
 export class HabitacionesPage implements OnInit {
 
-  // ================= ESTADO =================
   loading = false;
   habitaciones: any[] = [];
-
-  // ================= FILTROS / INFO =================
-  checkIn = '';
-  checkOut = '';
-  guestsLabel = '2 adultos';
-  nights = 0;
-
-  minPrice: number | null = null;
-  maxPrice: number | null = null;
-
-  sort: string = 'numero'; // 🔥 por defecto ordenado
+  slug: string = '';
 
   constructor(
     private habitacionesService: HabitacionesService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    //  CLAVE: obtener slug del hotel
+    this.slug = this.route.snapshot.paramMap.get('slug') || '';
+
+    console.log('HOTEL SLUG:', this.slug);
+
     this.loadHabitaciones();
   }
 
-  // ================= CARGA DE DATA =================
   loadHabitaciones() {
     this.loading = true;
 
-    this.habitacionesService.getAll().subscribe({
+    //  CLAVE: usar filtro por hotel
+    this.habitacionesService.getByHotel(this.slug).subscribe({
       next: (res: any) => {
-        const data = res?.data ?? res ?? [];
 
-        const mapped = data.map((h: any) => this.mapHabitacion(h));
+        console.log('HABITACIONES POR HOTEL:', res);
 
-        // 🔥 ORDENAMIENTO APLICADO AQUÍ
-        this.habitaciones = this.applySort(mapped);
+        this.habitaciones = res
+          .map((h: any) => this.mapHabitacion(h))
+          .sort((a: any, b: any) => Number(a.numero) - Number(b.numero));
 
         this.loading = false;
       },
       error: (err) => {
-        console.error('Error cargando habitaciones:', err);
+        console.error('ERROR CARGANDO HABITACIONES:', err);
         this.loading = false;
       }
     });
   }
 
-  // ================= MAPEO =================
   mapHabitacion(h: any) {
     return {
       id: h.id,
-      numero: h.numero || h.id,
-      precio: h.precio || 0,
-      descripcion: h.descripcion || 'Habitación cómoda y equipada',
+      numero: h.numero || h.numero_habitacion || h.id,
+      precio: h.precio || h.precioNoche || 0,
+      descripcion: h.descripcion || 'Habitación cómoda con excelente ubicación',
       capacidad: h.capacidad || 2,
       camas: h.camas || 1,
       bano: h.bano ?? true,
-      imagen: h.imagen || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'
+      imagen: h.imagen || h.imagenUrl || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'
     };
-  }
-
-  // ================= ORDENAMIENTO =================
-  applySort(data: any[]) {
-    switch (this.sort) {
-
-      case 'precio':
-        return data.sort((a, b) => a.precio - b.precio);
-
-      case 'numero':
-        return data.sort((a, b) => Number(a.numero) - Number(b.numero));
-
-      default:
-        return data;
-    }
-  }
-
-  setSort(value: string) {
-    this.sort = value;
-    this.habitaciones = this.applySort([...this.habitaciones]);
-  }
-
-  // ================= ACCIONES =================
-  clearFilters() {
-    this.minPrice = null;
-    this.maxPrice = null;
-    this.sort = 'numero';
-
-    this.checkIn = '';
-    this.checkOut = '';
-    this.nights = 0;
-    this.guestsLabel = '2 adultos';
-
-    this.loadHabitaciones(); // 🔥 recarga limpia
-  }
-
-  openFilters() {
-    console.log('Abrir filtros');
   }
 
   goToDetalle(h: any) {
     this.router.navigate(['/habitacion-detalle', h.id]);
   }
 
-  // ================= UTILIDADES =================
-  totalFor(h: any) {
-    return h.precio;
-  }
-
   trackById(index: number, item: any) {
     return item.id;
   }
-
 }

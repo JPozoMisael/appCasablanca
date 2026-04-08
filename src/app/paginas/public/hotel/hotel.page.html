@@ -1,32 +1,40 @@
 <div class="hotel-page" *ngIf="hotel">
 
-  <!-- HERO FULL WIDTH -->
-
-  <section class="hero-full">
+  <!-- ================= HERO ================= -->
+  <section class="hero">
 
     <img [src]="hotel.heroImage" />
 
-    <div class="hero-content">
+    <div class="hero-overlay">
 
-      <div class="hero-info">
+      <!-- INFO -->
+      <div class="hero-left">
+
         <h1>{{ hotel.name }}</h1>
 
         <div class="location">
           <ion-icon name="location-outline"></ion-icon>
-          {{ hotel.location }}
+          <span>{{ hotel.location }}</span>
         </div>
 
-        <p>{{ hotel.description }}</p>
+        <p class="desc">{{ hotel.description }}</p>
+
       </div>
 
-      <div class="hero-booking">
+      <!-- CARD RESERVA -->
+      <div class="hero-card">
 
-        <div class="price">Desde $85 / noche</div>
+        <div class="price">
+          Desde <strong>$85</strong>
+          <span>/ noche</span>
+        </div>
 
-        <ion-button
-          expand="block"
+        <ion-button expand="block" class="primary-btn"
           [routerLink]="['/hotel', slug, 'habitaciones']">
+
+          <ion-icon name="search-outline" slot="start"></ion-icon>
           Ver disponibilidad
+
         </ion-button>
 
       </div>
@@ -35,154 +43,140 @@
 
   </section>
 
-<!-- ================= BUSCADOR DISPONIBILIDAD ================= -->
 
-<!-- ================= AVAILABILITY BAR PREMIUM ================= -->
+  <!-- ================= AVAILABILITY ================= -->
+  <section class="availability">
 
-<section class="availability-bar">
+    <div class="availability-container">
 
-  <div class="bar-container">
-
-    <!-- SUCURSAL -->
-
-    <div class="bar-item branch" (click)="toggleBranchMenu()">
-      <ion-icon name="location-outline"></ion-icon>
-
-      <div>
-        <span class="label">Sucursal</span>
-        <strong>{{ hotel.name }}</strong>
+      <!-- FECHAS -->
+      <div class="item">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <div>
+          <span class="label">Fechas</span>
+          <strong>Entrada — Salida</strong>
+        </div>
       </div>
 
-      <ion-icon name="chevron-down-outline"></ion-icon>
-    </div>
-
-    <!-- FECHAS -->
-
-    <div class="bar-item">
-      <ion-icon name="calendar-outline"></ion-icon>
-
-      <div>
-        <span class="label">Fechas</span>
-        <strong>Entrada — Salida</strong>
+      <!-- HUÉSPEDES -->
+      <div class="item">
+        <ion-icon name="people-outline"></ion-icon>
+        <div>
+          <span class="label">Huéspedes</span>
+          <strong>2 adultos</strong>
+        </div>
       </div>
+
+      <!-- BOTÓN -->
+      <button class="search-btn" (click)="goToAvailability()">
+        <ion-icon name="search-outline"></ion-icon>
+        Buscar habitaciones
+      </button>
+
     </div>
 
-    <!-- HUESPEDES -->
+  </section>
 
-    <div class="bar-item">
-      <ion-icon name="people-outline"></ion-icon>
 
-      <div>
-        <span class="label">Huéspedes</span>
-        <strong>2 adultos · 1 habitación</strong>
-      </div>
+  <!-- ================= ROOMS ================= -->
+  <section class="rooms">
+
+    <div class="section-header">
+      <h2>Habitaciones destacadas</h2>
+      <span class="see-all"
+        [routerLink]="['/hotel', slug, 'habitaciones']">
+        Ver todas
+      </span>
     </div>
 
-    <!-- BOTON -->
+    <div class="rooms-grid">
 
-    <button class="search-btn" (click)="goToAvailability()">
-      <ion-icon name="search-outline"></ion-icon>
-      Buscar habitaciones
-    </button>
+      <div class="room-card" *ngFor="let r of featuredRooms">
 
-  </div>
-
-</section>
-
-
-<!-- ================= HABITACIONES DESTACADAS ================= -->
-
-<section class="featured-rooms">
-
-  <h2>Habitaciones destacadas</h2>
-
-  <div class="rooms-grid">
-
-    <div class="room-card" *ngFor="let r of featuredRooms">
-
-      <img [src]="r.image" />
-
-      <div class="info">
-
-        <h3>{{ r.name }}</h3>
-
-        <p>{{ r.desc }}</p>
-
-        <div class="price">
-          Desde <strong>${{ r.price }}</strong> / noche
+        <div class="room-img">
+          <img [src]="r.image" />
         </div>
 
-        <ion-button
-          expand="block"
-          [routerLink]="['/hotel', slug, 'habitaciones']">
+        <div class="info">
 
-          Ver disponibilidad
+          <h3>{{ r.name }}</h3>
 
-        </ion-button>
+          <p>{{ r.desc }}</p>
+
+          <div class="price">
+            <strong>${{ r.price }}</strong>
+            <span>/ noche</span>
+          </div>
+
+          <ion-button expand="block" class="secondary-btn"
+            [routerLink]="['/hotel', slug, 'habitaciones']">
+
+            Ver disponibilidad
+
+          </ion-button>
+
+        </div>
 
       </div>
 
     </div>
 
-  </div>
+  </section>
 
-</section>
-  <!-- CONTENIDO PRINCIPAL -->
 
-  <div class="content-wrapper">
+  <!-- ================= GALERÍA ================= -->
+  <section class="gallery">
 
-    <!-- GALERÍA HORIZONTAL -->
-
-    <section class="gallery-horizontal">
-
+    <div class="section-header">
       <h2>Galería</h2>
+    </div>
 
-      <div class="gallery-scroll">
+    <div class="gallery-scroll">
 
-        <img *ngFor="let img of hotel.gallery" [src]="img" />
+      <img *ngFor="let img of hotel.gallery" [src]="img" />
 
+    </div>
+
+  </section>
+
+
+  <!-- ================= SERVICIOS ================= -->
+  <section class="services">
+
+    <div class="section-header">
+      <h2>Servicios</h2>
+    </div>
+
+    <div class="services-grid">
+
+      <div class="service">
+        <ion-icon name="wifi-outline"></ion-icon>
+        <span>WiFi gratis</span>
       </div>
 
-    </section>
-
-
-    <!-- SERVICIOS DETALLADOS -->
-
-    <section class="services-detailed">
-
-      <h2>Servicios destacados</h2>
-
-      <div class="services-grid">
-
-        <div class="service">
-          <ion-icon name="wifi-outline"></ion-icon>
-          WiFi gratis
-        </div>
-
-        <div class="service">
-          <ion-icon name="water-outline"></ion-icon>
-          Piscina
-        </div>
-
-        <div class="service">
-          <ion-icon name="restaurant-outline"></ion-icon>
-          Desayuno incluido
-        </div>
-
-        <div class="service">
-          <ion-icon name="snow-outline"></ion-icon>
-          Aire acondicionado
-        </div>
-
-        <div class="service">
-          <ion-icon name="sunny-outline"></ion-icon>
-          Frente al mar
-        </div>
-
+      <div class="service">
+        <ion-icon name="water-outline"></ion-icon>
+        <span>Piscina</span>
       </div>
 
-    </section>
+      <div class="service">
+        <ion-icon name="restaurant-outline"></ion-icon>
+        <span>Desayuno incluido</span>
+      </div>
 
-  </div>
+      <div class="service">
+        <ion-icon name="snow-outline"></ion-icon>
+        <span>Aire acondicionado</span>
+      </div>
+
+      <!-- 🔥 ICONO CORREGIDO (ANTES FALLABA) -->
+      <div class="service">
+        <ion-icon name="sunny-outline"></ion-icon>
+        <span>Frente al mar</span>
+      </div>
+
+    </div>
+
+  </section>
 
 </div>
