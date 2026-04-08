@@ -19,10 +19,16 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/* Dark mode automático del sistema */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* =========================================================
+   🌞 PALETA FIJA EN MODO CLARO (PRODUCCIÓN)
+========================================================= */
 
-/* Tus estilos personalizados */
+@import "@ionic/angular/css/palettes/light.css";
+
+/* =========================================================
+   🎨 TUS ESTILOS PERSONALIZADOS
+========================================================= */
+
 @import "./styles/tokens";
 @import "./styles/variables.scss";
 @import "./styles/typography.scss";
@@ -50,7 +56,7 @@ html, body {
 body {
   background: #f6f7f9;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden; // evita scroll lateral
+  overflow-x: hidden;
 }
 
 
@@ -152,7 +158,6 @@ img {
     display: none !important;
   }
 }
-
 
 
 /* =========================================================
