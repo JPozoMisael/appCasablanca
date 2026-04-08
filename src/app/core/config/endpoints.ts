@@ -61,4 +61,10 @@ export const API_ENDPOINTS = {
     reservas: `${API_BASE}/reports/bookings`,
   },
 
+  //  FIX CRÍTICO
+  dashboard: {
+    stats: `${API_BASE}/admin/dashboard/stats`,
+    reservasHoy: `${API_BASE}/admin/dashboard/reservas-hoy`,
+  },
+
 };
