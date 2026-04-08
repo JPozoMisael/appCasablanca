@@ -2,16 +2,8 @@ import { environment } from 'src/environments/environment';
 
 const API_BASE = environment.apiUrl;
 
-/*
-  Convención:
-  - list   → GET todos
-  - get    → GET por id
-  - create → POST
-  - update → PUT/PATCH
-  - delete → DELETE
-*/
-
 export const API_ENDPOINTS = {
+
   auth: {
     login: `${API_BASE}/auth/login`,
     register: `${API_BASE}/auth/register`,
@@ -21,46 +13,52 @@ export const API_ENDPOINTS = {
   },
 
   usuarios: {
-    list: `${API_BASE}/usuarios`,
-    get: (id: number | string) => `${API_BASE}/usuarios/${id}`,
-    create: `${API_BASE}/usuarios`,
-    update: (id: number | string) => `${API_BASE}/usuarios/${id}`,
-    delete: (id: number | string) => `${API_BASE}/usuarios/${id}`,
+    list: `${API_BASE}/admin/users`,
+    get: (id: number | string) => `${API_BASE}/admin/users/${id}`,
+    create: `${API_BASE}/admin/users`,
+    update: (id: number | string) => `${API_BASE}/admin/users/${id}`,
+    delete: (id: number | string) => `${API_BASE}/admin/users/${id}`,
   },
 
   habitaciones: {
-    list: `${API_BASE}/habitaciones`,
-    disponibles: `${API_BASE}/habitaciones/disponibles`,
-    get: (id: number | string) => `${API_BASE}/habitaciones/${id}`,
-    create: `${API_BASE}/habitaciones`,
-    update: (id: number | string) => `${API_BASE}/habitaciones/${id}`,
-    delete: (id: number | string) => `${API_BASE}/habitaciones/${id}`,
+    list: `${API_BASE}/rooms`,
+    disponibles: `${API_BASE}/rooms/available`,
+    get: (id: number | string) => `${API_BASE}/rooms/${id}`,
+    create: `${API_BASE}/rooms`,
+    update: (id: number | string) => `${API_BASE}/rooms/${id}`,
+    delete: (id: number | string) => `${API_BASE}/rooms/${id}`,
   },
 
   huespedes: {
-    list: `${API_BASE}/huespedes`,
-    get: (id: number | string) => `${API_BASE}/huespedes/${id}`,
-    create: `${API_BASE}/huespedes`,
-    update: (id: number | string) => `${API_BASE}/huespedes/${id}`,
-    delete: (id: number | string) => `${API_BASE}/huespedes/${id}`,
+    list: `${API_BASE}/clients`,
+    get: (id: number | string) => `${API_BASE}/clients/${id}`,
+    create: `${API_BASE}/clients`,
+    update: (id: number | string) => `${API_BASE}/clients/${id}`,
+    delete: (id: number | string) => `${API_BASE}/clients/${id}`,
   },
 
   reservas: {
-    list: `${API_BASE}/reservas`,
-    get: (id: number | string) => `${API_BASE}/reservas/${id}`,
-    create: `${API_BASE}/reservas`,
-    update: (id: number | string) => `${API_BASE}/reservas/${id}`,
-    cancel: (id: number | string) => `${API_BASE}/reservas/${id}/cancelar`,
+    list: `${API_BASE}/bookings`,
+    get: (id: number | string) => `${API_BASE}/bookings/${id}`,
+    create: `${API_BASE}/bookings`,
+    update: (id: number | string) => `${API_BASE}/bookings/${id}`,
+    cancel: (id: number | string) => `${API_BASE}/bookings/${id}/cancel`,
+  },
+
+  pagos: {
+    list: `${API_BASE}/payments`,
+    get: (id: number | string) => `${API_BASE}/payments/${id}`,
+    create: `${API_BASE}/payments`,
+  },
+
+  servicios: {
+    list: `${API_BASE}/services`,
   },
 
   reportes: {
-    ingresos: `${API_BASE}/reportes/ingresos`,
-    ocupacion: `${API_BASE}/reportes/ocupacion`,
-    reservas: `${API_BASE}/reportes/reservas`,
+    ingresos: `${API_BASE}/reports/income`,
+    ocupacion: `${API_BASE}/reports/occupancy`,
+    reservas: `${API_BASE}/reports/bookings`,
   },
 
-  dashboard: {
-  stats: '/dashboard/stats',
-  reservasHoy: '/dashboard/reservas-hoy'
-},
 };
