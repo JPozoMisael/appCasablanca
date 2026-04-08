@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api/v1',
+  apiUrl: 'http://api.95.216.170.195.nip.io',
 };
 
 /*

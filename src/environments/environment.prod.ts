@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://tu-api-produccion.com/api/v1',
+  apiUrl: 'http://api.95.216.170.195.nip.io'
 };
