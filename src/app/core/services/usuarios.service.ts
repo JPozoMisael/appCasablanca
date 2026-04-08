@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_ENDPOINTS } from '../config/endpoints';
-import { ApiService } from './api.services';
+import { ApiService } from './api.service';
 import { Usuario } from '@app/shared/models/usuario.model';
 
 @Injectable({ providedIn: 'root' })

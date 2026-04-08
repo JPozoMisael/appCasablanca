@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
 import { API_ENDPOINTS } from '../config/endpoints';
-import { ApiService } from './api.services';
+import { ApiService } from './api.service';
 import { StorageService, StoredUser } from './storage.service';
 import { Role } from '../config/roles';
 

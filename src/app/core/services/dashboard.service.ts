@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiService } from './api.services';
+import { ApiService } from './api.service';
 import { API_ENDPOINTS } from '../config/endpoints';
 
 export interface DashboardStats {
