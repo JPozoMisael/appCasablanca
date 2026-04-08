@@ -6,6 +6,7 @@ import { Reserva } from '@app/shared/models/reserva.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReservasService {
+
   constructor(private api: ApiService) {}
 
   getAll(params?: { estado?: string; desde?: string; hasta?: string }): Observable<Reserva[]> {
@@ -27,4 +28,5 @@ export class ReservasService {
   cancel(id: number): Observable<any> {
     return this.api.post(API_ENDPOINTS.reservas.cancel(id), {});
   }
+
 }
