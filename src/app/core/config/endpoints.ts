@@ -22,27 +22,38 @@ export const API_ENDPOINTS = {
     delete: (id: number | string) => `${API_BASE}/admin/users/${id}`,
   },
 
-  // ================= ROOMS =================
-   habitaciones: {
-    list: '/habitaciones',
-    disponibles: '/habitaciones/disponibles',
-    get: (id: string | number) => `/habitaciones/${id}`,
-    create: '/habitaciones',
-    update: (id: string | number) => `/habitaciones/${id}`,
-    delete: (id: string | number) => `/habitaciones/${id}`,
+  // ================= HOTELS =================
+  hoteles: {
+    list: `${API_BASE}/hotels`,
+    get: (id: number | string) => `${API_BASE}/hotels/${id}`,
+    bySlug: (slug: string) => `${API_BASE}/hotels/slug/${slug}`,
+  },
 
-    // CLAVE
-    byHotel: (slug: string) => `/habitaciones/hotel/${slug}`
-  }
-,
+  // ================= ROOMS (ANTES HABITACIONES) =================
+  habitaciones: {
+    list: `${API_BASE}/rooms`,
+    disponibles: `${API_BASE}/rooms/disponibles`,
+    get: (id: number | string) => `${API_BASE}/rooms/${id}`,
+    create: `${API_BASE}/rooms`,
+    update: (id: number | string) => `${API_BASE}/rooms/${id}`,
+    delete: (id: number | string) => `${API_BASE}/rooms/${id}`,
+
+    // 🔥 CLAVE
+    byHotel: (slug: string) => `${API_BASE}/rooms/hotel/${slug}`,
+  },
+
+  // ================= ROOM TYPES =================
+  tiposHabitacion: {
+    list: `${API_BASE}/room-types`,
+  },
 
   // ================= GUESTS =================
   huespedes: {
-    list: `${API_BASE}/guests`,
-    get: (id: number | string) => `${API_BASE}/guests/${id}`,
-    create: `${API_BASE}/guests`,
-    update: (id: number | string) => `${API_BASE}/guests/${id}`,
-    delete: (id: number | string) => `${API_BASE}/guests/${id}`,
+    list: `${API_BASE}/clients`,
+    get: (id: number | string) => `${API_BASE}/clients/${id}`,
+    create: `${API_BASE}/clients`,
+    update: (id: number | string) => `${API_BASE}/clients/${id}`,
+    delete: (id: number | string) => `${API_BASE}/clients/${id}`,
   },
 
   // ================= BOOKINGS =================
@@ -73,7 +84,7 @@ export const API_ENDPOINTS = {
     reservas: `${API_BASE}/reports/bookings`,
   },
 
-  // ================= DASHBOARD (🔥 TE FALTABA) =================
+  // ================= DASHBOARD =================
   dashboard: {
     stats: `${API_BASE}/admin/dashboard/stats`,
     reservasHoy: `${API_BASE}/admin/dashboard/today-bookings`,
