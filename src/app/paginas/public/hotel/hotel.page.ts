@@ -116,30 +116,32 @@ export class HotelPage implements OnInit {
 
   // ================= ROOMS =================
 
-  loadRooms() {
+ loadRooms() {
 
-    this.loading = true;
+  this.loading = true;
 
-    this.habitacionesService.getByHotel(this.slug).subscribe({
-      next: (rooms) => {
+  this.habitacionesService.getByHotel(this.slug).subscribe({
+    next: (rooms) => {
 
-        this.featuredRooms = (rooms || [])
-          .map((r: any) => ({
-            id: r.id,
-            name: `Habitación ${r.numero}`,
-            desc: r.descripcion,
-            price: r.precioNoche,
-            image: r.imagenUrl
-          }));
+      this.featuredRooms = (rooms || [])
+        .map((r: any) => ({
+          id: r.id,
+          numero: Number(r.numero), //  CLAVE
+          name: `Habitación ${r.numero}`,
+          desc: r.descripcion || `Piso ${r.piso}`,
+          price: r.precioNoche,
+          image: r.imagenUrl
+        }))
+        .sort((a: any, b: any) => a.numero - b.numero); // 🔥 ORDEN REAL
 
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error cargando habitaciones:', err);
-        this.loading = false;
-      }
-    });
-  }
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error('Error cargando habitaciones:', err);
+      this.loading = false;
+    }
+  });
+}
 
   // ================= NAV =================
 
