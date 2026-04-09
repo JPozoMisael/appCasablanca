@@ -124,7 +124,6 @@ export class HotelPage implements OnInit {
       next: (rooms) => {
 
         this.featuredRooms = (rooms || [])
-          .slice(0, 3)
           .map((r: any) => ({
             id: r.id,
             name: `Habitación ${r.numero}`,
