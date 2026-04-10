@@ -15,7 +15,7 @@ export class HabitacionesService {
     return this.api.get<any>(API_ENDPOINTS.habitaciones.list).pipe(
       map(res => this.safeMapArray(res)),
       catchError(err => {
-        console.error('❌ ERROR getAll:', err);
+        console.error('ERROR getAll:', err);
         return of([]);
       })
     );
@@ -24,46 +24,76 @@ export class HabitacionesService {
   // ================= POR HOTEL =================
   getByHotel(slug: string): Observable<Habitacion[]> {
 
-    console.log('📡 LLAMANDO API CON SLUG:', slug);
-
     if (!slug) {
-      console.error('❌ SLUG VACÍO');
+      console.error('SLUG VACÍO');
       return of([]);
     }
 
     return this.api.get<any>(API_ENDPOINTS.habitaciones.byHotel(slug)).pipe(
 
+      map(res => this.safeMapArray(res)),
+
+      catchError(err => {
+        console.error('ERROR getByHotel:', err);
+        return of([]);
+      })
+    );
+  }
+
+  // ================= DISPONIBILIDAD REAL =================
+  getDisponiblesByHotel(
+    slug: string,
+    filters: any
+  ): Observable<Habitacion[]> {
+
+    console.log('BUSCANDO DISPONIBLES:', { slug, filters });
+
+    if (!slug) {
+      console.error('SLUG VACÍO');
+      return of([]);
+    }
+
+    const params: any = {};
+
+    if (filters?.checkIn) params.checkIn = filters.checkIn;
+    if (filters?.checkOut) params.checkOut = filters.checkOut;
+    if (filters?.adults) params.adults = filters.adults;
+    if (filters?.children) params.children = filters.children;
+    if (filters?.rooms) params.rooms = filters.rooms;
+    if (filters?.withPets !== undefined) params.withPets = filters.withPets;
+
+    params.hotel = slug;
+
+    return this.api.get<any>(
+      API_ENDPOINTS.habitaciones.disponibles,
+      { params }
+    ).pipe(
+
       map((res) => {
 
-        console.log('📡 RESPUESTA CRUDA API:', res);
+        console.log('RESPUESTA DISPONIBLES:', res);
 
-        // 🔥 VALIDACIÓN CLAVE (evita error HTML)
         if (!res || typeof res !== 'object') {
-          console.error('❌ RESPUESTA INVALIDA (no es JSON)');
+          console.error('RESPUESTA NO ES JSON');
           return [];
         }
 
         if (!res.data || !Array.isArray(res.data)) {
-          console.warn('⚠️ API sin data válida');
+          console.warn('API SIN DATA');
           return [];
         }
 
-        const mapped = res.data.map((item: any, index: number) => {
-          console.log(`ITEM [${index}]`, item);
-          return this.mapHabitacion(item);
-        });
-
-        console.log('✅ RESULTADO FINAL:', mapped);
-
-        return mapped;
+        return res.data.map((item: any) =>
+          this.mapHabitacion(item)
+        );
       }),
 
       catchError((err) => {
-        console.error('❌ ERROR getByHotel:', err);
 
-        // 🔥 AQUÍ ATRAPAMOS EL ERROR DE HTML (EL TUYO)
+        console.error('ERROR DISPONIBLES:', err);
+
         if (err?.error?.text) {
-          console.error('❌ API DEVOLVIÓ HTML (URL INCORRECTA)');
+          console.error('API DEVOLVIÓ HTML (endpoint incorrecto)');
         }
 
         return of([]);
@@ -73,24 +103,46 @@ export class HabitacionesService {
 
   // ================= SAFE MAP =================
   private safeMapArray(res: any): Habitacion[] {
+
     if (!res || !res.data || !Array.isArray(res.data)) {
       return [];
     }
-    return res.data.map((item: any) => this.mapHabitacion(item));
+
+    return res.data.map((item: any) =>
+      this.mapHabitacion(item)
+    );
   }
 
   // ================= MAPPER =================
   private mapHabitacion(item: any): Habitacion {
+
     return {
       id: item.id,
-      numero: String(item.numero_habitacion ?? item.numero ?? ''),
-      tipo: `Habitación ${item.numero_habitacion ?? item.numero}`,
-      descripcion: item.descripcion || `Piso ${item.piso}`,
+
+      numero: String(
+        item.numero_habitacion ??
+        item.numero ??
+        ''
+      ),
+
+      tipo: item.tipo_nombre || `Habitación ${item.numero}`,
+
+      descripcion:
+        item.descripcion ||
+        `Piso ${item.piso || 'N/A'}`,
+
       capacidad: item.capacidad ?? 2,
+
       camas: item.camas ?? 1,
+
       precioNoche: item.precio ?? 80,
+
       estado: item.estado || 'DISPONIBLE',
-      imagenUrl: item.imagen || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2',
+
+      imagenUrl:
+        item.imagen ||
+        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2',
+
       hotelSlug: item.hotel_slug || ''
     };
   }

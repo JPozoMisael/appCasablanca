@@ -19,6 +19,8 @@ export class HabitacionesPage implements OnInit {
   habitaciones: any[] = [];
   slug: string = '';
 
+  filters: any = {};
+
   constructor(
     private habitacionesService: HabitacionesService,
     private router: Router,
@@ -26,34 +28,52 @@ export class HabitacionesPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    //  CLAVE: obtener slug del hotel
-    this.slug = this.route.snapshot.paramMap.get('slug') || '';
 
+    this.slug = this.route.snapshot.paramMap.get('slug') || '';
     console.log('HOTEL SLUG:', this.slug);
 
-    this.loadHabitaciones();
+    this.route.queryParams.subscribe(params => {
+
+      console.log('FILTROS RECIBIDOS:', params);
+
+      this.filters = {
+        checkIn: params['checkIn'],
+        checkOut: params['checkOut'],
+        adults: params['adults'],
+        children: params['children'],
+        rooms: params['rooms'],
+        withPets: params['withPets']
+      };
+
+      this.loadHabitaciones();
+    });
   }
 
   loadHabitaciones() {
     this.loading = true;
 
-    //  CLAVE: usar filtro por hotel
-    this.habitacionesService.getByHotel(this.slug).subscribe({
-      next: (res: any) => {
+    this.habitacionesService
+      .getDisponiblesByHotel(this.slug, this.filters)
+      .subscribe({
 
-        console.log('HABITACIONES POR HOTEL:', res);
+        next: (res: any) => {
 
-        this.habitaciones = res
-          .map((h: any) => this.mapHabitacion(h))
-          .sort((a: any, b: any) => Number(a.numero) - Number(b.numero));
+          console.log('HABITACIONES DISPONIBLES:', res);
 
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('ERROR CARGANDO HABITACIONES:', err);
-        this.loading = false;
-      }
-    });
+          this.habitaciones = res
+            .map((h: any) => this.mapHabitacion(h))
+            .sort((a: any, b: any) =>
+              Number(a.numero) - Number(b.numero)
+            );
+
+          this.loading = false;
+        },
+
+        error: (err) => {
+          console.error('ERROR CARGANDO HABITACIONES:', err);
+          this.loading = false;
+        }
+      });
   }
 
   mapHabitacion(h: any) {
@@ -61,16 +81,23 @@ export class HabitacionesPage implements OnInit {
       id: h.id,
       numero: h.numero || h.numero_habitacion || h.id,
       precio: h.precio || h.precioNoche || 0,
-      descripcion: h.descripcion || 'Habitación cómoda con excelente ubicación',
+      descripcion:
+        h.descripcion ||
+        'Habitación cómoda con excelente ubicación',
       capacidad: h.capacidad || 2,
       camas: h.camas || 1,
       bano: h.bano ?? true,
-      imagen: h.imagen || h.imagenUrl || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'
+      imagen:
+        h.imagen ||
+        h.imagenUrl ||
+        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'
     };
   }
 
   goToDetalle(h: any) {
-    this.router.navigate(['/habitacion-detalle', h.id]);
+    this.router.navigate(['/habitacion-detalle', h.id], {
+      queryParams: this.filters 
+    });
   }
 
   trackById(index: number, item: any) {

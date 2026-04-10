@@ -13,29 +13,41 @@
   --muted: #6b7280;
 
   --border: rgba(0,0,0,0.08);
-  --shadow: 0 8px 24px rgba(0,0,0,0.08);
+  --shadow: 0 10px 30px rgba(0,0,0,0.08);
 
   display: block;
   background: var(--bg);
 }
 
+/* ========================= */
+/* LAYOUT BASE */
+/* ========================= */
+
 .booking-shell {
-  width: min(var(--container-wide), calc(100% - 24px));
-  margin-inline: auto;
+  width: 100%; /* 🔥 FULL WIDTH */
 }
 
+.main-container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 20px;
+  margin-top: 60px;
+}
+
+/* ========================= */
 /* HERO */
+/* ========================= */
 
 .main-search-integradao {
   background: linear-gradient(135deg, var(--primary), var(--primary-2));
   border-radius: 18px;
-  padding: 28px 28px 60px;
-  margin-top: 16px;
+  padding: 28px 20px 60px;
+  margin: 16px;
 }
 
 .search-container-integrado {
-  width: min(var(--container), 100%);
-  margin-inline: auto;
+  max-width: var(--container);
+  margin: 0 auto;
 }
 
 .search-title {
@@ -57,60 +69,9 @@
   transform: translateY(40px);
 }
 
-/* CONTENIDO */
-
-.main-container {
-  width: min(var(--container), 100%);
-  margin-inline: auto;
-  margin-top: 60px;
-}
-
-/* ⭐ HOTELES */
-
-.hotels-section {
-  margin-bottom: 30px;
-}
-
-.hotels-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-
-.hotel-card {
-  background: #fff;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  transition: transform .2s ease;
-}
-
-.hotel-card:hover {
-  transform: translateY(-4px);
-}
-
-.hotel-card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-}
-
-.hotel-card-body {
-  padding: 16px;
-}
-
-.hotel-card-body h3 {
-  margin: 0 0 6px;
-  font-size: 18px;
-}
-
-.hotel-card-body p {
-  margin: 0;
-  color: var(--muted);
-}
-
+/* ========================= */
 /* HEADER HOTEL */
+/* ========================= */
 
 .hotel-top {
   display: flex;
@@ -123,13 +84,16 @@
 
 .hotel-title {
   font-size: 26px;
+  font-weight: 800;
 }
 
 .hotel-subline {
   color: var(--muted);
 }
 
+/* ========================= */
 /* GALERÍA */
+/* ========================= */
 
 .gallery-grid {
   display: grid;
@@ -152,7 +116,9 @@
   object-fit: cover;
 }
 
+/* ========================= */
 /* SECCIONES */
+/* ========================= */
 
 .content-section {
   background: #fff;
@@ -162,7 +128,9 @@
   box-shadow: var(--shadow);
 }
 
+/* ========================= */
 /* SERVICIOS */
+/* ========================= */
 
 .services-grid {
   display: grid;
@@ -170,7 +138,9 @@
   gap: 12px;
 }
 
+/* ========================= */
 /* MAPA */
+/* ========================= */
 
 .map-card {
   background: #fff;
@@ -186,7 +156,9 @@
   border-radius: 10px;
 }
 
+/* ========================= */
 /* HABITACIONES */
+/* ========================= */
 
 .booking-widget {
   background: #fff;
@@ -203,6 +175,11 @@
   padding: 16px;
   margin-top: 12px;
   cursor: pointer;
+  transition: all .2s ease;
+}
+
+.room-card:hover {
+  transform: translateY(-2px);
 }
 
 .room-card.selected {
@@ -222,19 +199,22 @@
 .current-price {
   font-size: 22px;
   font-weight: 800;
-  color: #003580;
+  color: var(--primary);
 }
 
 .total-price {
   font-size: 13px;
   color: var(--muted);
 }
-/* ===================================================== */
-/* SECCIÓN SUCURSALES */
-/* ===================================================== */
+
+/* ========================= */
+/* SUCURSALES */
+/* ========================= */
 
 .branches-section {
-  margin: 40px 0;
+  max-width: var(--container);
+  margin: 60px auto;
+  padding: 0 20px;
 }
 
 .section-title {
@@ -254,8 +234,6 @@
   gap: 22px;
 }
 
-/* TARJETAS */
-
 .branch-card {
   background: #fff;
   border-radius: 18px;
@@ -269,24 +247,18 @@
 
 .branch-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.12);
 }
-
-/* DESTACADA */
 
 .branch-card.featured {
   border: 2px solid #0071c2;
 }
-
-/* IMAGEN */
 
 .branch-card img {
   width: 100%;
   height: 200px;
   object-fit: cover;
 }
-
-/* CONTENIDO */
 
 .branch-content {
   padding: 18px;
@@ -303,8 +275,6 @@
   font-size: 14px;
 }
 
-/* TAGS */
-
 .branch-tags {
   display: flex;
   flex-wrap: wrap;
@@ -316,4 +286,39 @@
   border-radius: 999px;
   padding: 6px 10px;
   font-size: 12px;
+}
+
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
+@media (max-width: 1024px) {
+  .branches-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, 200px);
+  }
+}
+
+@media (max-width: 768px) {
+  .branches-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hotel-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .room-card {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .room-price {
+    text-align: left;
+  }
 }
