@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 type Params = Record<string, any>;
 
@@ -9,8 +10,7 @@ type Params = Record<string, any>;
 })
 export class ApiService {
 
-  // 🔥 TU API REAL (CAMBIA ESTO)
-  private baseUrl = 'https://TU_API_DOCKPLOY.com';
+  private baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -19,14 +19,12 @@ export class ApiService {
   | GET
   |--------------------------------------------------------------------------
   */
-  get<T>(endpoint: string, params?: Params): Observable<T> {
+  get<T>(endpoint: string, options?: { params?: Params }): Observable<T> {
 
     const url = this.buildUrl(endpoint);
 
-    console.log('🌍 GET URL:', url);
-
     return this.http.get<T>(url, {
-      params: this.buildParams(params),
+      params: this.buildParams(options?.params),
       headers: this.buildHeaders(),
     });
   }
@@ -36,12 +34,12 @@ export class ApiService {
   | POST
   |--------------------------------------------------------------------------
   */
-  post<T>(endpoint: string, body?: any, params?: Params): Observable<T> {
+  post<T>(endpoint: string, body?: any, options?: { params?: Params }): Observable<T> {
 
     const url = this.buildUrl(endpoint);
 
     return this.http.post<T>(url, body ?? {}, {
-      params: this.buildParams(params),
+      params: this.buildParams(options?.params),
       headers: this.buildHeaders(),
     });
   }
@@ -51,12 +49,12 @@ export class ApiService {
   | PUT
   |--------------------------------------------------------------------------
   */
-  put<T>(endpoint: string, body?: any, params?: Params): Observable<T> {
+  put<T>(endpoint: string, body?: any, options?: { params?: Params }): Observable<T> {
 
     const url = this.buildUrl(endpoint);
 
     return this.http.put<T>(url, body ?? {}, {
-      params: this.buildParams(params),
+      params: this.buildParams(options?.params),
       headers: this.buildHeaders(),
     });
   }
@@ -66,24 +64,23 @@ export class ApiService {
   | DELETE
   |--------------------------------------------------------------------------
   */
-  delete<T>(endpoint: string, params?: Params): Observable<T> {
+  delete<T>(endpoint: string, options?: { params?: Params }): Observable<T> {
 
     const url = this.buildUrl(endpoint);
 
     return this.http.delete<T>(url, {
-      params: this.buildParams(params),
+      params: this.buildParams(options?.params),
       headers: this.buildHeaders(),
     });
   }
 
   /*
   |--------------------------------------------------------------------------
-  | URL BUILDER (🔥 CLAVE)
+  | URL BUILDER
   |--------------------------------------------------------------------------
   */
   private buildUrl(endpoint: string): string {
 
-    // Si ya es URL completa, la usa
     if (endpoint.startsWith('http')) return endpoint;
 
     return `${this.baseUrl}${endpoint}`;
@@ -91,11 +88,11 @@ export class ApiService {
 
   /*
   |--------------------------------------------------------------------------
-  | Helpers
+  | PARAMS BUILDER
   |--------------------------------------------------------------------------
   */
-
   private buildParams(params?: Params): HttpParams | undefined {
+
     if (!params) return undefined;
 
     let httpParams = new HttpParams();
@@ -108,7 +105,13 @@ export class ApiService {
     return httpParams;
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | HEADERS
+  |--------------------------------------------------------------------------
+  */
   private buildHeaders(): HttpHeaders {
+
     const token = localStorage.getItem('token');
 
     let headers = new HttpHeaders({
@@ -121,5 +124,4 @@ export class ApiService {
 
     return headers;
   }
-
 }
