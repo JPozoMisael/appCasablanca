@@ -1,143 +1,65 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  HostListener
-} from '@angular/core';
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
-import { CommonModule, DatePipe } from '@angular/common';
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
-
-import { addIcons } from 'ionicons';
-import {
-  searchOutline,
-  calendarOutline,
-  peopleOutline,
-  locationOutline,
-  addOutline,
-  removeOutline,
-  checkmarkCircle
-} from 'ionicons/icons';
-
-import {
-  CalendarPickerComponent,
-  DateRange
-} from '../calendar-picker/calendar-picker.component';
-
-
-export interface SearchBarValue {
-  branch: string;
-  checkIn: Date | null;
-  checkOut: Date | null;
-  adults: number;
-  children: number;
-  rooms: number;
-  withPets: boolean;
-}
-
-interface BranchOption {
-  id: string;
-  name: string;
-  desc: string;
-}
+// 🔥 Tipado seguro para huéspedes
+type GuestField = 'adults' | 'children' | 'rooms';
 
 @Component({
   selector: 'app-search-bar',
-  standalone: true,
-  imports: [
-    CommonModule,
-    DatePipe,
-    IonButton,
-    IonIcon,
-    CalendarPickerComponent
-  ],
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.scss'],
 })
 export class SearchBarComponent {
 
-  // =========================
-  // DATA
-  // =========================
+  disabled = false;
 
-  branches: BranchOption[] = [
-    { id: 'chipipe', name: 'Chipipe — Frente al mar', desc: 'Vista directa al océano' },
-    { id: 'palmeras', name: 'Las Palmeras — Zona céntrica', desc: 'Cerca de restaurantes' },
-    { id: 'ballenita', name: 'Ballenita — Vista panorámica', desc: 'Zona tranquila' },
-  ];
-
-  @Input() branch: string = 'palmeras';
-
-  @Input() checkIn: Date | null = null;
-  @Input() checkOut: Date | null = null;
-
-  @Input() adults = 2;
-  @Input() children = 0;
-  @Input() rooms = 1;
-  @Input() withPets = false;
-
-  @Input() buttonText = 'Buscar habitaciones';
-  @Input() disabled = false;
-
-  @Output() valueChange = new EventEmitter<SearchBarValue>();
-  @Output() submit = new EventEmitter<SearchBarValue>();
-
-
-  // =========================
-  // STATE
-  // =========================
-
+  // ================= UI =================
   branchOpen = false;
   datesOpen = false;
   guestsOpen = false;
 
+  // ================= DATA =================
+  branch: string = ''; // slug del hotel
+  checkIn: string = '';
+  checkOut: string = '';
 
-  constructor() {
-    addIcons({
-      searchOutline,
-      calendarOutline,
-      peopleOutline,
-      locationOutline,
-      addOutline,
-      removeOutline,
-      checkmarkCircle
-    });
+  adults: number = 2;
+  children: number = 0;
+  rooms: number = 1;
+  withPets: boolean = false;
+
+  // ================= SUCURSALES =================
+  branches = [
+    { id: 'palmeras', name: 'Palmeras - Salinas', desc: 'Frente al mar' },
+    { id: 'chipipe', name: 'Chipipe', desc: 'Zona tranquila' },
+    { id: 'ballenita', name: 'Ballenita', desc: 'Vista panorámica' },
+  ];
+
+  constructor(private router: Router) {}
+
+  // ================= LABEL =================
+  get branchLabel(): string {
+    const b = this.branches.find(x => x.id === this.branch);
+    return b ? b.name : 'Seleccionar';
   }
 
-
-  // =========================
-  // TOGGLES
-  // =========================
-
-  toggleBranch(ev: Event) {
-    if (this.disabled) return;
-
-    ev.stopPropagation();
-
+  // ================= UI CONTROL =================
+  toggleBranch(e: Event) {
+    e.stopPropagation();
+    this.closeAll();
     this.branchOpen = !this.branchOpen;
-    this.datesOpen = false;
-    this.guestsOpen = false;
   }
 
-  toggleDates(ev: Event) {
-    if (this.disabled) return;
-
-    ev.stopPropagation();
-
+  toggleDates(e: Event) {
+    e.stopPropagation();
+    this.closeAll();
     this.datesOpen = !this.datesOpen;
-    this.branchOpen = false;
-    this.guestsOpen = false;
   }
 
-  toggleGuests(ev: Event) {
-    if (this.disabled) return;
-
-    ev.stopPropagation();
-
+  toggleGuests(e: Event) {
+    e.stopPropagation();
+    this.closeAll();
     this.guestsOpen = !this.guestsOpen;
-    this.branchOpen = false;
-    this.datesOpen = false;
   }
 
   closeAll() {
@@ -146,119 +68,78 @@ export class SearchBarComponent {
     this.guestsOpen = false;
   }
 
-  @HostListener('document:keydown.escape')
-  onEsc() {
-    this.closeAll();
-  }
-
-
-  // =========================
-  // BRANCH
-  // =========================
-
-  selectBranch(id: string) {
-    this.branch = id;
+  // ================= ACCIONES =================
+  selectBranch(slug: string) {
+    this.branch = slug;
     this.branchOpen = false;
-    this.emitValue();
   }
 
-  get branchLabel(): string {
-    return this.branches.find(b => b.id === this.branch)?.name ?? 'Seleccionar sucursal';
-  }
-
-
-  // =========================
-  // DATES
-  // =========================
-
-  onRangeChange(range: DateRange) {
+  onRangeChange(range: { checkIn: string; checkOut: string }) {
     this.checkIn = range.checkIn;
     this.checkOut = range.checkOut;
-    this.emitValue();
   }
 
-
-  // =========================
-  // GUESTS
-  // =========================
-
-  inc(key: 'adults' | 'children' | 'rooms') {
-    if (key === 'adults') this.adults++;
-    if (key === 'children') this.children++;
-    if (key === 'rooms') this.rooms++;
-    this.emitValue();
+  inc(type: GuestField) {
+    this[type]++;
   }
 
-  dec(key: 'adults' | 'children' | 'rooms') {
-    if (key === 'adults') this.adults = Math.max(1, this.adults - 1);
-    if (key === 'children') this.children = Math.max(0, this.children - 1);
-    if (key === 'rooms') this.rooms = Math.max(1, this.rooms - 1);
-    this.emitValue();
+  dec(type: GuestField) {
+    if (this[type] > 0) this[type]--;
   }
 
   togglePets() {
     this.withPets = !this.withPets;
-    this.emitValue();
   }
 
+  // ================= TEXTO =================
+  getGuestsText(): string {
+    return `${this.adults} adultos · ${this.children} niños · ${this.rooms} hab`;
+  }
 
-  // =========================
-  // SUBMIT (CLAVE)
-  // =========================
+  get buttonText(): string {
+    return 'Buscar habitaciones disponibles';
+  }
 
+  // ================= SUBMIT =================
   onSubmit() {
 
-    if (this.disabled) return;
-
-    // 🔥 VALIDACIÓN PROFESIONAL
     if (!this.branch) {
-      alert('Seleccione una sucursal');
+      console.warn('Selecciona una sucursal');
       return;
     }
 
     if (!this.checkIn || !this.checkOut) {
-      alert('Seleccione fechas de entrada y salida');
+      console.warn('Selecciona fechas');
       return;
     }
 
-    const v = this.currentValue();
+    if (this.checkIn >= this.checkOut) {
+      console.warn('Fechas inválidas');
+      return;
+    }
 
-    this.submit.emit(v);
-    this.closeAll();
-  }
-
-
-  // =========================
-  // HELPERS
-  // =========================
-
-  private emitValue() {
-    this.valueChange.emit(this.currentValue());
-  }
-
-  private currentValue(): SearchBarValue {
-    return {
-      branch: this.branch,
+    console.log('BUSQUEDA:', {
+      hotel: this.branch,
       checkIn: this.checkIn,
       checkOut: this.checkOut,
       adults: this.adults,
       children: this.children,
       rooms: this.rooms,
-      withPets: this.withPets,
-    };
+      withPets: this.withPets
+    });
+
+    this.router.navigate(['/habitaciones'], {
+      queryParams: {
+        hotel: this.branch,
+        checkIn: this.checkIn,
+        checkOut: this.checkOut,
+        adults: this.adults,
+        children: this.children,
+        rooms: this.rooms,
+        withPets: this.withPets ? 1 : 0
+      }
+    });
+
   }
 
-  getGuestsText(): string {
-    let text = `${this.adults} adulto${this.adults !== 1 ? 's' : ''}`;
-
-    if (this.children > 0) {
-      text += ` · ${this.children} niño${this.children !== 1 ? 's' : ''}`;
-    }
-
-    text += ` · ${this.rooms} habitación${this.rooms !== 1 ? 'es' : ''}`;
-
-    if (this.withPets) text += ` · Mascotas`;
-
-    return text;
-  }
 }
