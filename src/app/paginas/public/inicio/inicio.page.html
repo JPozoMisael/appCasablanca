@@ -1,299 +1,165 @@
-<div class="booking-shell">
+<div class="home">
 
-  <!-- ================= HERO + BUSCADOR ================= -->
+  <!-- ================= HERO ================= -->
+  <section class="hero">
 
-  <section class="main-search-integradao">
-    <div class="search-container-integrado">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
 
-      <div class="search-header">
-        <h2 class="search-title">Encuentra tu estadía ideal en Salinas</h2>
-        <p class="search-subtitle">
-          Tres ubicaciones privilegiadas frente al mar
-        </p>
-      </div>
+    <div class="hero-content">
 
-      <div class="search-card-integrada">
+      <h1>Vive Salinas como nunca antes</h1>
+      <p>Hospédate frente al mar en experiencias únicas</p>
+
+      <div class="hero-search">
         <app-search-bar
           [checkIn]="checkInDate"
           [checkOut]="checkOutDate"
           [adults]="adults"
           [children]="children"
           [rooms]="rooms"
-          [withPets]="withPets"
-          [buttonText]="'Buscar habitaciones disponibles'"
-        ></app-search-bar>
+          [withPets]="withPets">
+        </app-search-bar>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ================= BENEFICIOS ================= -->
+  <section class="benefits">
+    <div class="container">
+
+      <div class="benefit">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <span>Mejor precio garantizado</span>
+      </div>
+
+      <div class="benefit">
+        <ion-icon name="time-outline"></ion-icon>
+        <span>Reserva inmediata</span>
+      </div>
+
+      <div class="benefit">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+        <span>Pago seguro</span>
+      </div>
+
+      <div class="benefit">
+        <ion-icon name="call-outline"></ion-icon>
+        <span>Soporte 24/7</span>
       </div>
 
     </div>
   </section>
 
-
   <!-- ================= SUCURSALES ================= -->
+  <section class="branches">
+    <div class="container">
 
-  <section class="branches-section">
+      <h2>Nuestras ubicaciones</h2>
+      <p class="subtitle">Tres experiencias únicas frente al mar</p>
 
-  <h2 class="section-title">Elige tu ubicación ideal</h2>
+      <div class="grid">
 
-  <p class="section-subtitle">
-    Tres hoteles Casa Blanca, cada uno con una experiencia única
-  </p>
-
-  <div class="branches-grid">
-
-    <!-- CHIPIPE -->
-    <div class="branch-card featured" [routerLink]="['/hotel/chipipe']">
-
-      <img src="assets/img/26.jpeg" />
-
-      <div class="branch-content">
-
-        <h3>Casa Blanca Chipipe</h3>
-
-        <p>Frente a la playa más tranquila de Salinas</p>
-
-        <div class="branch-tags">
-
-          <span>
-            <ion-icon name="water-outline"></ion-icon>
-            Playa
-          </span>
-
-          <span>
-            <ion-icon name="people-outline"></ion-icon>
-            Familiar
-          </span>
-
-          <span>
-            <ion-icon name="sunny-outline"></ion-icon>
-            Vista al mar
-          </span>
-
+        <div class="card" [routerLink]="['/hotel/chipipe']">
+          <img src="assets/img/26.jpeg" />
+          <div class="overlay"></div>
+          <div class="content">
+            <h3>Casa Blanca Chipipe</h3>
+            <p>Playa tranquila y familiar</p>
+          </div>
         </div>
 
-      </div>
-
-    </div>
-
-
-    <!-- PALMERAS -->
-    <div class="branch-card" [routerLink]="['/hotel/palmeras']">
-
-      <img src="assets/img/25.jpeg" />
-
-      <div class="branch-content">
-
-        <h3>Casa Blanca Palmeras</h3>
-
-        <p>Zona céntrica cerca de restaurantes y comercio</p>
-
-        <div class="branch-tags">
-
-          <span>
-            <ion-icon name="restaurant-outline"></ion-icon>
-            Restaurantes
-          </span>
-
-          <span>
-            <ion-icon name="business-outline"></ion-icon>
-            Centro
-          </span>
-
-          <span>
-            <ion-icon name="moon-outline"></ion-icon>
-            Vida nocturna
-          </span>
-
+        <div class="card" [routerLink]="['/hotel/palmeras']">
+          <img src="assets/img/25.jpeg" />
+          <div class="overlay"></div>
+          <div class="content">
+            <h3>Casa Blanca Palmeras</h3>
+            <p>Centro y vida nocturna</p>
+          </div>
         </div>
 
-      </div>
-
-    </div>
-
-
-    <!-- BALLENITA -->
-    <div class="branch-card" [routerLink]="['/hotel/ballenita']">
-
-      <img src="assets/img/27.jpeg" />
-
-      <div class="branch-content">
-
-        <h3>Casa Blanca Ballenita</h3>
-
-        <p>Vista panorámica en zona tranquila</p>
-
-        <div class="branch-tags">
-
-          <span>
-            <ion-icon name="eye-outline"></ion-icon>
-            Vista
-          </span>
-
-          <span>
-            <ion-icon name="leaf-outline"></ion-icon>
-            Relax
-          </span>
-
-          <span>
-            <ion-icon name="bed-outline"></ion-icon>
-            Tranquilidad
-          </span>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-  <!-- ================= CONTENIDO ================= -->
-
-  <main class="main-container">
-
-
-    <!-- HOTEL DESTACADO -->
-
-    <section class="hotel-top">
-
-      <div class="hotel-top-left">
-        <div class="chip">
-          <ion-icon name="sunny-outline"></ion-icon>
-          Frente a la playa
-        </div>
-
-        <h1 class="hotel-title">Casa Blanca Salinas</h1>
-
-        <div class="hotel-subline">
-          <ion-icon name="location-outline"></ion-icon>
-          Avenida Malecón de Salinas, Ecuador
-          <a href="#" (click)="openMap($event)">Ver mapa</a>
-        </div>
-      </div>
-
-      <div class="hotel-top-right">
-        <ion-button
-          class="reserve-cta"
-          [routerLink]="['/habitaciones']"
-          [queryParams]="getSearchParams()">
-          Ver disponibilidad
-        </ion-button>
-      </div>
-
-    </section>
-
-
-    <!-- GALERÍA -->
-
-    <section class="gallery booking-gallery">
-
-      <div class="gallery-grid">
-
-        <div class="g g1">
-          <img src="assets/img/1.PNG" />
-        </div>
-
-        <div class="g g2">
-          <img src="assets/img/4.PNG" />
-        </div>
-
-        <div class="g g3">
-          <img src="assets/img/9.PNG" />
-        </div>
-
-        <div class="g g4">
-          <img src="assets/img/8.PNG" />
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- DESCRIPCIÓN -->
-
-    <section class="content-section">
-
-      <h2>Descripción</h2>
-
-      <p>
-        El Hotel Casa Blanca Salinas está situado frente a la playa y ofrece
-        habitaciones con Wi-Fi gratuita, aire acondicionado y desayuno incluido.
-      </p>
-
-    </section>
-
-
-    <!-- SERVICIOS -->
-
-    <section class="content-section">
-
-      <h2>Servicios más populares</h2>
-
-      <div class="services-grid">
-
-        <div class="service-item" *ngFor="let service of services">
-          <ion-icon [name]="service.icon"></ion-icon>
-          <span>{{ service.name }}</span>
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- MAPA -->
-
-    <section class="map-card">
-
-      <iframe loading="lazy" [src]="mapEmbedUrl"></iframe>
-
-      <ion-button expand="block" (click)="openMap()">
-        Ver en Google Maps
-      </ion-button>
-
-    </section>
-
-
-    <!-- HABITACIONES -->
-
-    <section class="booking-widget">
-
-      <h2>Habitaciones disponibles</h2>
-
-      <div
-        *ngFor="let room of roomsData; trackBy: trackById"
-        class="room-card"
-        [class.selected]="room.selected"
-        (click)="selectRoom(room.id)">
-
-        <div class="room-details">
-          <h4>{{ room.name }}</h4>
-          <p>{{ room.description }}</p>
-        </div>
-
-        <div class="room-price">
-          <div class="old-price">${{ room.oldPrice }}</div>
-          <div class="current-price">${{ room.price }}/noche</div>
-          <div class="total-price">
-            Total: ${{ room.price * calculateNights() }}
+        <div class="card" [routerLink]="['/hotel/ballenita']">
+          <img src="assets/img/27.jpeg" />
+          <div class="overlay"></div>
+          <div class="content">
+            <h3>Casa Blanca Ballenita</h3>
+            <p>Vista panorámica</p>
           </div>
         </div>
 
       </div>
 
-      <ion-button
-        expand="block"
-        class="reserve-cta"
-        [routerLink]="['/habitaciones']"
-        [queryParams]="getSearchParams()">
-        Reservar ahora
-      </ion-button>
+    </div>
+  </section>
 
-    </section>
+  <!-- ================= GALERÍA ================= -->
+  <section class="gallery">
+    <div class="container">
 
-  </main>
+      <h2>Explora la experiencia</h2>
+
+      <div class="gallery-grid">
+        <img src="assets/img/1.PNG">
+        <img src="assets/img/4.PNG">
+        <img src="assets/img/9.PNG">
+        <img src="assets/img/8.PNG">
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= HABITACIONES DESTACADAS ================= -->
+  <section class="featured-rooms">
+    <div class="container">
+
+      <h2>Habitaciones destacadas</h2>
+
+      <div class="rooms-grid">
+
+        <div class="room-card" *ngFor="let r of roomsData">
+          <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2" />
+          <div class="room-info">
+            <h4>{{ r.name }}</h4>
+            <p>{{ r.description }}</p>
+            <span>${{ r.price }}/noche</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= SERVICIOS ================= -->
+  <section class="services">
+    <div class="container">
+
+      <h2>Servicios</h2>
+
+      <div class="services-grid">
+        <div class="service" *ngFor="let s of services">
+          <ion-icon [name]="s.icon"></ion-icon>
+          <span>{{ s.name }}</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= MAPA ================= -->
+  <section class="map">
+    <iframe [src]="mapEmbedUrl"></iframe>
+  </section>
+
+  <!-- ================= CTA FINAL ================= -->
+  <section class="cta">
+    <h2>¿Listo para tu próxima estadía?</h2>
+    <ion-button size="large" color="primary"
+      [routerLink]="['/hotel/palmeras/habitaciones']">
+      Reservar ahora
+    </ion-button>
+  </section>
 
 </div>
