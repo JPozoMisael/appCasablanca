@@ -37,7 +37,7 @@ export class SearchBarComponent {
   datesOpen = false;
   guestsOpen = false;
 
-  branch: string = '';
+  branch: string = 'palmeras';
 
   branches = [
     { id: 'palmeras', name: 'Palmeras - Salinas', desc: 'Frente al mar' },
@@ -78,7 +78,7 @@ export class SearchBarComponent {
     this.guestsOpen = false;
   }
 
-  // 🔥 FIX CLAVE
+  //  FIX CLAVE
   onSelectBranch(slug: string, e: Event) {
     e.stopPropagation();
     this.branch = slug;
@@ -118,8 +118,7 @@ export class SearchBarComponent {
     console.log('BRANCH:', this.branch);
 
     if (!this.branch) {
-      console.warn('Selecciona una sucursal');
-      return;
+      this.branch = 'palmeras';
     }
 
     if (!this.checkIn || !this.checkOut) {
