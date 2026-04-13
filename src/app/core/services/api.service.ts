@@ -19,15 +19,20 @@ export class ApiService {
   | GET
   |--------------------------------------------------------------------------
   */
-  get<T>(endpoint: string, options?: { params?: Params }): Observable<T> {
+  get<T>(endpoint: string, params?: Params): Observable<T> {
 
-    const url = this.buildUrl(endpoint);
+  const url = this.buildUrl(endpoint);
 
-    return this.http.get<T>(url, {
-      params: this.buildParams(options?.params),
-      headers: this.buildHeaders(),
-    });
-  }
+  const httpParams = this.buildParams(params);
+
+  console.log('GET URL FINAL:', url);
+  console.log('QUERY PARAMS:', httpParams?.toString()); // 🔥 CLAVE
+
+  return this.http.get<T>(url, {
+    params: httpParams,
+    headers: this.buildHeaders(),
+  });
+}
 
   /*
   |--------------------------------------------------------------------------

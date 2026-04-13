@@ -46,40 +46,31 @@ export class HabitacionesService {
   filters: any
 ): Observable<Habitacion[]> {
 
-  console.log('BUSCANDO DISPONIBLES:', { slug, filters });
-
   if (!slug) {
     console.error('SLUG VACÍO');
     return of([]);
   }
 
   const params: any = {
-    hotel: slug
+    hotel: slug,
+    checkIn: filters?.checkIn,
+    checkOut: filters?.checkOut,
+    adults: filters?.adults,
+    children: filters?.children,
+    rooms: filters?.rooms,
+    withPets: filters?.withPets
   };
 
-  if (filters?.checkIn) params.checkIn = filters.checkIn;
-  if (filters?.checkOut) params.checkOut = filters.checkOut;
-  if (filters?.adults) params.adults = filters.adults;
-  if (filters?.children) params.children = filters.children;
-  if (filters?.rooms) params.rooms = filters.rooms;
-  if (filters?.withPets !== undefined) params.withPets = filters.withPets;
+  console.log('PARAMS FINALES:', params);
 
   return this.api.get<any>(
     API_ENDPOINTS.habitaciones.disponibles,
-    params   // ✅ CORRECTO (SIN { params })
+    params   // 🔥 AQUÍ VA DIRECTO
   ).pipe(
 
     map((res) => {
 
-      console.log('RESPUESTA DISPONIBLES:', res);
-
-      if (!res || typeof res !== 'object') {
-        console.error('RESPUESTA NO ES JSON');
-        return [];
-      }
-
-      if (!res.data || !Array.isArray(res.data)) {
-        console.warn('API SIN DATA');
+      if (!res || !res.data || !Array.isArray(res.data)) {
         return [];
       }
 
