@@ -52,26 +52,30 @@ export class HabitacionesPage implements OnInit {
   loadHabitaciones() {
   this.loading = true;
 
-  this.habitacionesService
-    .getDisponiblesByHotel(this.slug, this.filters)
-    .subscribe({
+  const hasFilters = this.filters?.checkIn && this.filters?.checkOut;
 
-      next: (res: any[]) => {
+  const request$ = hasFilters
+    ? this.habitacionesService.getDisponiblesByHotel(this.slug, this.filters)
+    : this.habitacionesService.getByHotel(this.slug);
 
-        console.log('HABITACIONES DISPONIBLES:', res);
+  request$.subscribe({
 
-        this.habitaciones = res.sort(
-          (a: any, b: any) => Number(a.numero) - Number(b.numero)
-        );
+    next: (res: any[]) => {
 
-        this.loading = false;
-      },
+      console.log('HABITACIONES RESULTADO:', res);
 
-      error: (err) => {
-        console.error('ERROR CARGANDO HABITACIONES:', err);
-        this.loading = false;
-      }
-    });
+      this.habitaciones = res.sort(
+        (a: any, b: any) => Number(a.numero) - Number(b.numero)
+      );
+
+      this.loading = false;
+    },
+
+    error: (err) => {
+      console.error('ERROR CARGANDO HABITACIONES:', err);
+      this.loading = false;
+    }
+  });
 }
 
   mapHabitacion(h: any) {
