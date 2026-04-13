@@ -21,8 +21,8 @@ type GuestField = 'adults' | 'children' | 'rooms';
 export class SearchBarComponent {
 
   // ================= INPUTS (CLAVE PARA QUE INICIO FUNCIONE) =================
-  @Input() checkIn: string = '';
-  @Input() checkOut: string = '';
+  @Input() checkIn: Date | null = null;
+  @Input() checkOut: Date | null = null;
   @Input() adults: number = 2;
   @Input() children: number = 0;
   @Input() rooms: number = 1;
@@ -85,11 +85,11 @@ export class SearchBarComponent {
     this.branchOpen = false;
   }
 
-  // 🔥 AJUSTADO PARA CALENDAR
+  //  AJUSTADO PARA CALENDAR
   onRangeChange(range: { checkIn: Date | null; checkOut: Date | null }) {
-    this.checkIn = range.checkIn ? this.formatDate(range.checkIn) : '';
-    this.checkOut = range.checkOut ? this.formatDate(range.checkOut) : '';
-  }
+  this.checkIn = range.checkIn;
+  this.checkOut = range.checkOut;
+}
 
   inc(type: GuestField) {
     this[type]++;
@@ -133,8 +133,8 @@ export class SearchBarComponent {
     this.router.navigate(['/habitaciones'], {
       queryParams: {
         hotel: this.branch,
-        checkIn: this.checkIn,
-        checkOut: this.checkOut,
+        checkIn: this.checkIn ? this.formatDate(this.checkIn) : '',
+        checkOut: this.checkOut ? this.formatDate(this.checkOut) : '',
         adults: this.adults,
         children: this.children,
         rooms: this.rooms,
