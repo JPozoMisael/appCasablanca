@@ -18,13 +18,10 @@ export interface DateRange {
   styleUrls: ['./calendar-picker.component.scss'],
 })
 export class CalendarPickerComponent implements OnChanges {
+
   @Input() checkIn: Date | null = null;
   @Input() checkOut: Date | null = null;
 
-  // opcional (si luego quieres limitar mínimo)
-  @Input() minDate: Date | null = null;
-
-  // ✅ un solo output, el mismo que escucha search-bar
   @Output() rangeChange = new EventEmitter<DateRange>();
 
   checkInStr = '';
@@ -42,9 +39,9 @@ export class CalendarPickerComponent implements OnChanges {
   onCheckIn(value: string) {
     const inDate = value ? new Date(value + 'T00:00:00') : null;
 
-    // si el check-out queda inválido, lo limpiamos
     let outDate = this.checkOut;
-    if (inDate && outDate && outDate.getTime() <= inDate.getTime()) {
+
+    if (inDate && outDate && outDate <= inDate) {
       outDate = null;
       this.checkOutStr = '';
     }
@@ -59,8 +56,7 @@ export class CalendarPickerComponent implements OnChanges {
   onCheckOut(value: string) {
     const outDate = value ? new Date(value + 'T00:00:00') : null;
 
-    // no permitir check-out <= check-in
-    if (this.checkIn && outDate && outDate.getTime() <= this.checkIn.getTime()) {
+    if (this.checkIn && outDate && outDate <= this.checkIn) {
       this.checkOut = null;
       this.checkOutStr = '';
       this.emit();
@@ -82,7 +78,10 @@ export class CalendarPickerComponent implements OnChanges {
   }
 
   private emit() {
-    this.rangeChange.emit({ checkIn: this.checkIn, checkOut: this.checkOut });
+    this.rangeChange.emit({
+      checkIn: this.checkIn,
+      checkOut: this.checkOut
+    });
   }
 
   private toInputDate(date: Date): string {
@@ -91,4 +90,5 @@ export class CalendarPickerComponent implements OnChanges {
     const d = String(date.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   }
+
 }

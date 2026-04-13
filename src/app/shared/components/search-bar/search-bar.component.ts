@@ -1,15 +1,33 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import { CommonModule, DatePipe } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { CalendarPickerComponent } from '../calendar-picker/calendar-picker.component';
 
-// 🔥 Tipado seguro para huéspedes
 type GuestField = 'adults' | 'children' | 'rooms';
 
 @Component({
   selector: 'app-search-bar',
+  standalone: true,
+  imports: [
+    CommonModule,
+    IonicModule,
+    DatePipe,
+    CalendarPickerComponent
+  ],
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.scss'],
 })
 export class SearchBarComponent {
+
+  // ================= INPUTS (CLAVE PARA QUE INICIO FUNCIONE) =================
+  @Input() checkIn: string = '';
+  @Input() checkOut: string = '';
+  @Input() adults: number = 2;
+  @Input() children: number = 0;
+  @Input() rooms: number = 1;
+  @Input() withPets: boolean = false;
+  @Input() buttonText: string = 'Buscar habitaciones disponibles';
 
   disabled = false;
 
@@ -19,14 +37,7 @@ export class SearchBarComponent {
   guestsOpen = false;
 
   // ================= DATA =================
-  branch: string = ''; // slug del hotel
-  checkIn: string = '';
-  checkOut: string = '';
-
-  adults: number = 2;
-  children: number = 0;
-  rooms: number = 1;
-  withPets: boolean = false;
+  branch: string = '';
 
   // ================= SUCURSALES =================
   branches = [
@@ -74,9 +85,10 @@ export class SearchBarComponent {
     this.branchOpen = false;
   }
 
-  onRangeChange(range: { checkIn: string; checkOut: string }) {
-    this.checkIn = range.checkIn;
-    this.checkOut = range.checkOut;
+  // 🔥 AJUSTADO PARA CALENDAR
+  onRangeChange(range: { checkIn: Date | null; checkOut: Date | null }) {
+    this.checkIn = range.checkIn ? this.formatDate(range.checkIn) : '';
+    this.checkOut = range.checkOut ? this.formatDate(range.checkOut) : '';
   }
 
   inc(type: GuestField) {
@@ -91,13 +103,13 @@ export class SearchBarComponent {
     this.withPets = !this.withPets;
   }
 
-  // ================= TEXTO =================
+  // ================= HELPERS =================
   getGuestsText(): string {
     return `${this.adults} adultos · ${this.children} niños · ${this.rooms} hab`;
   }
 
-  get buttonText(): string {
-    return 'Buscar habitaciones disponibles';
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
   }
 
   // ================= SUBMIT =================
@@ -118,16 +130,6 @@ export class SearchBarComponent {
       return;
     }
 
-    console.log('BUSQUEDA:', {
-      hotel: this.branch,
-      checkIn: this.checkIn,
-      checkOut: this.checkOut,
-      adults: this.adults,
-      children: this.children,
-      rooms: this.rooms,
-      withPets: this.withPets
-    });
-
     this.router.navigate(['/habitaciones'], {
       queryParams: {
         hotel: this.branch,
@@ -139,7 +141,6 @@ export class SearchBarComponent {
         withPets: this.withPets ? 1 : 0
       }
     });
-
   }
 
 }
