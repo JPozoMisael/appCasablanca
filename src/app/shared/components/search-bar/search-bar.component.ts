@@ -4,6 +4,9 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { CalendarPickerComponent } from '../calendar-picker/calendar-picker.component';
 
+import { addIcons } from 'ionicons';
+import { checkmarkCircle } from 'ionicons/icons';
+
 type GuestField = 'adults' | 'children' | 'rooms';
 
 @Component({
@@ -20,7 +23,6 @@ type GuestField = 'adults' | 'children' | 'rooms';
 })
 export class SearchBarComponent {
 
-  // ================= INPUTS (CLAVE PARA QUE INICIO FUNCIONE) =================
   @Input() checkIn: Date | null = null;
   @Input() checkOut: Date | null = null;
   @Input() adults: number = 2;
@@ -31,30 +33,27 @@ export class SearchBarComponent {
 
   disabled = false;
 
-  // ================= UI =================
   branchOpen = false;
   datesOpen = false;
   guestsOpen = false;
 
-  // ================= DATA =================
   branch: string = '';
 
-  // ================= SUCURSALES =================
   branches = [
     { id: 'palmeras', name: 'Palmeras - Salinas', desc: 'Frente al mar' },
     { id: 'chipipe', name: 'Chipipe', desc: 'Zona tranquila' },
     { id: 'ballenita', name: 'Ballenita', desc: 'Vista panorámica' },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    addIcons({ checkmarkCircle });
+  }
 
-  // ================= LABEL =================
   get branchLabel(): string {
     const b = this.branches.find(x => x.id === this.branch);
     return b ? b.name : 'Seleccionar';
   }
 
-  // ================= UI CONTROL =================
   toggleBranch(e: Event) {
     e.stopPropagation();
     this.closeAll();
@@ -79,17 +78,19 @@ export class SearchBarComponent {
     this.guestsOpen = false;
   }
 
-  // ================= ACCIONES =================
-  selectBranch(slug: string) {
+  // 🔥 FIX CLAVE
+  onSelectBranch(slug: string, e: Event) {
+    e.stopPropagation();
     this.branch = slug;
     this.branchOpen = false;
+
+    console.log('SELECTED:', slug);
   }
 
-  //  AJUSTADO PARA CALENDAR
   onRangeChange(range: { checkIn: Date | null; checkOut: Date | null }) {
-  this.checkIn = range.checkIn;
-  this.checkOut = range.checkOut;
-}
+    this.checkIn = range.checkIn;
+    this.checkOut = range.checkOut;
+  }
 
   inc(type: GuestField) {
     this[type]++;
@@ -103,7 +104,6 @@ export class SearchBarComponent {
     this.withPets = !this.withPets;
   }
 
-  // ================= HELPERS =================
   getGuestsText(): string {
     return `${this.adults} adultos · ${this.children} niños · ${this.rooms} hab`;
   }
@@ -112,8 +112,10 @@ export class SearchBarComponent {
     return date.toISOString().split('T')[0];
   }
 
-  // ================= SUBMIT =================
   onSubmit() {
+
+    console.log('CLICK SEARCH');
+    console.log('BRANCH:', this.branch);
 
     if (!this.branch) {
       console.warn('Selecciona una sucursal');
@@ -140,7 +142,12 @@ export class SearchBarComponent {
         rooms: this.rooms,
         withPets: this.withPets ? 1 : 0
       }
+    }).then(() => {
+      console.log('NAVEGACIÓN OK');
+    }).catch(err => {
+      console.error('ERROR NAV:', err);
     });
+
   }
 
 }

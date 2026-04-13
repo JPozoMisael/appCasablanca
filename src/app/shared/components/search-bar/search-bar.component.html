@@ -18,7 +18,7 @@
         <div
           class="branch-card"
           *ngFor="let b of branches"
-          (click)="selectBranch(b.id); $event.stopPropagation()"
+          (click)="onSelectBranch(b.id, $event)"
           [class.active]="branch === b.id">
 
           <div class="branch-info">
