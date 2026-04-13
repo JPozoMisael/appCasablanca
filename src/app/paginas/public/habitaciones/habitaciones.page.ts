@@ -50,31 +50,29 @@ export class HabitacionesPage implements OnInit {
   }
 
   loadHabitaciones() {
-    this.loading = true;
+  this.loading = true;
 
-    this.habitacionesService
-      .getDisponiblesByHotel(this.slug, this.filters)
-      .subscribe({
+  this.habitacionesService
+    .getDisponiblesByHotel(this.slug, this.filters)
+    .subscribe({
 
-        next: (res: any) => {
+      next: (res: any[]) => {
 
-          console.log('HABITACIONES DISPONIBLES:', res);
+        console.log('HABITACIONES DISPONIBLES:', res);
 
-          this.habitaciones = res
-            .map((h: any) => this.mapHabitacion(h))
-            .sort((a: any, b: any) =>
-              Number(a.numero) - Number(b.numero)
-            );
+        this.habitaciones = res.sort(
+          (a: any, b: any) => Number(a.numero) - Number(b.numero)
+        );
 
-          this.loading = false;
-        },
+        this.loading = false;
+      },
 
-        error: (err) => {
-          console.error('ERROR CARGANDO HABITACIONES:', err);
-          this.loading = false;
-        }
-      });
-  }
+      error: (err) => {
+        console.error('ERROR CARGANDO HABITACIONES:', err);
+        this.loading = false;
+      }
+    });
+}
 
   mapHabitacion(h: any) {
     return {

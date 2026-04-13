@@ -42,65 +42,58 @@ export class HabitacionesService {
 
   // ================= DISPONIBILIDAD REAL =================
   getDisponiblesByHotel(
-    slug: string,
-    filters: any
-  ): Observable<Habitacion[]> {
+  slug: string,
+  filters: any
+): Observable<Habitacion[]> {
 
-    console.log('BUSCANDO DISPONIBLES:', { slug, filters });
+  console.log('BUSCANDO DISPONIBLES:', { slug, filters });
 
-    if (!slug) {
-      console.error('SLUG VACÍO');
-      return of([]);
-    }
-
-    const params: any = {};
-
-    if (filters?.checkIn) params.checkIn = filters.checkIn;
-    if (filters?.checkOut) params.checkOut = filters.checkOut;
-    if (filters?.adults) params.adults = filters.adults;
-    if (filters?.children) params.children = filters.children;
-    if (filters?.rooms) params.rooms = filters.rooms;
-    if (filters?.withPets !== undefined) params.withPets = filters.withPets;
-
-    params.hotel = slug;
-
-    return this.api.get<any>(
-      API_ENDPOINTS.habitaciones.disponibles,
-      { params }
-    ).pipe(
-
-      map((res) => {
-
-        console.log('RESPUESTA DISPONIBLES:', res);
-
-        if (!res || typeof res !== 'object') {
-          console.error('RESPUESTA NO ES JSON');
-          return [];
-        }
-
-        if (!res.data || !Array.isArray(res.data)) {
-          console.warn('API SIN DATA');
-          return [];
-        }
-
-        return res.data.map((item: any) =>
-          this.mapHabitacion(item)
-        );
-      }),
-
-      catchError((err) => {
-
-        console.error('ERROR DISPONIBLES:', err);
-
-        if (err?.error?.text) {
-          console.error('API DEVOLVIÓ HTML (endpoint incorrecto)');
-        }
-
-        return of([]);
-      })
-    );
+  if (!slug) {
+    console.error('SLUG VACÍO');
+    return of([]);
   }
 
+  const params: any = {
+    hotel: slug
+  };
+
+  if (filters?.checkIn) params.checkIn = filters.checkIn;
+  if (filters?.checkOut) params.checkOut = filters.checkOut;
+  if (filters?.adults) params.adults = filters.adults;
+  if (filters?.children) params.children = filters.children;
+  if (filters?.rooms) params.rooms = filters.rooms;
+  if (filters?.withPets !== undefined) params.withPets = filters.withPets;
+
+  return this.api.get<any>(
+    API_ENDPOINTS.habitaciones.disponibles,
+    params   // ✅ CORRECTO (SIN { params })
+  ).pipe(
+
+    map((res) => {
+
+      console.log('RESPUESTA DISPONIBLES:', res);
+
+      if (!res || typeof res !== 'object') {
+        console.error('RESPUESTA NO ES JSON');
+        return [];
+      }
+
+      if (!res.data || !Array.isArray(res.data)) {
+        console.warn('API SIN DATA');
+        return [];
+      }
+
+      return res.data.map((item: any) =>
+        this.mapHabitacion(item)
+      );
+    }),
+
+    catchError((err) => {
+      console.error('ERROR DISPONIBLES:', err);
+      return of([]);
+    })
+  );
+}
   // ================= SAFE MAP =================
   private safeMapArray(res: any): Habitacion[] {
 

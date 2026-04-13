@@ -114,39 +114,33 @@ export class SearchBarComponent {
 
   onSubmit() {
 
-    console.log('CLICK SEARCH');
-    console.log('BRANCH:', this.branch);
+  if (!this.branch) {
+    this.branch = 'palmeras';
+  }
 
-    if (!this.branch) {
-      this.branch = 'palmeras';
-    }
+  if (!this.checkIn || !this.checkOut) {
+    console.warn('Selecciona fechas');
+    return;
+  }
 
-    if (!this.checkIn || !this.checkOut) {
-      console.warn('Selecciona fechas');
-      return;
-    }
+  if (this.checkIn >= this.checkOut) {
+    console.warn('Fechas inválidas');
+    return;
+  }
 
-    if (this.checkIn >= this.checkOut) {
-      console.warn('Fechas inválidas');
-      return;
-    }
-
-    this.router.navigate(['/habitaciones'], {
+  this.router.navigate(
+    ['/hotel', this.branch, 'habitaciones'],
+    {
       queryParams: {
-        hotel: this.branch,
-        checkIn: this.checkIn ? this.formatDate(this.checkIn) : '',
-        checkOut: this.checkOut ? this.formatDate(this.checkOut) : '',
+        checkIn: this.formatDate(this.checkIn),
+        checkOut: this.formatDate(this.checkOut),
         adults: this.adults,
         children: this.children,
         rooms: this.rooms,
         withPets: this.withPets ? 1 : 0
       }
-    }).then(() => {
-      console.log('NAVEGACIÓN OK');
-    }).catch(err => {
-      console.error('ERROR NAV:', err);
-    });
-
-  }
+    }
+  );
+}
 
 }
