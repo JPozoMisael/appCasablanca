@@ -18,7 +18,7 @@
         <div
           class="branch-card"
           *ngFor="let b of branches"
-          (click)="onSelectBranch(b.id, $event)"
+          (click)="selectBranch(b.id)"
           [class.active]="branch === b.id">
 
           <div class="branch-info">
@@ -78,29 +78,53 @@
         (click)="$event.stopPropagation()">
 
         <div class="guest-row">
-          Adultos
-          <button (click)="dec('adults')">-</button>
-          {{ adults }}
-          <button (click)="inc('adults')">+</button>
+          <span>Adultos</span>
+          <div class="guest-controls">
+            <button (click)="dec('adults')">
+              <ion-icon name="remove-outline"></ion-icon>
+            </button>
+            <span>{{ adults }}</span>
+            <button (click)="inc('adults')">
+              <ion-icon name="add-outline"></ion-icon>
+            </button>
+          </div>
         </div>
 
         <div class="guest-row">
-          Niños
-          <button (click)="dec('children')">-</button>
-          {{ children }}
-          <button (click)="inc('children')">+</button>
+          <span>Niños</span>
+          <div class="guest-controls">
+            <button (click)="dec('children')">
+              <ion-icon name="remove-outline"></ion-icon>
+            </button>
+            <span>{{ children }}</span>
+            <button (click)="inc('children')">
+              <ion-icon name="add-outline"></ion-icon>
+            </button>
+          </div>
         </div>
 
         <div class="guest-row">
-          Habitaciones
-          <button (click)="dec('rooms')">-</button>
-          {{ rooms }}
-          <button (click)="inc('rooms')">+</button>
+          <span>Habitaciones</span>
+          <div class="guest-controls">
+            <button (click)="dec('rooms')">
+              <ion-icon name="remove-outline"></ion-icon>
+            </button>
+            <span>{{ rooms }}</span>
+            <button (click)="inc('rooms')">
+              <ion-icon name="add-outline"></ion-icon>
+            </button>
+          </div>
         </div>
 
-        <button (click)="togglePets()">
-          Mascotas: {{ withPets ? 'Sí' : 'No' }}
-        </button>
+        <div class="guest-row pets-row" (click)="togglePets()">
+          <span>
+            <ion-icon name="paw-outline"></ion-icon>
+            Mascotas
+          </span>
+          <div class="pet-toggle" [class.active]="withPets">
+            {{ withPets ? 'Sí' : 'No' }}
+          </div>
+        </div>
 
       </div>
     </div>
@@ -111,7 +135,6 @@
         class="bk-btn"
         expand="block"
         (click)="onSubmit()">
-
         <ion-icon slot="start" name="search-outline"></ion-icon>
         {{ buttonText }}
       </ion-button>

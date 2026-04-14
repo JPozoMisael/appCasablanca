@@ -1,12 +1,23 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonIcon, IonButton } from "@ionic/angular/standalone";
+import { CommonModule, DatePipe } from '@angular/common';
+import { IonIcon, IonButton } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { locationOutline, calendarOutline, peopleOutline, searchOutline, addOutline, removeOutline, pawOutline, checkmarkCircle } from 'ionicons/icons';
+import { CalendarPickerComponent, DateRange } from '@app/shared/components/calendar-picker/calendar-picker.component';
 
-// 🔥 Tipado seguro para huéspedes
 type GuestField = 'adults' | 'children' | 'rooms';
 
 @Component({
   selector: 'app-search-bar',
+  standalone: true,
+  imports: [
+    CommonModule,
+    DatePipe,
+    IonIcon,
+    IonButton,
+    CalendarPickerComponent,
+  ],
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.scss'],
 })
@@ -14,34 +25,34 @@ export class SearchBarComponent {
 
   disabled = false;
 
-  // ================= UI =================
   branchOpen = false;
   datesOpen = false;
   guestsOpen = false;
 
-  // ================= DATA =================
-  branch: string = ''; // slug del hotel
-  checkIn: string = '';
-  checkOut: string = '';
+  branch: string = '';
+
+  // Ahora Date | null para coincidir con CalendarPickerComponent
+  checkIn: Date | null = null;
+  checkOut: Date | null = null;
 
   adults: number = 2;
   children: number = 0;
   rooms: number = 1;
   withPets: boolean = false;
 
-  // ================= SUCURSALES =================
   branches = [
     { id: 'palmeras', name: 'Palmeras - Salinas', desc: 'Frente al mar' },
-    { id: 'chipipe', name: 'Chipipe', desc: 'Zona tranquila' },
-    { id: 'ballenita', name: 'Ballenita', desc: 'Vista panorámica' },
+    { id: 'chipipe',  name: 'Chipipe',            desc: 'Zona tranquila' },
+    { id: 'ballenita',name: 'Ballenita',           desc: 'Vista panorámica' },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    addIcons({locationOutline,checkmarkCircle,calendarOutline,peopleOutline,removeOutline,addOutline,pawOutline,searchOutline,});
+  }
 
-  // ================= LABEL =================
   get branchLabel(): string {
     const b = this.branches.find(x => x.id === this.branch);
-    return b ? b.name : 'Seleccionar';
+    return b ? b.name : 'Seleccionar sucursal';
   }
 
   // ================= UI CONTROL =================
@@ -75,8 +86,9 @@ export class SearchBarComponent {
     this.branchOpen = false;
   }
 
-  onRangeChange(range: { checkIn: string; checkOut: string }) {
-    this.checkIn = range.checkIn;
+  // Recibe DateRange con Date | null desde CalendarPickerComponent
+  onRangeChange(range: DateRange) {
+    this.checkIn  = range.checkIn;
     this.checkOut = range.checkOut;
   }
 
@@ -92,7 +104,7 @@ export class SearchBarComponent {
     this.withPets = !this.withPets;
   }
 
-  // ================= TEXTO =================
+  // ================= HELPERS =================
   getGuestsText(): string {
     return `${this.adults} adultos · ${this.children} niños · ${this.rooms} hab`;
   }
@@ -101,9 +113,13 @@ export class SearchBarComponent {
     return 'Buscar habitaciones disponibles';
   }
 
+  // Convierte Date a string 'YYYY-MM-DD' para los queryParams
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
   // ================= SUBMIT =================
   onSubmit() {
-
     if (!this.branch) {
       console.warn('Selecciona una sucursal');
       return;
@@ -119,28 +135,16 @@ export class SearchBarComponent {
       return;
     }
 
-    console.log('BUSQUEDA:', {
-      hotel: this.branch,
-      checkIn: this.checkIn,
-      checkOut: this.checkOut,
-      adults: this.adults,
-      children: this.children,
-      rooms: this.rooms,
-      withPets: this.withPets
-    });
-
     this.router.navigate(['/habitaciones'], {
       queryParams: {
-        hotel: this.branch,
-        checkIn: this.checkIn,
-        checkOut: this.checkOut,
-        adults: this.adults,
+        hotel:    this.branch,
+        checkIn:  this.formatDate(this.checkIn),
+        checkOut: this.formatDate(this.checkOut),
+        adults:   this.adults,
         children: this.children,
-        rooms: this.rooms,
-        withPets: this.withPets ? 1 : 0
+        rooms:    this.rooms,
+        withPets: this.withPets ? 1 : 0,
       }
     });
-
   }
-
 }
