@@ -9,9 +9,7 @@
 
     <!-- BRAND -->
     <a class="brand" routerLink="/inicio">
-
       <div class="logo">{{ logoText }}</div>
-
       <div class="txt">
         <div class="t">{{ title }}</div>
         <div class="s">
@@ -19,64 +17,56 @@
           {{ subtitle }}
         </div>
       </div>
-
     </a>
 
     <!-- NAV DESKTOP -->
     <nav class="nav">
-
       <a routerLink="/inicio"
          routerLinkActive="active"
          [routerLinkActiveOptions]="{ exact: true }">
         Inicio
       </a>
-
-      <a routerLink="/inicio#sucursales">
+      <a routerLink="/inicio#sucursales"
+         routerLinkActive="active">
         Sucursales
       </a>
-
-      <a routerLink="/ofertas">
+      <a routerLink="/habitaciones"
+         routerLinkActive="active">
+        Habitaciones
+      </a>
+      <a routerLink="/ofertas"
+         routerLinkActive="active">
         Ofertas
       </a>
-
     </nav>
 
     <!-- ACTIONS -->
     <div class="actions">
-
-      <a class="reserve-btn" routerLink="/inicio">
-        Reservar ahora
-      </a>
-
       <a class="login-btn" routerLink="/login">
         <ion-icon name="person-outline"></ion-icon>
         Iniciar sesión
       </a>
-
+      <a class="reserve-btn" routerLink="/hotel/palmeras/habitaciones">
+        Reservar ahora
+      </a>
     </div>
 
   </div>
 
 </header>
 
-
 <!-- MOBILE DRAWER -->
 <div class="drawer" [class.open]="menuOpen">
-
   <div class="drawer-content">
-
     <a routerLink="/inicio" (click)="closeMenu()">Inicio</a>
-
-    <a routerLink="/inicio#sucursales" (click)="closeMenu()">
-      Sucursales
-    </a>
-
+    <a routerLink="/inicio#sucursales" (click)="closeMenu()">Sucursales</a>
+    <a routerLink="/habitaciones" (click)="closeMenu()">Habitaciones</a>
     <a routerLink="/ofertas" (click)="closeMenu()">Ofertas</a>
-
-    <a routerLink="/login" (click)="closeMenu()">
-      Iniciar sesión
+    <a routerLink="/login" (click)="closeMenu()">Iniciar sesión</a>
+    <a routerLink="/hotel/palmeras/habitaciones"
+       class="reserve-drawer"
+       (click)="closeMenu()">
+      Reservar ahora
     </a>
-
   </div>
-
 </div>

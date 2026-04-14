@@ -1,18 +1,38 @@
-<footer class="ftr">
+<footer class="bftr">
   <div class="wrap">
-    <div class="col">
-      <h4>Hotel Casa Blanca</h4>
-      <p>Tu mejor opción en Salinas, Santa Elena</p>
+
+    <div class="brand">
+      <div class="logo">CB</div>
+      <div class="txt">
+        <div class="t">Hotel Casa Blanca</div>
+        <div class="s">Tu mejor opción en Salinas</div>
+      </div>
     </div>
 
-    <div class="col">
-      <h5>Contacto</h5>
-      <p><ion-icon name="call-outline"></ion-icon> {{ phone }}</p>
-      <p><ion-icon name="mail-outline"></ion-icon> {{ email }}</p>
+    <nav class="links">
+      <a routerLink="/inicio">Inicio</a>
+      <a routerLink="/inicio#sucursales">Sucursales</a>
+      <a routerLink="/habitaciones">Habitaciones</a>
+      <a routerLink="/ofertas">Ofertas</a>
+      <a routerLink="/login">Iniciar sesión</a>
+    </nav>
+
+    <div class="social">
+      <a href="#" target="_blank">
+        <ion-icon name="logo-instagram"></ion-icon>
+      </a>
+      <a href="#" target="_blank">
+        <ion-icon name="logo-facebook"></ion-icon>
+      </a>
+      <a href="#" target="_blank">
+        <ion-icon name="logo-whatsapp"></ion-icon>
+      </a>
     </div>
+
   </div>
 
-  <div class="bottom">
-    © {{ year }} Hotel Casa Blanca. Todos los derechos reservados.
+  <div class="copy">
+    <span>© 2026 Hotel Casa Blanca · Salinas, Santa Elena</span>
+    <span>Todos los derechos reservados</span>
   </div>
 </footer>
