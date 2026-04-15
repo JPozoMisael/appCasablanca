@@ -22,20 +22,23 @@
            @fadeSlide
            (click)="$event.stopPropagation()">
 
-        <div class="branch-card"
-             *ngFor="let b of branches"
-             (click)="selectBranch(b.id)"
-             [class.active]="branch === b.id">
+        <div
+  class="branch-card"
+  *ngFor="let b of branches"
+  (click)="selectBranch(b.id)"
+  [class.active]="branch === b.id">
 
-          <div class="branch-info">
-            <div class="branch-name">{{ b.name }}</div>
-            <div class="branch-desc">{{ b.desc }}</div>
-          </div>
+  <div class="branch-left">
+    <div class="branch-name">{{ b.name }}</div>
+    <div class="branch-desc">{{ b.desc }}</div>
+  </div>
 
-          <ion-icon *ngIf="branch === b.id"
-                    name="checkmark-circle"></ion-icon>
+  <div class="branch-right">
+    <ion-icon *ngIf="branch === b.id"
+              name="checkmark-circle"></ion-icon>
+  </div>
 
-        </div>
+</div>
       </div>
     </div>
 
