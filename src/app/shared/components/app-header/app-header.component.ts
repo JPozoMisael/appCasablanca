@@ -24,7 +24,7 @@ export class AppHeaderComponent {
   @Input() logoText = 'CB';
 
   menuOpen = false;
-  hiddenOnScroll = false;
+  @Input() hiddenOnScroll = false;
   private lastScroll = 0;
 
   constructor() {
@@ -44,7 +44,6 @@ export class AppHeaderComponent {
     this.menuOpen = false;
   }
 
-  @HostListener('window:scroll')
   onScroll() {
     const current = window.scrollY;
 
