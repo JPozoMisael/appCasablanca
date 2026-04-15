@@ -230,11 +230,9 @@ export class SearchBarComponent {
       withPets: this.withPets ? 1 : 0,
     };
 
-    // 🔥 EMIT (para futuro uso)
     this.search.emit(data);
 
-    // 🔥 NAVEGACIÓN
-    this.router.navigate(['/habitaciones'], {
+    this.router.navigate([`/hotel/${this.branch}/habitaciones`], {
       queryParams: data
     });
   }
