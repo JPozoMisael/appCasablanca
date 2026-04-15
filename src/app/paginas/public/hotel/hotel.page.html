@@ -32,9 +32,18 @@
             Ver habitaciones
           </ion-button>
 
-          <ion-button fill="outline" class="outline-btn" routerLink="/inicio">
-            Cambiar sucursal
-          </ion-button>
+          <div class="hotel-switch">
+
+  <button
+    *ngFor="let h of hotelList"
+    [class.active]="slug === h.id"
+    (click)="changeHotel(h.id)">
+
+    {{ h.name }}
+
+  </button>
+
+</div>
         </div>
       </div>
 
@@ -209,10 +218,10 @@
 
       <div class="services-grid">
 
-        <div class="service">
-          <ion-icon name="wifi-outline"></ion-icon>
-          <span>WiFi gratis</span>
-        </div>
+        <div class="service" *ngFor="let s of hotel.services">
+  <ion-icon [name]="s.icon"></ion-icon>
+  <span>{{ s.name }}</span>
+</div>
 
         <div class="service">
           <ion-icon name="water-outline"></ion-icon>

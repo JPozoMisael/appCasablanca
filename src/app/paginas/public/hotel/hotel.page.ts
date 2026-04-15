@@ -38,6 +38,13 @@ export class HotelPage implements OnInit {
   featuredRooms: any[] = [];
   loading = true;
 
+  // 🔥 SWITCH ENTRE HOTELES
+  hotelList = [
+    { id: 'chipipe', name: 'Chipipe' },
+    { id: 'palmeras', name: 'Palmeras' },
+    { id: 'ballenita', name: 'Ballenita' },
+  ];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -75,39 +82,82 @@ export class HotelPage implements OnInit {
   loadHotel() {
 
     const hotelesMock: any = {
+
       chipipe: {
         name: 'Casa Blanca Chipipe',
         location: 'Chipipe, Salinas',
         description: 'Frente a la playa más tranquila de Salinas',
         heroImage: 'assets/img/26.jpeg',
+
+        features: [
+          'Ambiente familiar',
+          'Playa tranquila',
+          'Ideal para descanso'
+        ],
+
+        services: [
+          { name: 'Piscina', icon: 'water-outline' },
+          { name: 'WiFi', icon: 'wifi-outline' },
+          { name: 'Aire acondicionado', icon: 'thermometer-outline' }
+        ],
+
         gallery: [
           'assets/img/26.jpeg',
           'assets/img/26.jpeg',
           'assets/img/26.jpeg'
         ]
       },
+
       palmeras: {
         name: 'Casa Blanca Palmeras',
-        location: 'Palmeras, Salinas',
-        description: 'Zona céntrica cerca de restaurantes',
+        location: 'Centro, Salinas',
+        description: 'Zona céntrica, restaurantes y vida nocturna',
         heroImage: 'assets/img/25.jpeg',
+
+        features: [
+          'Zona céntrica',
+          'Cerca de bares',
+          'Ambiente activo'
+        ],
+
+        services: [
+          { name: 'Restaurante', icon: 'restaurant-outline' },
+          { name: 'Bar', icon: 'wine-outline' },
+          { name: 'WiFi', icon: 'wifi-outline' }
+        ],
+
         gallery: [
           'assets/img/25.jpeg',
           'assets/img/25.jpeg',
           'assets/img/25.jpeg'
         ]
       },
+
       ballenita: {
         name: 'Casa Blanca Ballenita',
         location: 'Ballenita, Santa Elena',
-        description: 'Vista panorámica y tranquilidad',
+        description: 'Vista panorámica y máxima tranquilidad',
         heroImage: 'assets/img/27.jpeg',
+
+        features: [
+          'Vista al mar',
+          'Zona tranquila',
+          'Atardeceres únicos'
+        ],
+
+        services: [
+          { name: 'Piscina', icon: 'water-outline' },
+          { name: 'Vista al mar', icon: 'sunny-outline' },
+          { name: 'WiFi', icon: 'wifi-outline' }
+        ],
+
         gallery: [
           'assets/img/27.jpeg',
           'assets/img/27.jpeg',
           'assets/img/27.jpeg'
         ]
       }
+
     };
 
     this.hotel = hotelesMock[this.slug] || null;
@@ -115,41 +165,46 @@ export class HotelPage implements OnInit {
 
   // ================= ROOMS =================
 
- loadRooms() {
+  loadRooms() {
 
-  this.loading = true;
+    this.loading = true;
 
-  this.habitacionesService.getByHotel(this.slug).subscribe({
-    next: (rooms) => {
+    this.habitacionesService.getByHotel(this.slug).subscribe({
+      next: (rooms) => {
 
-      this.featuredRooms = (rooms || [])
-        .map((r: any) => ({
-          id: r.id,
-          numero: Number(r.numero), //  CLAVE
-          name: `Habitación ${r.numero}`,
-          desc: r.descripcion || `Piso ${r.piso}`,
-          price: r.precioNoche,
-          image: r.imagenUrl
-        }))
-        .sort((a: any, b: any) => a.numero - b.numero); // 🔥 ORDEN REAL
+        this.featuredRooms = (rooms || [])
+          .map((r: any) => ({
+            id: r.id,
+            numero: Number(r.numero),
+            name: `Habitación ${r.numero}`,
+            desc: r.descripcion || `Piso ${r.piso}`,
+            price: r.precioNoche,
+            image: r.imagenUrl
+          }))
+          .sort((a: any, b: any) => a.numero - b.numero);
 
-      this.loading = false;
-    },
-    error: (err) => {
-      console.error('Error cargando habitaciones:', err);
-      this.loading = false;
-    }
-  });
-}
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando habitaciones:', err);
+        this.loading = false;
+      }
+    });
+  }
 
   // ================= NAV =================
 
   goToAvailability() {
-    this.router.navigate([
-      '/hotel',
-      this.slug,
-      'habitaciones'
-    ]);
+    this.router.navigate(['/hotel', this.slug, 'habitaciones']);
   }
 
+  // 🔥 CAMBIO DINÁMICO DE HOTEL (PRO)
+  changeHotel(newSlug: string) {
+
+    if (newSlug === this.slug) return;
+
+    this.router.navigate(['/hotel', newSlug], {
+      queryParamsHandling: 'merge' // 🔥 mantiene fechas luego
+    });
+  }
 }
