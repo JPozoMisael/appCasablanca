@@ -4,7 +4,6 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { SearchBarComponent } from '@app/shared/components/search-bar/search-bar.component';
 import {
   locationOutline,
   searchOutline,
@@ -29,7 +28,6 @@ import { HabitacionesService } from '@app/core/services/habitaciones.service';
     RouterModule,
     IonButton,
     IonIcon,
-    SearchBarComponent
   ]
 })
 export class HotelPage implements OnInit {

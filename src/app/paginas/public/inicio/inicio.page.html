@@ -1,71 +1,68 @@
 <div class="home">
 
-  <!-- NAV -->
-  <nav class="top-nav">
-    <div class="nav-logo">
-      <div class="cb-badge">CB</div>
-      <div>
-        <span class="nav-name">Hotel Casa Blanca</span>
-        <span class="nav-loc">
-          <ion-icon name="location-outline"></ion-icon>
-          Salinas, Santa Elena
-        </span>
-      </div>
-    </div>
-    <div class="nav-links">
-      <a routerLink="/inicio" routerLinkActive="active">Inicio</a>
-      <a routerLink="/sucursales">Sucursales</a>
-      <a routerLink="/habitaciones">Habitaciones</a>
-      <a routerLink="/ofertas">Ofertas</a>
-      <button class="btn-ghost" routerLink="/login">Iniciar sesión</button>
-      <button class="btn-nav" routerLink="/hotel/palmeras/habitaciones">Reservar ahora</button>
-    </div>
-  </nav>
-
   <!-- ================= HERO ================= -->
   <section class="hero">
+
     <div class="hero-accent"></div>
     <div class="hero-accent2"></div>
+
     <div class="hero-content">
+
       <div class="hero-tag">
         <ion-icon name="water-outline"></ion-icon>
         Frente al mar · Salinas, Ecuador
       </div>
-      <h1>Vive Salinas como <em>nunca antes</em></h1>
-      <p>Hospédate frente al mar en experiencias únicas</p>
+
+      <h1>
+        Vive Salinas como <em>nunca antes</em>
+      </h1>
+
+      <p>
+        Hospédate frente al mar en experiencias únicas
+      </p>
+
       <div class="hero-search">
         <app-search-bar></app-search-bar>
       </div>
+
     </div>
   </section>
 
   <!-- ================= BENEFICIOS ================= -->
   <section class="benefits">
     <div class="container">
+
       <div class="benefit">
         <ion-icon name="checkmark-circle-outline"></ion-icon>
         <span>Mejor precio garantizado</span>
       </div>
+
       <div class="benefit">
         <ion-icon name="time-outline"></ion-icon>
         <span>Reserva inmediata</span>
       </div>
+
       <div class="benefit">
         <ion-icon name="shield-checkmark-outline"></ion-icon>
         <span>Pago seguro</span>
       </div>
+
       <div class="benefit">
         <ion-icon name="call-outline"></ion-icon>
         <span>Soporte 24/7</span>
       </div>
+
     </div>
   </section>
 
   <!-- ================= SUCURSALES ================= -->
-  <section class="branches">
+  <section id="sucursales" class="branches">
     <div class="container">
+
       <h2>Nuestras ubicaciones</h2>
-      <p class="subtitle">Tres experiencias únicas frente al mar</p>
+      <p class="subtitle">
+        Tres experiencias únicas frente al mar
+      </p>
 
       <div class="grid">
 
@@ -76,10 +73,6 @@
             <h3>Casa Blanca Chipipe</h3>
             <p>Playa tranquila y familiar</p>
           </div>
-          <div class="card-footer">
-            <span>Desde $69/noche</span>
-            <a>Ver habitaciones <ion-icon name="arrow-forward-outline"></ion-icon></a>
-          </div>
         </div>
 
         <div class="card" [routerLink]="['/hotel/palmeras']">
@@ -88,10 +81,6 @@
           <div class="content">
             <h3>Casa Blanca Palmeras</h3>
             <p>Centro y vida nocturna</p>
-          </div>
-          <div class="card-footer">
-            <span>Desde $89/noche</span>
-            <a>Ver habitaciones <ion-icon name="arrow-forward-outline"></ion-icon></a>
           </div>
         </div>
 
@@ -102,51 +91,59 @@
             <h3>Casa Blanca Ballenita</h3>
             <p>Vista panorámica</p>
           </div>
-          <div class="card-footer">
-            <span>Desde $75/noche</span>
-            <a>Ver habitaciones <ion-icon name="arrow-forward-outline"></ion-icon></a>
-          </div>
         </div>
 
       </div>
+
     </div>
   </section>
 
   <!-- ================= GALERÍA ================= -->
   <section class="gallery">
     <div class="container">
+
       <h2>Explora la experiencia</h2>
       <p class="subtitle">Momentos únicos en cada rincón</p>
+
       <div class="gallery-grid">
         <img src="assets/img/1.PNG">
         <img src="assets/img/4.PNG">
         <img src="assets/img/9.PNG">
         <img src="assets/img/8.PNG">
       </div>
+
     </div>
   </section>
 
-  <!-- ================= HABITACIONES DESTACADAS ================= -->
+  <!-- ================= HABITACIONES ================= -->
   <section class="featured-rooms">
     <div class="container">
+
       <h2>Habitaciones destacadas</h2>
-      <p class="subtitle">Comodidad y vistas al mar en cada opción</p>
+      <p class="subtitle">Comodidad y vistas al mar</p>
 
       <div class="rooms-grid">
+
         <div class="room-card" *ngFor="let r of roomsData; trackBy: trackById">
+
           <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2" />
+
           <div class="room-info">
             <h4>{{ r.name }}</h4>
             <p>{{ r.description }}</p>
+
             <div class="room-footer">
               <span class="price">${{ r.price }}/noche</span>
+
               <button class="btn-sm">
                 Ver detalles
                 <ion-icon name="arrow-forward-outline"></ion-icon>
               </button>
             </div>
           </div>
+
         </div>
+
       </div>
 
     </div>
@@ -155,8 +152,9 @@
   <!-- ================= SERVICIOS ================= -->
   <section class="services">
     <div class="container">
+
       <h2>Nuestros servicios</h2>
-      <p class="subtitle">Todo lo que necesitas para una estadía perfecta</p>
+      <p class="subtitle">Todo lo que necesitas</p>
 
       <div class="services-grid">
         <div class="service" *ngFor="let s of services">
@@ -164,6 +162,7 @@
           <span>{{ s.name }}</span>
         </div>
       </div>
+
     </div>
   </section>
 
@@ -175,14 +174,18 @@
     </div>
   </section>
 
-  <!-- ================= CTA FINAL ================= -->
+  <!-- ================= CTA ================= -->
   <section class="cta">
+
     <h2>¿Listo para tu próxima estadía?</h2>
+
     <p>Reserva directo y obtén el mejor precio garantizado</p>
+
     <ion-button size="large" [routerLink]="['/hotel/palmeras/habitaciones']">
       <ion-icon name="calendar-outline" slot="start"></ion-icon>
       Reservar ahora
     </ion-button>
+
   </section>
 
 </div>
