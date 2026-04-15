@@ -20,7 +20,6 @@
   grid-template-columns: 1.25fr 1fr 1fr 220px;
 
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  overflow: visible;
 }
 
 /* ================= ITEMS ================= */
@@ -34,6 +33,7 @@
   transition: all 0.18s ease;
 
   border-right: 1px solid #e6e6e6;
+  position: relative;
 }
 
 .bk-item:last-child {
@@ -42,7 +42,6 @@
 
 .bk-item:hover {
   background: #f0f7ff;
-  transform: translateY(-1px);
 }
 
 .bk-item.active {
@@ -67,50 +66,62 @@
 .bk-value-main.empty {
   color: #9aa0a6;
 }
-
-/* ================= POPOVER ================= */
+/* ================= POPOVER PROFESIONAL ================= */
 
 .bk-pop {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 8px);
+
+  /* 🔥 CLAVE: alineado al campo */
   left: 0;
 
-  width: 520px;
-  max-height: 420px;
-  overflow-y: auto;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
 
-  background: #ffffff;
-  border-radius: 16px;
-
-  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
   padding: 14px;
+  z-index: 40;
 
-  z-index: 200;
+  animation: fadeIn 0.16s ease;
 }
 
-/* ================= BACKDROP ================= */
+/* ================= TAMAÑOS REALES ================= */
 
-.bk-backdrop {
-  position: fixed;
-  inset: 0;
-
-  background: transparent;
-  backdrop-filter: none;
-
-  z-index: 100;
+/* SUCURSAL */
+.bk-item:nth-child(1) .bk-pop {
+  width: 360px;
 }
 
+/* FECHAS */
+.bk-item:nth-child(2) .bk-pop {
+  width: 520px;
+}
+
+/* HUÉSPEDES */
+.bk-item:nth-child(3) .bk-pop {
+  width: 300px;
+}
+
+/* ================= ANIMACIÓN LIMPIA ================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 /* ================= BOTÓN ================= */
 
 .bk-btn {
   --background: #0071c2;
-  --background-hover: #005fa3;
-
   height: 56px;
   font-weight: 900;
   font-size: 14px;
 
-  letter-spacing: 0.5px;
   transition: all 0.2s ease;
 }
 
@@ -119,99 +130,72 @@
   box-shadow: 0 6px 18px rgba(0,113,194,0.25);
 }
 
-/* ===================================================== */
-/* 🔥 BRANCH CARDS (AQUÍ ESTÁ LO QUE TE FALTABA) */
-/* ===================================================== */
+/* ================= SUCURSALES ================= */
 
 .branch-card {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 
   padding: 14px 16px;
-  border-radius: 14px;
+  border-radius: 12px;
 
   background: #f8fafc;
-  border: 1px solid #e6e6e6;
+  border: 1px solid #e5e7eb;
 
   cursor: pointer;
-  transition: all 0.18s ease;
+  margin-bottom: 8px;
+  transition: all 0.15s ease;
+}
+
+.branch-card:hover {
+  background: #eef5ff;
+  border-color: #0071c2;
+}
+
+.branch-card.active {
+  background: #e7f1ff;
+  border-color: #0071c2;
+}
+
+.branch-name {
+  font-weight: 800;
+}
+
+.branch-desc {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* ================= HUÉSPEDES ================= */
+
+.guest-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px;
+  border-radius: 10px;
+
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
 
   margin-bottom: 8px;
 }
 
-/* CONTENIDO IZQUIERDO */
-.branch-left {
-  display: flex;
-  flex-direction: column;
-}
-
-/* NOMBRE */
-.branch-name {
-  font-weight: 800;
-  font-size: 15px;
-  color: #0f172a;
-}
-
-/* DESCRIPCIÓN */
-.branch-desc {
-  font-size: 13px;
-  color: #64748b;
-  margin-top: 2px;
-}
-
-/* ICONO DERECHO */
-.branch-right {
+.guest-controls {
   display: flex;
   align-items: center;
-
-  ion-icon {
-    font-size: 22px;
-    color: #0071c2;
-  }
+  gap: 10px;
 }
 
-/* HOVER */
-.branch-card:hover {
-  background: #eef5ff;
-  border-color: #0071c2;
-  transform: translateY(-1px);
-}
+.guest-controls button {
+  width: 32px;
+  height: 32px;
 
-/* ACTIVO */
-.branch-card.active {
-  background: #e7f1ff;
-  border-color: #0071c2;
-  box-shadow: 0 4px 14px rgba(0,113,194,0.15);
-}
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
 
-/* ================= SCROLL BONITO ================= */
-
-.bk-pop::-webkit-scrollbar {
-  width: 6px;
-}
-
-.bk-pop::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 10px;
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media (max-width: 900px) {
-
-  .bk-bar {
-    grid-template-columns: 1fr;
-  }
-
-  .bk-pop {
-    position: fixed;
-    left: 50%;
-    bottom: 20px;
-
-    transform: translateX(-50%);
-
-    width: calc(100% - 24px);
-    max-height: 70vh;
-  }
+  background: #fff;
+  cursor: pointer;
 }

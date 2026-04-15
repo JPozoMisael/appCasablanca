@@ -1,6 +1,8 @@
 import {
   Component,
-  HostListener
+  HostListener,
+  Output,
+  EventEmitter
 } from '@angular/core';
 
 import { Router } from '@angular/router';
@@ -46,7 +48,6 @@ type GuestField = 'adults' | 'children' | 'rooms';
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.scss'],
 
-  // 🔥 Animaciones PRO
   animations: [
     trigger('fadeSlide', [
       transition(':enter', [
@@ -65,13 +66,21 @@ type GuestField = 'adults' | 'children' | 'rooms';
 })
 export class SearchBarComponent {
 
+  // 🔥 OUTPUT (para futuras mejoras)
+  @Output() search = new EventEmitter<any>();
+
+  // ================= UI STATE =================
+
   disabled = false;
 
   branchOpen = false;
   datesOpen = false;
   guestsOpen = false;
 
+  // ================= DATA =================
+
   branch: string = '';
+  branchLabel: string = 'Seleccionar sucursal';
 
   checkIn: Date | null = null;
   checkOut: Date | null = null;
@@ -80,6 +89,10 @@ export class SearchBarComponent {
   children = 0;
   rooms = 1;
   withPets = false;
+
+  buttonText: string = 'Buscar habitaciones';
+
+  // ================= DATA SOURCE =================
 
   branches = [
     { id: 'palmeras', name: 'Palmeras - Salinas', desc: 'Frente al mar' },
@@ -100,34 +113,44 @@ export class SearchBarComponent {
     });
   }
 
-  // 🔥 Cerrar con ESC
+  // ================= UX CONTROL =================
+
+  // ESC
   @HostListener('document:keydown.escape')
   onEsc() {
     this.closeAll();
   }
 
-  get branchLabel(): string {
-    const b = this.branches.find(x => x.id === this.branch);
-    return b ? b.name : 'Seleccionar sucursal';
+  // CLICK FUERA
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.bk-search')) {
+      this.closeAll();
+    }
   }
 
-  // ================= UI =================
+  // ================= TOGGLES =================
+
   toggleBranch(e: Event) {
     e.stopPropagation();
-    this.closeAll();
     this.branchOpen = !this.branchOpen;
+    this.datesOpen = false;
+    this.guestsOpen = false;
   }
 
   toggleDates(e: Event) {
     e.stopPropagation();
-    this.closeAll();
     this.datesOpen = !this.datesOpen;
+    this.branchOpen = false;
+    this.guestsOpen = false;
   }
 
   toggleGuests(e: Event) {
     e.stopPropagation();
-    this.closeAll();
     this.guestsOpen = !this.guestsOpen;
+    this.branchOpen = false;
+    this.datesOpen = false;
   }
 
   closeAll() {
@@ -137,8 +160,13 @@ export class SearchBarComponent {
   }
 
   // ================= ACCIONES =================
+
   selectBranch(slug: string) {
     this.branch = slug;
+
+    const b = this.branches.find(x => x.id === slug);
+    this.branchLabel = b ? b.name : 'Seleccionar sucursal';
+
     this.branchOpen = false;
   }
 
@@ -148,11 +176,15 @@ export class SearchBarComponent {
   }
 
   inc(type: GuestField) {
-    this[type]++;
+    if (type === 'adults') this.adults++;
+    if (type === 'children') this.children++;
+    if (type === 'rooms') this.rooms++;
   }
 
   dec(type: GuestField) {
-    if (this[type] > 0) this[type]--;
+    if (type === 'adults' && this.adults > 1) this.adults--;
+    if (type === 'children' && this.children > 0) this.children--;
+    if (type === 'rooms' && this.rooms > 1) this.rooms--;
   }
 
   togglePets() {
@@ -160,12 +192,9 @@ export class SearchBarComponent {
   }
 
   // ================= HELPERS =================
+
   getGuestsText(): string {
     return `${this.adults} adultos · ${this.children} niños · ${this.rooms} hab`;
-  }
-
-  get buttonText(): string {
-    return 'Buscar habitaciones';
   }
 
   private formatDate(date: Date): string {
@@ -173,22 +202,40 @@ export class SearchBarComponent {
   }
 
   // ================= SUBMIT =================
+
   onSubmit() {
 
-    if (!this.branch) return;
-    if (!this.checkIn || !this.checkOut) return;
-    if (this.checkIn >= this.checkOut) return;
+    if (!this.branch) {
+      alert('Selecciona una sucursal');
+      return;
+    }
 
+    if (!this.checkIn || !this.checkOut) {
+      alert('Selecciona fechas');
+      return;
+    }
+
+    if (this.checkIn >= this.checkOut) {
+      alert('Fechas inválidas');
+      return;
+    }
+
+    const data = {
+      hotel: this.branch,
+      checkIn: this.formatDate(this.checkIn),
+      checkOut: this.formatDate(this.checkOut),
+      adults: this.adults,
+      children: this.children,
+      rooms: this.rooms,
+      withPets: this.withPets ? 1 : 0,
+    };
+
+    // 🔥 EMIT (para futuro uso)
+    this.search.emit(data);
+
+    // 🔥 NAVEGACIÓN
     this.router.navigate(['/habitaciones'], {
-      queryParams: {
-        hotel: this.branch,
-        checkIn: this.formatDate(this.checkIn),
-        checkOut: this.formatDate(this.checkOut),
-        adults: this.adults,
-        children: this.children,
-        rooms: this.rooms,
-        withPets: this.withPets ? 1 : 0,
-      }
+      queryParams: data
     });
   }
 }

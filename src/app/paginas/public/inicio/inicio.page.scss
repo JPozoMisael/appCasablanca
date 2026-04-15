@@ -8,19 +8,17 @@
 /* ================= CONTAINER ================= */
 
 .container {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 24px;
 }
 
 /* ================= HERO ================= */
 
 .hero {
   background: #0f172a;
-  padding: 70px 40px 60px;
+  padding: 60px 24px 50px;
   position: relative;
-
-  /* 🔥 CLAVE */
   overflow: visible;
 
   .hero-accent {
@@ -46,8 +44,8 @@
   }
 
   .hero-content {
+    max-width: 600px;
     position: relative;
-    max-width: 680px;
     z-index: 2;
   }
 
@@ -55,19 +53,19 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255,255,255,0.1);
     border-radius: 20px;
     padding: 5px 14px;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255,255,255,0.8);
     margin-bottom: 20px;
   }
 
   h1 {
-    font-size: 42px;
+    font-size: 34px;
     font-weight: 700;
     color: #ffffff;
-    line-height: 1.18;
+    line-height: 1.2;
 
     em {
       color: #f0c040;
@@ -76,44 +74,49 @@
   }
 
   p {
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.65);
-    margin-bottom: 36px;
+    font-size: 15px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 28px;
   }
 
-  /* 🔥 SEARCH ENCIMA */
+  /* ================= SEARCH ================= */
+
   .hero-search {
     position: relative;
     z-index: 50;
     margin-top: 20px;
+
+    /* 🔥 FIX REAL: rompe el container */
+    width: calc(100% + 80px);
+    margin-left: -40px;
+  }
+
+  .hero-search app-search-bar {
+    display: block;
+    width: 100%;
+    max-width: 1200px;
   }
 }
 
 /* ================= FIX GLOBAL MODALS ================= */
 
-/* 🔥 ESTO EVITA QUE CUALQUIER CONTENEDOR CORTE MODALES */
 ion-content,
 .public-container,
 .page-wrapper {
   overflow: visible !important;
 }
 
-/* ================= BACKDROP FIX ================= */
+/* ================= BACKDROP ================= */
 
 .bk-backdrop {
   position: fixed;
   inset: 0;
-
-  /* ❌ quitamos degradado feo */
   background: rgba(0, 0, 0, 0.15);
-
-  /* ❌ SIN blur */
   backdrop-filter: none;
-
   z-index: 100;
 }
 
-/* ================= POPOVER FIX ================= */
+/* ================= POPOVER ================= */
 
 .bk-pop {
   z-index: 200 !important;
@@ -124,14 +127,42 @@ ion-content,
 
 .benefits {
   background: #ffffff;
-  padding: 18px 0;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 14px 0;
+  border-bottom: 1px solid #e5e7eb;
 
   .container {
     display: flex;
     justify-content: center;
-    gap: 48px;
+    gap: 28px;
+    flex-wrap: wrap;
   }
+
+  .benefit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 13px;
+    color: #334155;
+
+    ion-icon {
+      font-size: 18px;
+      color: #0071c2;
+    }
+  }
+}
+
+/* ================= TITULOS ================= */
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 24px;
 }
 
 /* ================= SECCIONES ================= */
@@ -142,4 +173,219 @@ ion-content,
 .map {
   position: relative;
   z-index: 1;
+}
+
+/* ================= SUCURSALES ================= */
+
+.branches {
+  padding: 50px 0;
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .card {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    height: 180px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: 0.4s;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    }
+
+    .content {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      color: #fff;
+
+      h3 {
+        font-size: 16px;
+        margin: 0;
+      }
+
+      p {
+        font-size: 13px;
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+/* ================= GALERÍA ================= */
+
+.gallery {
+  padding: 50px 0;
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+
+    img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+  }
+}
+
+/* ================= HABITACIONES ================= */
+
+.featured-rooms {
+  padding: 50px 0;
+
+  .rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .room-card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+
+    img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+    }
+
+    .room-info {
+      padding: 12px;
+
+      h4 {
+        font-size: 15px;
+      }
+
+      p {
+        font-size: 13px;
+        color: #64748b;
+      }
+    }
+
+    .room-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+
+      .price {
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      .btn-sm {
+        font-size: 13px;
+        background: transparent;
+        border: none;
+        color: #0071c2;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+/* ================= SERVICIOS ================= */
+
+.services {
+  padding: 50px 0;
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+
+  .service {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+
+    ion-icon {
+      font-size: 22px;
+      color: #0071c2;
+    }
+
+    span {
+      display: block;
+      margin-top: 6px;
+      font-size: 13px;
+    }
+  }
+}
+
+/* ================= MAPA ================= */
+
+.map {
+  padding: 50px 0;
+
+  iframe {
+    width: 100%;
+    height: 260px;
+    border-radius: 12px;
+    border: none;
+  }
+}
+
+/* ================= CTA ================= */
+
+.cta {
+  text-align: center;
+  padding: 60px 20px;
+
+  h2 {
+    font-size: 24px;
+  }
+
+  p {
+    margin: 10px 0 20px;
+    color: #64748b;
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+
+  .branches .grid,
+  .featured-rooms .rooms-grid,
+  .services .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  /* 🔥 MOBILE SEARCH */
+  .hero-search {
+    width: 100%;
+    margin-left: 0;
+  }
 }
