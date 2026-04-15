@@ -2,263 +2,92 @@
   display: block;
 }
 
-/* ===================================================== */
-/* WRAPPER
-/* ===================================================== */
-
+/* CONTENEDOR */
 .bk-search {
   width: 100%;
   position: relative;
 }
 
-.bk-search.disabled {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-/* ===================================================== */
-/* BARRA PRINCIPAL
-/* ===================================================== */
-
+/* BARRA */
 .bk-bar {
   background: #fff;
   border: 3px solid #febb02;
-  border-radius: 12px;
-
+  border-radius: 14px;
   display: grid;
   grid-template-columns: 1.25fr 1fr 1fr 220px;
-
-  align-items: stretch;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   overflow: visible;
-
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* ===================================================== */
-/* BLOQUES
-/* ===================================================== */
-
+/* ITEMS */
 .bk-item {
-  position: relative;
-  padding: 12px 14px;
-
+  padding: 12px 16px;
   display: grid;
-  align-content: center;
   gap: 6px;
-
-  min-height: 68px;
   cursor: pointer;
-  user-select: none;
+  transition: all 0.15s ease;
+  border-right: 1px solid #e6e6e6;
+}
 
-  transition: background 0.15s ease;
+.bk-item:last-child {
+  border-right: none;
 }
 
 .bk-item:hover {
-  background: rgba(0, 0, 0, 0.02);
+  background: #f0f7ff;
 }
 
-/* ===================================================== */
-/* LABEL + VALUE
-/* ===================================================== */
+.bk-item.active {
+  background: #eef5ff;
+  box-shadow: inset 0 0 0 2px #0071c2;
+}
 
+/* TEXTO */
 .bk-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
   font-size: 12px;
-  color: #5a5a5a;
+  color: #666;
   font-weight: 700;
-
-  ion-icon {
-    font-size: 16px;
-    color: #003580;
-  }
 }
 
 .bk-value-main {
-  font-weight: 900;
-  color: #1f1f1f;
   font-size: 15px;
+  font-weight: 800;
+  color: #111;
 }
 
-/* ===================================================== */
-/* POPOVER
-/* ===================================================== */
+.bk-value-main.empty {
+  color: #9aa0a6;
+}
 
+/* POPOVER */
 .bk-pop {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-
-  width: min(560px, calc(100vw - 24px));
-
+  width: 520px;
   background: #fff;
-  border: 1px solid #e6e6e6;
   border-radius: 14px;
-
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
-
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
   padding: 12px;
   z-index: 10;
 }
 
-/* Flecha */
-
-.bk-pop::before {
-  content: "";
-  position: absolute;
-  top: -8px;
-  left: 18px;
-
-  width: 14px;
-  height: 14px;
-
-  background: #fff;
-  border-left: 1px solid #e6e6e6;
-  border-top: 1px solid #e6e6e6;
-
-  transform: rotate(45deg);
-}
-
-/* ===================================================== */
-/* BACKDROP
-/* ===================================================== */
-
+/* BACKDROP */
 .bk-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.12);
-  z-index: 5;
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(2px);
 }
 
-/* ===================================================== */
-/* SUCURSALES
-/* ===================================================== */
-
-.branch-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.branch-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-
-  padding: 12px 14px;
-  border-radius: 12px;
-
-  background: #f6f7f9;
-  border: 1px solid #e6e6e6;
-
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.branch-card:hover {
-  background: #eef5ff;
-  border-color: #0071c2;
-}
-
-.branch-card.active {
-  background: #e7f1ff;
-  border-color: #0071c2;
-}
-
-.branch-info {
-  flex: 1;
-}
-
-.branch-name {
-  font-weight: 900;
-  font-size: 15px;
-}
-
-.branch-desc {
-  font-size: 13px;
-  color: #6b6b6b;
-}
-
-/* ===================================================== */
-/* HUÉSPEDES
-/* ===================================================== */
-
-.guest-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 10px 12px;
-
-  background: #f6f7f9;
-  border: 1px solid #e6e6e6;
-  border-radius: 12px;
-}
-
-.guest-row button {
-  width: 34px;
-  height: 34px;
-
-  border-radius: 10px;
-  border: 1px solid #ddd;
-
-  background: #fff;
-  font-weight: 900;
-  cursor: pointer;
-}
-
-/* ===================================================== */
-/* BOTÓN BUSCAR
-/* ===================================================== */
-
-.bk-action {
-  padding: 12px;
-  display: grid;
-  align-items: center;
-}
-
+/* BOTÓN */
 .bk-btn {
   --background: #0071c2;
-  --background-hover: #005fa3;
-  --border-radius: 10px;
-
-  height: 52px;
+  height: 56px;
   font-weight: 900;
+  transition: all 0.2s ease;
 }
 
-/* ===================================================== */
-/* RESPONSIVE
-/* ===================================================== */
-
-@media (max-width: 900px) {
-
-  .bk-bar {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 10px;
-  }
-
-  .bk-pop {
-    position: fixed;
-    left: 50%;
-    bottom: 16px;
-
-    transform: translateX(-50%);
-
-    width: min(560px, calc(100vw - 24px));
-    max-height: calc(100vh - 120px);
-
-    overflow: auto;
-    border-radius: 16px;
-  }
-
-  .bk-pop::before {
-    display: none;
-  }
-
-  .bk-backdrop {
-    background: rgba(0, 0, 0, 0.24);
-  }
+.bk-btn:hover {
+  transform: translateY(-2px);
 }

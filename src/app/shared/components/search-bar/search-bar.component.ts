@@ -1,10 +1,35 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  HostListener
+} from '@angular/core';
+
 import { Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { IonIcon, IonButton } from '@ionic/angular/standalone';
+
 import { addIcons } from 'ionicons';
-import { locationOutline, calendarOutline, peopleOutline, searchOutline, addOutline, removeOutline, pawOutline, checkmarkCircle } from 'ionicons/icons';
-import { CalendarPickerComponent, DateRange } from '@app/shared/components/calendar-picker/calendar-picker.component';
+import {
+  locationOutline,
+  calendarOutline,
+  peopleOutline,
+  searchOutline,
+  addOutline,
+  removeOutline,
+  pawOutline,
+  checkmarkCircle
+} from 'ionicons/icons';
+
+import {
+  CalendarPickerComponent,
+  DateRange
+} from '@app/shared/components/calendar-picker/calendar-picker.component';
+
+import {
+  trigger,
+  transition,
+  style,
+  animate
+} from '@angular/animations';
 
 type GuestField = 'adults' | 'children' | 'rooms';
 
@@ -20,6 +45,23 @@ type GuestField = 'adults' | 'children' | 'rooms';
   ],
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.scss'],
+
+  // 🔥 Animaciones PRO
+  animations: [
+    trigger('fadeSlide', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('180ms ease-out',
+          style({ opacity: 1, transform: 'translateY(0)' })
+        )
+      ]),
+      transition(':leave', [
+        animate('120ms ease-in',
+          style({ opacity: 0, transform: 'translateY(10px)' })
+        )
+      ])
+    ])
+  ]
 })
 export class SearchBarComponent {
 
@@ -31,23 +73,37 @@ export class SearchBarComponent {
 
   branch: string = '';
 
-  // Ahora Date | null para coincidir con CalendarPickerComponent
   checkIn: Date | null = null;
   checkOut: Date | null = null;
 
-  adults: number = 2;
-  children: number = 0;
-  rooms: number = 1;
-  withPets: boolean = false;
+  adults = 2;
+  children = 0;
+  rooms = 1;
+  withPets = false;
 
   branches = [
     { id: 'palmeras', name: 'Palmeras - Salinas', desc: 'Frente al mar' },
-    { id: 'chipipe',  name: 'Chipipe',            desc: 'Zona tranquila' },
-    { id: 'ballenita',name: 'Ballenita',           desc: 'Vista panorámica' },
+    { id: 'chipipe', name: 'Chipipe', desc: 'Zona tranquila' },
+    { id: 'ballenita', name: 'Ballenita', desc: 'Vista panorámica' },
   ];
 
   constructor(private router: Router) {
-    addIcons({locationOutline,checkmarkCircle,calendarOutline,peopleOutline,removeOutline,addOutline,pawOutline,searchOutline,});
+    addIcons({
+      locationOutline,
+      checkmarkCircle,
+      calendarOutline,
+      peopleOutline,
+      removeOutline,
+      addOutline,
+      pawOutline,
+      searchOutline,
+    });
+  }
+
+  // 🔥 Cerrar con ESC
+  @HostListener('document:keydown.escape')
+  onEsc() {
+    this.closeAll();
   }
 
   get branchLabel(): string {
@@ -55,7 +111,7 @@ export class SearchBarComponent {
     return b ? b.name : 'Seleccionar sucursal';
   }
 
-  // ================= UI CONTROL =================
+  // ================= UI =================
   toggleBranch(e: Event) {
     e.stopPropagation();
     this.closeAll();
@@ -86,9 +142,8 @@ export class SearchBarComponent {
     this.branchOpen = false;
   }
 
-  // Recibe DateRange con Date | null desde CalendarPickerComponent
   onRangeChange(range: DateRange) {
-    this.checkIn  = range.checkIn;
+    this.checkIn = range.checkIn;
     this.checkOut = range.checkOut;
   }
 
@@ -110,39 +165,28 @@ export class SearchBarComponent {
   }
 
   get buttonText(): string {
-    return 'Buscar habitaciones disponibles';
+    return 'Buscar habitaciones';
   }
 
-  // Convierte Date a string 'YYYY-MM-DD' para los queryParams
   private formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
   }
 
   // ================= SUBMIT =================
   onSubmit() {
-    if (!this.branch) {
-      console.warn('Selecciona una sucursal');
-      return;
-    }
 
-    if (!this.checkIn || !this.checkOut) {
-      console.warn('Selecciona fechas');
-      return;
-    }
-
-    if (this.checkIn >= this.checkOut) {
-      console.warn('Fechas inválidas');
-      return;
-    }
+    if (!this.branch) return;
+    if (!this.checkIn || !this.checkOut) return;
+    if (this.checkIn >= this.checkOut) return;
 
     this.router.navigate(['/habitaciones'], {
       queryParams: {
-        hotel:    this.branch,
-        checkIn:  this.formatDate(this.checkIn),
+        hotel: this.branch,
+        checkIn: this.formatDate(this.checkIn),
         checkOut: this.formatDate(this.checkOut),
-        adults:   this.adults,
+        adults: this.adults,
         children: this.children,
-        rooms:    this.rooms,
+        rooms: this.rooms,
         withPets: this.withPets ? 1 : 0,
       }
     });

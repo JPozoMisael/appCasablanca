@@ -3,54 +3,65 @@
   <div class="bk-bar">
 
     <!-- SUCURSAL -->
-    <div class="bk-item" (click)="toggleBranch($event)">
+    <div class="bk-item"
+         [class.active]="branchOpen"
+         (click)="toggleBranch($event)">
+
       <div class="bk-label">
         <ion-icon name="location-outline"></ion-icon>
         Sucursal
       </div>
-      <div class="bk-value-main">{{ branchLabel }}</div>
 
-      <div
-        class="bk-pop"
-        *ngIf="branchOpen"
-        (click)="$event.stopPropagation()">
+      <div class="bk-value-main"
+           [class.empty]="!branch">
+        {{ branchLabel }}
+      </div>
 
-        <div
-          class="branch-card"
-          *ngFor="let b of branches"
-          (click)="selectBranch(b.id)"
-          [class.active]="branch === b.id">
+      <div class="bk-pop"
+           *ngIf="branchOpen"
+           @fadeSlide
+           (click)="$event.stopPropagation()">
+
+        <div class="branch-card"
+             *ngFor="let b of branches"
+             (click)="selectBranch(b.id)"
+             [class.active]="branch === b.id">
 
           <div class="branch-info">
             <div class="branch-name">{{ b.name }}</div>
             <div class="branch-desc">{{ b.desc }}</div>
           </div>
 
-          <div *ngIf="branch === b.id">
-            <ion-icon name="checkmark-circle"></ion-icon>
-          </div>
+          <ion-icon *ngIf="branch === b.id"
+                    name="checkmark-circle"></ion-icon>
 
         </div>
       </div>
     </div>
 
     <!-- FECHAS -->
-    <div class="bk-item" (click)="toggleDates($event)">
+    <div class="bk-item"
+         [class.active]="datesOpen"
+         (click)="toggleDates($event)">
+
       <div class="bk-label">
         <ion-icon name="calendar-outline"></ion-icon>
         Fechas
       </div>
 
-      <div class="bk-value-main">
+      <div class="bk-value-main"
+           [class.empty]="!checkIn && !checkOut">
+
         {{ checkIn ? (checkIn | date:'dd MMM') : 'Entrada' }}
         —
         {{ checkOut ? (checkOut | date:'dd MMM') : 'Salida' }}
+
       </div>
 
-      <div
-        class="bk-pop"
-        *ngIf="datesOpen"
-        (click)="$event.stopPropagation()">
+      <div class="bk-pop"
+           *ngIf="datesOpen"
+           @fadeSlide
+           (click)="$event.stopPropagation()">
 
         <app-calendar-picker
           [checkIn]="checkIn"
@@ -62,7 +73,10 @@
     </div>
 
     <!-- HUÉSPEDES -->
-    <div class="bk-item" (click)="toggleGuests($event)">
+    <div class="bk-item"
+         [class.active]="guestsOpen"
+         (click)="toggleGuests($event)">
+
       <div class="bk-label">
         <ion-icon name="people-outline"></ion-icon>
         Huéspedes
@@ -72,10 +86,10 @@
         {{ getGuestsText() }}
       </div>
 
-      <div
-        class="bk-pop"
-        *ngIf="guestsOpen"
-        (click)="$event.stopPropagation()">
+      <div class="bk-pop"
+           *ngIf="guestsOpen"
+           @fadeSlide
+           (click)="$event.stopPropagation()">
 
         <div class="guest-row">
           <span>Adultos</span>
@@ -131,10 +145,9 @@
 
     <!-- BOTÓN -->
     <div class="bk-action">
-      <ion-button
-        class="bk-btn"
-        expand="block"
-        (click)="onSubmit()">
+      <ion-button class="bk-btn"
+                  expand="block"
+                  (click)="onSubmit()">
         <ion-icon slot="start" name="search-outline"></ion-icon>
         {{ buttonText }}
       </ion-button>
@@ -143,10 +156,9 @@
   </div>
 
   <!-- BACKDROP -->
-  <div
-    class="bk-backdrop"
-    *ngIf="branchOpen || datesOpen || guestsOpen"
-    (click)="closeAll()">
+  <div class="bk-backdrop"
+       *ngIf="branchOpen || datesOpen || guestsOpen"
+       (click)="closeAll()">
   </div>
 
 </div>
