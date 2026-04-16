@@ -31,7 +31,9 @@ export interface RegisterRequest {
   telefono?: string;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
 
   constructor(
@@ -39,17 +41,26 @@ export class AuthService {
     private storage: StorageService
   ) {}
 
+  // ================= LOGIN =================
   login(payload: LoginRequest): Observable<LoginResponse> {
 
-    return this.api.post<LoginResponse>(API_ENDPOINTS.auth.login, payload).pipe(
+    return this.api.post<LoginResponse>(
+      API_ENDPOINTS.auth.login,
+      payload
+    ).pipe(
 
       tap((res) => {
 
-        // guardar token
+        if (!res?.token || !res?.user) {
+          throw new Error('Respuesta inválida del servidor');
+        }
+
+        // 🔥 TOKEN
         this.storage.setToken(res.token);
 
-        // normalizar rol
-        const role: Role | undefined = res.user.rol ?? res.user.roles?.[0];
+        // 🔥 NORMALIZACIÓN DE ROL
+        const role: Role | undefined =
+          res.user.rol ?? res.user.roles?.[0];
 
         const user: StoredUser = {
           id: res.user.id,
@@ -57,30 +68,38 @@ export class AuthService {
           apellidos: res.user.apellidos,
           email: res.user.email,
           rol: role,
-          roles: res.user.roles
+          roles: res.user.roles ?? []
         };
 
-        // guardar usuario
+        // 🔥 GUARDAR USUARIO
         this.storage.setUser(user);
 
       })
 
     );
-
   }
 
+  // ================= REGISTER =================
   register(payload: RegisterRequest): Observable<any> {
-    return this.api.post(API_ENDPOINTS.auth.register, payload);
+    return this.api.post(
+      API_ENDPOINTS.auth.register,
+      payload
+    );
   }
 
+  // ================= PROFILE =================
   profile(): Observable<StoredUser> {
-    return this.api.get<StoredUser>(API_ENDPOINTS.auth.profile);
+    return this.api.get<StoredUser>(
+      API_ENDPOINTS.auth.profile
+    );
   }
 
+  // ================= LOGOUT =================
   logout(): void {
     this.storage.clearAll();
   }
 
+  // ================= HELPERS =================
   isLoggedIn(): boolean {
     return !!this.storage.getToken();
   }

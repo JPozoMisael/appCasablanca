@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { ReservasService } from '@app/core/services/reservas.service';
 import { HuespedesService } from '@app/core/services/huespedes.service';
@@ -31,26 +32,32 @@ export class ReservarPage implements OnInit {
 
   checkIn = '';
   checkOut = '';
+
+  adults = 2;
+  children = 0;
+
   nights = 0;
-  guestsLabel = '2 adultos';
+  guestsLabel = '';
 
   subtotal = 0;
   taxes = 0;
   total = 0;
 
-  adults = 2;
-  children = 0;
-
   constructor(
     private reservasService: ReservasService,
-    private huespedesService: HuespedesService
+    private huespedesService: HuespedesService,
+    private router: Router
   ) {}
 
+  // ================= INIT =================
   ngOnInit() {
     this.initData();
   }
 
+  // ================= DATA INICIAL =================
   initData() {
+
+    // 🔥 luego esto vendrá del backend / query params
     this.room = {
       id: 1,
       name: 'Habitación Deluxe',
@@ -62,16 +69,42 @@ export class ReservarPage implements OnInit {
     this.checkIn = '2026-04-10';
     this.checkOut = '2026-04-12';
 
+    this.updateGuestsLabel();
     this.calculateTotals();
   }
 
+  // ================= LABEL =================
+  updateGuestsLabel() {
+
+    let t = `${this.adults} adulto${this.adults !== 1 ? 's' : ''}`;
+
+    if (this.children > 0) {
+      t += ` · ${this.children} niño${this.children !== 1 ? 's' : ''}`;
+    }
+
+    this.guestsLabel = t;
+  }
+
+  // ================= CALCULOS =================
   calculateTotals() {
-    this.nights = 2;
+
+    if (!this.checkIn || !this.checkOut) return;
+
+    const a = new Date(this.checkIn).getTime();
+    const b = new Date(this.checkOut).getTime();
+
+    const diff = b - a;
+
+    this.nights = diff > 0
+      ? Math.ceil(diff / (1000 * 60 * 60 * 24))
+      : 1;
+
     this.subtotal = this.room.pricePerNight * this.nights;
     this.taxes = this.subtotal * 0.12;
     this.total = this.subtotal + this.taxes;
   }
 
+  // ================= CONFIRM =================
   confirmBooking() {
 
     if (!this.acceptingTerms) {
@@ -98,6 +131,14 @@ export class ReservarPage implements OnInit {
 
       next: (cliente) => {
 
+        // 🔥 FIX CRÍTICO
+        if (!cliente) {
+          console.error('Cliente null');
+          this.submitting = false;
+          alert('Error al crear huésped');
+          return;
+        }
+
         const reservaPayload = {
           huespedId: cliente.id,
           habitacionId: this.room.id,
@@ -110,9 +151,32 @@ export class ReservarPage implements OnInit {
 
         this.reservasService.create(reservaPayload).subscribe({
 
-          next: () => {
+          next: (reserva) => {
+
+            if (!reserva) {
+              this.submitting = false;
+              alert('Error al crear la reserva');
+              return;
+            }
+
             this.submitting = false;
-            alert('Reserva confirmada correctamente');
+
+            // 🔥 REDIRECCIÓN PRO
+            this.router.navigate(['/reserva-confirmada'], {
+              queryParams: {
+                roomId: this.room.id,
+                checkIn: this.checkIn,
+                checkOut: this.checkOut,
+                adults: this.adults,
+                children: this.children,
+                guestName: this.guest.nombres,
+                guestEmail: this.guest.email,
+                guestPhone: this.guest.telefono,
+                total: this.total,
+                code: 'CB-' + Math.random().toString(36).substring(2, 8).toUpperCase()
+              }
+            });
+
           },
 
           error: (err) => {
@@ -134,6 +198,7 @@ export class ReservarPage implements OnInit {
     });
   }
 
+  // ================= NAV =================
   backToRooms() {
     window.history.back();
   }

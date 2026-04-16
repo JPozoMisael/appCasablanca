@@ -55,42 +55,54 @@
     </div>
   </section>
 
-  <!-- ================= SUCURSALES ================= -->
-  <section id="sucursales" class="branches">
+  <!-- ================= HOTELES DINÁMICOS ================= -->
+  <section class="branches">
     <div class="container">
 
-      <h2>Nuestras ubicaciones</h2>
+      <h2>Destinos recomendados</h2>
       <p class="subtitle">
-        Tres experiencias únicas frente al mar
+        Explora nuestras mejores ubicaciones
       </p>
 
       <div class="grid">
 
-        <div class="card" [routerLink]="['/hotel/chipipe']">
-          <img src="assets/img/26.jpeg" />
-          <div class="overlay"></div>
-          <div class="content">
-            <h3>Casa Blanca Chipipe</h3>
-            <p>Playa tranquila y familiar</p>
-          </div>
-        </div>
+        <div
+          class="card"
+          *ngFor="let h of hoteles; trackBy: trackById"
+          [routerLink]="['/hotel', h.slug]"
+        >
 
-        <div class="card" [routerLink]="['/hotel/palmeras']">
-          <img src="assets/img/25.jpeg" />
-          <div class="overlay"></div>
-          <div class="content">
-            <h3>Casa Blanca Palmeras</h3>
-            <p>Centro y vida nocturna</p>
-          </div>
-        </div>
+          <!-- 🔥 imagen segura -->
+          <img [src]="getImage(h.imagen)" />
 
-        <div class="card" [routerLink]="['/hotel/ballenita']">
-          <img src="assets/img/27.jpeg" />
           <div class="overlay"></div>
+
           <div class="content">
-            <h3>Casa Blanca Ballenita</h3>
-            <p>Vista panorámica</p>
+
+            <h3>{{ h.nombre }}</h3>
+
+            <p class="price">
+              Desde <strong>${{ h.precio_desde }}</strong> / noche
+            </p>
+
+            <!-- 🔥 RATING REAL -->
+            <div class="rating">
+
+              <div class="stars">
+                <ion-icon
+                  *ngFor="let s of getStars(h.rating || 0)"
+                  [name]="s">
+                </ion-icon>
+              </div>
+
+              <span class="text">
+                {{ getRatingText(h.rating || 0) }}
+              </span>
+
+            </div>
+
           </div>
+
         </div>
 
       </div>
@@ -110,40 +122,6 @@
         <img src="assets/img/4.PNG">
         <img src="assets/img/9.PNG">
         <img src="assets/img/8.PNG">
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ================= HABITACIONES ================= -->
-  <section class="featured-rooms">
-    <div class="container">
-
-      <h2>Habitaciones destacadas</h2>
-      <p class="subtitle">Comodidad y vistas al mar</p>
-
-      <div class="rooms-grid">
-
-        <div class="room-card" *ngFor="let r of roomsData; trackBy: trackById">
-
-          <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2" />
-
-          <div class="room-info">
-            <h4>{{ r.name }}</h4>
-            <p>{{ r.description }}</p>
-
-            <div class="room-footer">
-              <span class="price">${{ r.price }}/noche</span>
-
-              <button class="btn-sm">
-                Ver detalles
-                <ion-icon name="arrow-forward-outline"></ion-icon>
-              </button>
-            </div>
-          </div>
-
-        </div>
-
       </div>
 
     </div>
@@ -172,20 +150,6 @@
       <h2>¿Dónde estamos?</h2>
       <iframe [src]="mapEmbedUrl"></iframe>
     </div>
-  </section>
-
-  <!-- ================= CTA ================= -->
-  <section class="cta">
-
-    <h2>¿Listo para tu próxima estadía?</h2>
-
-    <p>Reserva directo y obtén el mejor precio garantizado</p>
-
-    <ion-button size="large" [routerLink]="['/hotel/palmeras/habitaciones']">
-      <ion-icon name="calendar-outline" slot="start"></ion-icon>
-      Reservar ahora
-    </ion-button>
-
   </section>
 
 </div>

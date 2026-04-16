@@ -1,104 +1,126 @@
 <div class="rc-container" *ngIf="room; else noData">
 
-  <!-- HEADER SUCCESS -->
+  <!-- ================= HEADER ================= -->
   <section class="rc-header">
+
     <ion-icon name="checkmark-circle-outline" class="ok"></ion-icon>
 
     <h1>¡Reserva confirmada!</h1>
     <p>Tu habitación ha sido reservada exitosamente</p>
 
     <div class="code">
-      Código de reserva: <strong>{{ reservationCode }}</strong>
+      Código de reserva:
+      <strong>{{ reservationCode }}</strong>
     </div>
+
   </section>
 
-  <!-- DETALLE -->
+  <!-- ================= GRID ================= -->
   <section class="rc-grid">
 
-    <!-- LEFT -->
+    <!-- ================= LEFT ================= -->
     <main class="rc-main">
 
+      <!-- RESERVA -->
       <div class="box">
-        <div class="box-title">Datos de la reserva</div>
+
+        <div class="box-title">
+          Datos de la reserva
+        </div>
 
         <div class="line">
           <span>Check-in</span>
-          <strong>{{ checkIn }}</strong>
+          <strong>{{ checkIn || '-' }}</strong>
         </div>
 
         <div class="line">
           <span>Check-out</span>
-          <strong>{{ checkOut }}</strong>
+          <strong>{{ checkOut || '-' }}</strong>
         </div>
 
         <div class="line">
           <span>Noches</span>
-          <strong>{{ nights }}</strong>
+          <strong>{{ nights || 1 }}</strong>
         </div>
 
         <div class="line">
           <span>Huéspedes</span>
           <strong>{{ guestsLabel }}</strong>
         </div>
+
       </div>
 
+      <!-- HUESPED -->
       <div class="box">
-        <div class="box-title">Datos del huésped</div>
+
+        <div class="box-title">
+          Datos del huésped
+        </div>
 
         <div class="line">
           <span>Nombre</span>
-          <strong>{{ guestName }}</strong>
+          <strong>{{ guestName || '-' }}</strong>
         </div>
 
         <div class="line">
           <span>Email</span>
-          <strong>{{ guestEmail }}</strong>
+          <strong>{{ guestEmail || '-' }}</strong>
         </div>
 
         <div class="line" *ngIf="guestPhone">
           <span>Teléfono</span>
           <strong>{{ guestPhone }}</strong>
         </div>
+
       </div>
 
     </main>
 
-    <!-- RIGHT -->
+    <!-- ================= RIGHT ================= -->
     <aside class="rc-side">
 
       <div class="summary">
 
+        <!-- ROOM -->
         <div class="sum-room">
-          <img [src]="room.image" [alt]="room.name" />
+
+          <img
+            [src]="room.image || 'assets/img/default.jpg'"
+            [alt]="room.name"
+          />
 
           <div class="info">
             <div class="name">{{ room.name }}</div>
             <div class="loc">{{ room.location }}</div>
           </div>
+
         </div>
 
+        <!-- PRICE -->
         <div class="sum-price">
 
           <div class="line">
             <span>Precio por noche</span>
-            <strong>${{ room.pricePerNight }}</strong>
+            <strong>${{ room.pricePerNight || 0 }}</strong>
           </div>
 
           <div class="line">
             <span>Noches</span>
-            <strong>{{ nights }}</strong>
+            <strong>{{ nights || 1 }}</strong>
           </div>
 
           <div class="line total">
             <span>Total pagado</span>
-            <strong>${{ total }}</strong>
+            <strong>${{ total || 0 }}</strong>
           </div>
 
         </div>
 
       </div>
 
+      <!-- ACTIONS -->
       <div class="actions">
+
         <ion-button expand="block" routerLink="/mis-reservas">
           Ver mis reservas
         </ion-button>
@@ -106,6 +128,7 @@
         <ion-button expand="block" fill="outline" routerLink="/inicio">
           Volver al inicio
         </ion-button>
+
       </div>
 
     </aside>
@@ -114,9 +137,13 @@
 
 </div>
 
+<!-- ================= EMPTY ================= -->
 <ng-template #noData>
-  <div class="rc-container">
+  <div class="rc-container empty">
     <h2>No hay datos de reserva</h2>
-    <ion-button routerLink="/inicio">Ir al inicio</ion-button>
+
+    <ion-button routerLink="/inicio">
+      Ir al inicio
+    </ion-button>
   </div>
 </ng-template>

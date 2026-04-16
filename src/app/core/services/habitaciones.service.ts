@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+
 import { API_ENDPOINTS } from '../config/endpoints';
 import { ApiService } from './api.service';
 import { Habitacion } from '@app/shared/models/habitacion.model';
@@ -29,62 +30,51 @@ export class HabitacionesService {
       return of([]);
     }
 
-    return this.api.get<any>(API_ENDPOINTS.habitaciones.byHotel(slug)).pipe(
-
-      map(res => this.safeMapArray(res)),
-
-      catchError(err => {
-        console.error('ERROR getByHotel:', err);
-        return of([]);
-      })
-    );
+    return this.api
+      .get<any>(API_ENDPOINTS.habitaciones.byHotel(slug))
+      .pipe(
+        map(res => this.safeMapArray(res)),
+        catchError(err => {
+          console.error('ERROR getByHotel:', err);
+          return of([]);
+        })
+      );
   }
 
   // ================= DISPONIBILIDAD REAL =================
   getDisponiblesByHotel(
-  slug: string,
-  filters: any
-): Observable<Habitacion[]> {
+    slug: string,
+    filters: any
+  ): Observable<Habitacion[]> {
 
-  if (!slug) {
-    console.error('SLUG VACÍO');
-    return of([]);
+    if (!slug) {
+      console.error('SLUG VACÍO');
+      return of([]);
+    }
+
+    const params: any = {
+      hotel: slug,
+      checkIn: filters?.checkIn,
+      checkOut: filters?.checkOut,
+      adults: filters?.adults,
+      children: filters?.children,
+      rooms: filters?.rooms,
+      withPets: filters?.withPets
+    };
+
+    return this.api
+      .get<any>(API_ENDPOINTS.habitaciones.disponibles, { params }) // 🔥 CORRECTO
+      .pipe(
+
+        map(res => this.safeMapArray(res)),
+
+        catchError(err => {
+          console.error('ERROR DISPONIBLES:', err);
+          return of([]);
+        })
+      );
   }
 
-  const params: any = {
-    hotel: slug,
-    checkIn: filters?.checkIn,
-    checkOut: filters?.checkOut,
-    adults: filters?.adults,
-    children: filters?.children,
-    rooms: filters?.rooms,
-    withPets: filters?.withPets
-  };
-
-  console.log('PARAMS FINALES:', params);
-
-  return this.api.get<any>(
-    API_ENDPOINTS.habitaciones.disponibles,
-    params   // 🔥 AQUÍ VA DIRECTO
-  ).pipe(
-
-    map((res) => {
-
-      if (!res || !res.data || !Array.isArray(res.data)) {
-        return [];
-      }
-
-      return res.data.map((item: any) =>
-        this.mapHabitacion(item)
-      );
-    }),
-
-    catchError((err) => {
-      console.error('ERROR DISPONIBLES:', err);
-      return of([]);
-    })
-  );
-}
   // ================= SAFE MAP =================
   private safeMapArray(res: any): Habitacion[] {
 
@@ -109,25 +99,32 @@ export class HabitacionesService {
         ''
       ),
 
-      tipo: item.tipo_nombre || `Habitación ${item.numero}`,
+      tipo:
+        item.tipo_nombre ||
+        `Habitación ${item.numero_habitacion || item.numero}`,
 
       descripcion:
         item.descripcion ||
-        `Piso ${item.piso || 'N/A'}`,
+        `Piso ${item.piso ?? 'N/A'}`,
 
       capacidad: item.capacidad ?? 2,
 
       camas: item.camas ?? 1,
 
-      precioNoche: item.precio ?? 80,
+      // 🔥 CORRECCIÓN CLAVE
+      precioNoche:
+        Number(item.precio_noche ?? item.precio ?? 0),
 
-      estado: item.estado || 'DISPONIBLE',
+      estado: item.estado || 'disponible',
 
+      // 🔥 CORRECCIÓN CLAVE
       imagenUrl:
+        item.imagen_url ||
         item.imagen ||
         'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2',
 
-      hotelSlug: item.hotel_slug || ''
+      hotelSlug:
+        item.hotel_slug || ''
     };
   }
 }

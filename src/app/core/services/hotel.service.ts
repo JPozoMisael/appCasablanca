@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
+import { Hotel } from '@app/shared/models/hotel.model';
+
+interface ApiResponse<T> {
+  ok: boolean;
+  data: T;
+  meta?: any;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -14,21 +21,31 @@ export class HotelesService {
   constructor(private http: HttpClient) {}
 
   // ================= GET ALL =================
-  getAll(): Observable<any> {
-    return this.http.get(this.API);
+  getAll(): Observable<Hotel[]> {
+    return this.http
+      .get<ApiResponse<Hotel[]>>(this.API)
+      .pipe(map(res => res.data || []));
   }
 
   // ================= RESUMEN =================
-  getResumen(): Observable<any> {
-    return this.http.get(`${this.API}/resumen`);
+  getResumen(): Observable<Hotel[]> {
+    return this.http
+      .get<ApiResponse<Hotel[]>>(`${this.API}/resumen`)
+      .pipe(map(res => res.data || []));
   }
 
   // ================= BY ID =================
-  getById(id: number): Observable<any> {
-    return this.http.get(`${this.API}/${id}`);
+  getById(id: number): Observable<Hotel | null> {
+    return this.http
+      .get<ApiResponse<Hotel>>(`${this.API}/${id}`)
+      .pipe(map(res => res.data || null));
   }
 
-  getBySlug(slug: string): Observable<any> {
-    return this.http.get(`${this.API}/slug/${slug}`);
+  // ================= BY SLUG =================
+  getBySlug(slug: string): Observable<Hotel | null> {
+    return this.http
+      .get<ApiResponse<Hotel>>(`${this.API}/slug/${slug}`)
+      .pipe(map(res => res.data || null));
   }
+
 }

@@ -1,0 +1,259 @@
+/* ================= ROOT ================= */
+
+.rc-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px 20px 40px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ================= HEADER ================= */
+
+.rc-header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  .ok {
+    font-size: 64px;
+    color: #16a34a;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+
+  p {
+    color: #64748b;
+    font-size: 14px;
+  }
+
+  .code {
+    margin-top: 14px;
+    background: #f1f5f9;
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+
+    strong {
+      color: #0071c2;
+      font-weight: 800;
+    }
+  }
+}
+
+/* ================= GRID ================= */
+
+.rc-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+}
+
+/* ================= LEFT ================= */
+
+.rc-main {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ================= BOX ================= */
+
+.box {
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+.box-title {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  color: #0f172a;
+}
+
+/* ================= LINE ================= */
+
+.line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 10px 0;
+  border-bottom: 1px dashed #e5e7eb;
+
+  span {
+    color: #64748b;
+    font-size: 13px;
+  }
+
+  strong {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+}
+
+.line:last-child {
+  border-bottom: none;
+}
+
+/* ================= RIGHT ================= */
+
+.rc-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ================= SUMMARY ================= */
+
+.summary {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* ROOM */
+
+.sum-room {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 14px;
+
+  img {
+    width: 110px;
+    height: 85px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .name {
+      font-weight: 800;
+      font-size: 14px;
+      color: #0f172a;
+    }
+
+    .loc {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+  }
+}
+
+/* ================= PRICE ================= */
+
+.sum-price {
+  .line {
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .total {
+    margin-top: 10px;
+    padding-top: 10px;
+
+    span {
+      font-weight: 600;
+    }
+
+    strong {
+      font-size: 18px;
+      font-weight: 900;
+      color: #0071c2;
+    }
+  }
+}
+
+/* ================= ACTIONS ================= */
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  ion-button {
+    height: 46px;
+    font-weight: 700;
+  }
+}
+
+/* ================= EMPTY ================= */
+
+.rc-container.empty {
+  text-align: center;
+  padding: 60px 20px;
+
+  h2 {
+    margin-bottom: 20px;
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+
+  .rc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rc-side {
+    order: -1;
+  }
+
+  .sum-room img {
+    width: 90px;
+    height: 70px;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .rc-container {
+    padding: 20px 14px;
+  }
+
+  .rc-header {
+
+    h1 {
+      font-size: 22px;
+    }
+
+    .ok {
+      font-size: 52px;
+    }
+
+  }
+
+  .box {
+    padding: 14px;
+  }
+
+  .sum-room {
+    flex-direction: column;
+
+    img {
+      width: 100%;
+      height: 140px;
+    }
+  }
+
+}

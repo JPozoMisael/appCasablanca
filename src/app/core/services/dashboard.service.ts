@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
+
 import { ApiService } from './api.service';
 import { API_ENDPOINTS } from '../config/endpoints';
 
@@ -19,6 +20,13 @@ export interface ReservaHoy {
   total: number;
 }
 
+// 🔥 RESPUESTA BASE DE TU API
+interface ApiResponse<T> {
+  ok: boolean;
+  data: T;
+  meta?: any;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -26,12 +34,24 @@ export class DashboardService {
 
   constructor(private api: ApiService) {}
 
+  // ================= STATS =================
   getStats(): Observable<DashboardStats> {
-    return this.api.get<DashboardStats>(API_ENDPOINTS.dashboard.stats);
+
+    return this.api
+      .get<ApiResponse<DashboardStats>>(API_ENDPOINTS.dashboard.stats)
+      .pipe(
+        map(res => res.data)
+      );
   }
 
+  // ================= RESERVAS HOY =================
   getReservasHoy(): Observable<ReservaHoy[]> {
-    return this.api.get<ReservaHoy[]>(API_ENDPOINTS.dashboard.reservasHoy);
+
+    return this.api
+      .get<ApiResponse<ReservaHoy[]>>(API_ENDPOINTS.dashboard.reservasHoy)
+      .pipe(
+        map(res => res.data)
+      );
   }
 
 }
