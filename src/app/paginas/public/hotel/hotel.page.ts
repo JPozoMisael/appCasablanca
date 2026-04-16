@@ -17,6 +17,7 @@ import {
 } from 'ionicons/icons';
 
 import { HabitacionesService } from '@app/core/services/habitaciones.service';
+import { HotelesService } from '@app/core/services/hotel.service'; 
 
 @Component({
   selector: 'app-hotel',
@@ -48,7 +49,8 @@ export class HotelPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private habitacionesService: HabitacionesService
+    private habitacionesService: HabitacionesService,
+    private hotelesService: HotelesService 
   ) {
     addIcons({
       locationOutline,
@@ -81,6 +83,57 @@ export class HotelPage implements OnInit {
 
   loadHotel() {
 
+    // 🔥 INTENTO BACKEND
+    this.hotelesService.getAll().subscribe({
+      next: (res: any) => {
+
+        const hoteles = res.data || [];
+
+        const found = hoteles.find((h: any) =>
+          h.slug === this.slug ||
+          h.nombre.toLowerCase().includes(this.slug)
+        );
+
+        if (found) {
+          this.hotel = {
+            name: found.nombre,
+            location: `${found.ciudad}`,
+            description: found.descripcion,
+            heroImage: 'assets/img/default.jpg', // puedes mejorar esto luego
+
+            features: [
+              'Ubicación privilegiada',
+              'Alta valoración',
+              'Confort garantizado'
+            ],
+
+            services: [
+              { name: 'WiFi', icon: 'wifi-outline' },
+              { name: 'Piscina', icon: 'water-outline' },
+              { name: 'Restaurante', icon: 'restaurant-outline' }
+            ],
+
+            gallery: [
+              'assets/img/default.jpg',
+              'assets/img/default.jpg',
+              'assets/img/default.jpg'
+            ]
+          };
+
+        } else {
+          this.loadHotelFallback();
+        }
+      },
+      error: () => {
+        console.warn('Backend no disponible, usando fallback');
+        this.loadHotelFallback();
+      }
+    });
+  }
+
+  // 🔥 FALLBACK (NO ROMPE NADA)
+  loadHotelFallback() {
+
     const hotelesMock: any = {
 
       chipipe: {
@@ -88,24 +141,13 @@ export class HotelPage implements OnInit {
         location: 'Chipipe, Salinas',
         description: 'Frente a la playa más tranquila de Salinas',
         heroImage: 'assets/img/26.jpeg',
-
-        features: [
-          'Ambiente familiar',
-          'Playa tranquila',
-          'Ideal para descanso'
-        ],
-
+        features: ['Ambiente familiar', 'Playa tranquila', 'Ideal para descanso'],
         services: [
           { name: 'Piscina', icon: 'water-outline' },
           { name: 'WiFi', icon: 'wifi-outline' },
           { name: 'Aire acondicionado', icon: 'thermometer-outline' }
         ],
-
-        gallery: [
-          'assets/img/26.jpeg',
-          'assets/img/26.jpeg',
-          'assets/img/26.jpeg'
-        ]
+        gallery: ['assets/img/26.jpeg', 'assets/img/26.jpeg']
       },
 
       palmeras: {
@@ -113,24 +155,13 @@ export class HotelPage implements OnInit {
         location: 'Centro, Salinas',
         description: 'Zona céntrica, restaurantes y vida nocturna',
         heroImage: 'assets/img/25.jpeg',
-
-        features: [
-          'Zona céntrica',
-          'Cerca de bares',
-          'Ambiente activo'
-        ],
-
+        features: ['Zona céntrica', 'Cerca de bares', 'Ambiente activo'],
         services: [
           { name: 'Restaurante', icon: 'restaurant-outline' },
           { name: 'Bar', icon: 'wine-outline' },
           { name: 'WiFi', icon: 'wifi-outline' }
         ],
-
-        gallery: [
-          'assets/img/25.jpeg',
-          'assets/img/25.jpeg',
-          'assets/img/25.jpeg'
-        ]
+        gallery: ['assets/img/25.jpeg', 'assets/img/25.jpeg']
       },
 
       ballenita: {
@@ -138,24 +169,13 @@ export class HotelPage implements OnInit {
         location: 'Ballenita, Santa Elena',
         description: 'Vista panorámica y máxima tranquilidad',
         heroImage: 'assets/img/27.jpeg',
-
-        features: [
-          'Vista al mar',
-          'Zona tranquila',
-          'Atardeceres únicos'
-        ],
-
+        features: ['Vista al mar', 'Zona tranquila', 'Atardeceres únicos'],
         services: [
           { name: 'Piscina', icon: 'water-outline' },
           { name: 'Vista al mar', icon: 'sunny-outline' },
           { name: 'WiFi', icon: 'wifi-outline' }
         ],
-
-        gallery: [
-          'assets/img/27.jpeg',
-          'assets/img/27.jpeg',
-          'assets/img/27.jpeg'
-        ]
+        gallery: ['assets/img/27.jpeg', 'assets/img/27.jpeg']
       }
 
     };
@@ -198,13 +218,12 @@ export class HotelPage implements OnInit {
     this.router.navigate(['/hotel', this.slug, 'habitaciones']);
   }
 
-  // 🔥 CAMBIO DINÁMICO DE HOTEL (PRO)
   changeHotel(newSlug: string) {
 
     if (newSlug === this.slug) return;
 
     this.router.navigate(['/hotel', newSlug], {
-      queryParamsHandling: 'merge' // 🔥 mantiene fechas luego
+      queryParamsHandling: 'merge'
     });
   }
 }

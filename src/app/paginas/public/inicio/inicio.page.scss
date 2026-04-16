@@ -178,12 +178,12 @@ h2 {
 /* ================= SUCURSALES ================= */
 
 .branches {
-  padding: 50px 0;
+  padding: 60px 0;
 
   .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+    gap: 20px;
   }
 
   .card {
@@ -191,39 +191,48 @@ h2 {
     border-radius: 14px;
     overflow: hidden;
     cursor: pointer;
-    height: 180px;
+    height: 200px;
+
+    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    transition: all 0.25s ease;
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: 0.4s;
+      transition: transform 0.4s ease;
+    }
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 14px 35px rgba(0,0,0,0.15);
     }
 
     &:hover img {
-      transform: scale(1.05);
+      transform: scale(1.08);
     }
 
     .overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+      background: linear-gradient(to top, rgba(0,0,0,0.65), transparent);
     }
 
     .content {
       position: absolute;
-      bottom: 12px;
-      left: 12px;
+      bottom: 14px;
+      left: 14px;
       color: #fff;
 
       h3 {
         font-size: 16px;
         margin: 0;
+        font-weight: 700;
       }
 
       p {
         font-size: 13px;
-        opacity: 0.8;
+        opacity: 0.9;
       }
     }
   }
@@ -232,18 +241,23 @@ h2 {
 /* ================= GALERÍA ================= */
 
 .gallery {
-  padding: 50px 0;
+  padding: 60px 0;
 
   .gallery-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 12px;
 
     img {
       width: 100%;
-      height: 120px;
+      height: 140px;
       object-fit: cover;
-      border-radius: 10px;
+      border-radius: 12px;
+      transition: all 0.25s ease;
+    }
+
+    img:hover {
+      transform: scale(1.06);
     }
   }
 }
@@ -251,31 +265,40 @@ h2 {
 /* ================= HABITACIONES ================= */
 
 .featured-rooms {
-  padding: 50px 0;
+  padding: 60px 0;
 
   .rooms-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+    gap: 20px;
   }
 
   .room-card {
     background: #fff;
     border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+
+    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    transition: all 0.25s ease;
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 14px 35px rgba(0,0,0,0.15);
+    }
 
     img {
       width: 100%;
-      height: 140px;
+      height: 160px;
       object-fit: cover;
     }
 
     .room-info {
-      padding: 12px;
+      padding: 14px;
 
       h4 {
         font-size: 15px;
+        margin-bottom: 4px;
+        font-weight: 700;
       }
 
       p {
@@ -291,16 +314,24 @@ h2 {
       margin-top: 10px;
 
       .price {
-        font-weight: 700;
-        font-size: 14px;
+        font-weight: 800;
+        font-size: 15px;
+        color: #0071c2;
       }
 
       .btn-sm {
         font-size: 13px;
-        background: transparent;
+        background: #0071c2;
+        color: #fff;
         border: none;
-        color: #0071c2;
+        padding: 6px 10px;
+        border-radius: 8px;
         cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .btn-sm:hover {
+        background: #005fa3;
       }
     }
   }
@@ -309,29 +340,39 @@ h2 {
 /* ================= SERVICIOS ================= */
 
 .services {
-  padding: 50px 0;
+  padding: 60px 0;
 
   .services-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
+    gap: 20px;
   }
 
   .service {
     background: #fff;
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 14px;
+    padding: 18px;
+
     text-align: center;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    }
 
     ion-icon {
-      font-size: 22px;
+      font-size: 24px;
       color: #0071c2;
     }
 
     span {
       display: block;
-      margin-top: 6px;
+      margin-top: 8px;
       font-size: 13px;
+      font-weight: 600;
     }
   }
 }
@@ -339,13 +380,14 @@ h2 {
 /* ================= MAPA ================= */
 
 .map {
-  padding: 50px 0;
+  padding: 60px 0;
 
   iframe {
     width: 100%;
-    height: 260px;
-    border-radius: 12px;
+    height: 280px;
+    border-radius: 14px;
     border: none;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
   }
 }
 
@@ -353,15 +395,22 @@ h2 {
 
 .cta {
   text-align: center;
-  padding: 60px 20px;
+  padding: 70px 20px;
 
   h2 {
-    font-size: 24px;
+    font-size: 26px;
+    font-weight: 700;
   }
 
   p {
-    margin: 10px 0 20px;
+    margin: 12px 0 24px;
     color: #64748b;
+  }
+
+  ion-button {
+    --background: #0071c2;
+    --border-radius: 10px;
+    font-weight: 700;
   }
 }
 
@@ -379,13 +428,4 @@ h2 {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .hero h1 {
-    font-size: 28px;
-  }
-
-  /* 🔥 MOBILE SEARCH */
-  .hero-search {
-    width: 100%;
-    margin-left: 0;
-  }
 }
