@@ -2,25 +2,28 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { environment } from 'src/environments/environment'; 
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HotelesService {
 
-  private API = `${environment.apiUrl}/hoteles`;
+  private API = `${environment.apiUrl}/hotels`;
 
   constructor(private http: HttpClient) {}
 
+  // ================= GET ALL =================
   getAll(): Observable<any> {
     return this.http.get(this.API);
   }
 
+  // ================= RESUMEN =================
   getResumen(): Observable<any> {
     return this.http.get(`${this.API}/resumen`);
   }
 
+  // ================= BY ID =================
   getById(id: number): Observable<any> {
     return this.http.get(`${this.API}/${id}`);
   }
