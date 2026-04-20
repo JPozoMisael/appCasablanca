@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 
 import { SearchBarComponent } from '@app/shared/components/search-bar/search-bar.component';
 import { HotelesService } from '@app/core/services/hotel.service';
+import { Hotel } from '@app/shared/models/hotel.model';
 
 @Component({
   selector: 'app-inicio',
@@ -22,7 +23,7 @@ import { HotelesService } from '@app/core/services/hotel.service';
 export class InicioPage implements OnInit {
 
   // ================= DATA =================
-  hoteles: any[] = [];
+  hoteles: Hotel[] = [];
   loading = true;
 
   // ================= SERVICIOS =================
@@ -55,48 +56,55 @@ export class InicioPage implements OnInit {
     this.loading = true;
 
     this.hotelesService.getResumen().subscribe({
-      next: (res: any) => {
 
-        this.hoteles = (res.data || []).map((h: any) => ({
+      // 🔥 YA NO ES res.data → ya viene limpio
+      next: (hoteles) => {
+
+        this.hoteles = hoteles.map(h => ({
           ...h,
 
-          // 🔥 IMAGEN SEGURA
+          // imagen segura
           imagen: this.getImage(h.imagen),
 
-          // 🔥 RATING REAL (YA NO MOCK)
-          rating: Number(h.rating) || 0
+          // rating real o fallback
+          rating: Number((h as any).rating) || 0
         }));
 
         this.loading = false;
       },
+
       error: (err) => {
         console.error('Error cargando hoteles:', err);
         this.loading = false;
       }
+
     });
   }
 
   // ================= HELPERS =================
 
-  // 🔥 IMAGEN SEGURA
-  getImage(img: string | null): string {
-    return img && img.trim() !== '' ? img : 'assets/img/default.jpg';
+  getImage(img?: string): string {
+    return img && img.trim() !== ''
+      ? img
+      : 'assets/img/default.jpg';
   }
 
-  // 🔥 ESTRELLAS (1–5 REAL)
+  // ⭐ estrellas reales
   getStars(rating: number): string[] {
     const stars: string[] = [];
 
+    const fullStars = Math.round(rating);
+
     for (let i = 0; i < 5; i++) {
-      stars.push(i < rating ? 'star' : 'star-outline');
+      stars.push(i < fullStars ? 'star' : 'star-outline');
     }
 
     return stars;
   }
 
-  // 🔥 TEXTO RATING REAL
+  // ⭐ texto rating
   getRatingText(rating: number): string {
-    if (rating >= 5) return 'Excepcional';
+    if (rating >= 4.5) return 'Excepcional';
     if (rating >= 4) return 'Muy bueno';
     if (rating >= 3) return 'Bueno';
     if (rating >= 2) return 'Aceptable';
@@ -109,24 +117,8 @@ export class InicioPage implements OnInit {
     window.open('https://maps.google.com/?q=Salinas+Ecuador', '_blank');
   }
 
-  // ================= DEMO (puedes borrar luego) =================
-  roomsData = [
-    {
-      id: 1,
-      name: 'Suite Vista al Mar',
-      description: 'Habitación amplia con balcón',
-      price: 120,
-    },
-    {
-      id: 2,
-      name: 'Habitación Doble',
-      description: 'Ideal para parejas',
-      price: 80,
-    }
-  ];
-
   // ================= UTILS =================
-  trackById(index: number, item: any) {
+  trackById(index: number, item: Hotel) {
     return item.id;
   }
 

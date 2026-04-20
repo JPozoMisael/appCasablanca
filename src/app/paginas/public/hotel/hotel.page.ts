@@ -39,7 +39,6 @@ export class HotelPage implements OnInit {
   featuredRooms: any[] = [];
   loading = true;
 
-  // 🔥 SWITCH ENTRE HOTELES
   hotelList = [
     { id: 'chipipe', name: 'Chipipe' },
     { id: 'palmeras', name: 'Palmeras' },
@@ -83,7 +82,6 @@ export class HotelPage implements OnInit {
 
   loadHotel() {
 
-    // 🔥 INTENTO BACKEND
     this.hotelesService.getAll().subscribe({
       next: (res: any) => {
 
@@ -131,7 +129,6 @@ export class HotelPage implements OnInit {
     });
   }
 
-  // 🔥 FALLBACK (NO ROMPE NADA)
   loadHotelFallback() {
 
     const hotelesMock: any = {
