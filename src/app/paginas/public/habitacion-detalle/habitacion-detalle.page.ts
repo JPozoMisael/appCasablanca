@@ -30,12 +30,25 @@ export class HabitacionDetallePage implements OnInit {
   habitacion: any = null;
   mapUrlSafe: SafeResourceUrl | null = null;
 
-  // ================= UI PRO =================
+  // ================= UI =================
   gallery: string[] = [];
   selectedImage: string = '';
 
-  rating: number = 8.7; // 🔥 luego vendrá de BD
+  // ================= REVIEWS =================
+  hotelId: number = 0;
+  rating: number = 0;
+  totalReviews: number = 0;
+  reviews: any[] = [];
+
   availabilityHint: string = 'Quedan pocas habitaciones';
+
+  // ================= FORM =================
+  newReview = {
+    puntuacion: 0,
+    comentario: ''
+  };
+
+  submittingReview = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -47,13 +60,11 @@ export class HabitacionDetallePage implements OnInit {
   // ================= INIT =================
   ngOnInit() {
 
-    // 🔥 PARAM ID
     this.route.paramMap.subscribe(pm => {
       this.roomId = Number(pm.get('id'));
       this.loadHabitacion();
     });
 
-    // 🔥 QUERY PARAMS (vienen del search)
     this.route.queryParamMap.subscribe(qp => {
       this.checkIn = qp.get('checkIn') ?? '';
       this.checkOut = qp.get('checkOut') ?? '';
@@ -69,21 +80,21 @@ export class HabitacionDetallePage implements OnInit {
 
     this.habitacionesService.getById(this.roomId).subscribe({
 
-      next: (res: any) => {
-
-        const h = res?.data || res;
+      next: (h: any) => {
 
         if (!h) {
           this.habitacion = null;
           return;
         }
 
+        this.hotelId = h.hotel_id ?? h.hotelId ?? 0;
+
         this.habitacion = {
           id: h.id,
           nombre: h.tipo || `Habitación ${h.numero}`,
-          descripcion: h.descripcion,
-          precio: h.precioNoche || h.precio,
-          capacidad: `${h.capacidad} personas · ${h.camas} cama(s)`,
+          descripcion: h.descripcion || '',
+          precio: h.precioNoche || h.precio || 0,
+          capacidad: `${h.capacidad ?? 2} personas · ${h.camas ?? 1} cama(s)`,
 
           servicios: [
             'Wi-Fi',
@@ -94,11 +105,10 @@ export class HabitacionDetallePage implements OnInit {
 
           lat: -2.2149,
           lng: -80.951,
-
           imagen: h.imagenUrl
         };
 
-        // 🔥 GALERÍA (temporal)
+        // GALERÍA
         this.gallery = [
           this.habitacion.imagen,
           this.habitacion.imagen,
@@ -107,16 +117,93 @@ export class HabitacionDetallePage implements OnInit {
 
         this.selectedImage = this.gallery[0];
 
-        // 🔥 MAPA
+        // MAPA
         const url = `https://www.google.com/maps?q=${this.habitacion.lat},${this.habitacion.lng}&output=embed`;
-
         this.mapUrlSafe =
           this.sanitizer.bypassSecurityTrustResourceUrl(url);
+
+        // REVIEWS
+        this.loadReviews();
       },
 
       error: (err: any) => {
         console.error('ERROR DETALLE:', err);
         this.habitacion = null;
+      }
+    });
+  }
+
+  // ================= REVIEWS =================
+  loadReviews() {
+
+    if (!this.hotelId) return;
+
+    this.habitacionesService
+      .getReviewsByHotel(this.hotelId)
+      .subscribe(data => {
+
+        this.reviews = data || [];
+
+        if (this.reviews.length > 0) {
+
+          const total = this.reviews.reduce(
+            (acc, r) => acc + Number(r.puntuacion || 0),
+            0
+          );
+
+          this.rating = Number((total / this.reviews.length).toFixed(1));
+          this.totalReviews = this.reviews.length;
+
+        } else {
+          this.rating = 0;
+          this.totalReviews = 0;
+        }
+      });
+  }
+
+  // ================= FORM REVIEW =================
+  setRating(value: number) {
+    this.newReview.puntuacion = value;
+  }
+
+  isStarActive(i: number): boolean {
+    return i <= this.newReview.puntuacion;
+  }
+
+  submitReview() {
+
+    if (this.submittingReview) return;
+
+    if (!this.hotelId) {
+      alert('Error: hotel no identificado');
+      return;
+    }
+
+    if (this.newReview.puntuacion < 1) {
+      alert('Selecciona una puntuación');
+      return;
+    }
+
+    this.submittingReview = true;
+
+    this.habitacionesService.createReview({
+      hotel_id: this.hotelId,
+      puntuacion: this.newReview.puntuacion,
+      comentario: this.newReview.comentario?.trim()
+    }).subscribe({
+
+      next: () => {
+
+        this.newReview = { puntuacion: 0, comentario: '' };
+
+        this.loadReviews();
+
+        this.submittingReview = false;
+      },
+
+      error: () => {
+        alert('Error al enviar review');
+        this.submittingReview = false;
       }
     });
   }
@@ -171,5 +258,4 @@ export class HabitacionDetallePage implements OnInit {
     const n = Number(v);
     return Number.isFinite(n) ? n : fallback;
   }
-
 }

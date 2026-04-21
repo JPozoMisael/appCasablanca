@@ -50,13 +50,14 @@ export class HabitacionesPage implements OnInit {
       this.filters = {
         checkIn: params['checkIn'],
         checkOut: params['checkOut'],
-        adults: params['adults'],
-        children: params['children'],
-        rooms: params['rooms'],
-        withPets: params['withPets']
+        adults: Number(params['adults'] ?? 2),
+        children: Number(params['children'] ?? 0),
+        rooms: Number(params['rooms'] ?? 1),
+        withPets: Number(params['withPets'] ?? 0)
       };
 
-      this.page = 1; // reset paginación en nueva búsqueda
+      // 🔥 RESET PAGINACIÓN
+      this.page = 1;
 
       this.loadHabitaciones();
     });
@@ -85,10 +86,12 @@ export class HabitacionesPage implements OnInit {
 
         next: (res) => {
 
-          this.habitaciones = res.data || [];
+          // 🔥 DATA
+          this.habitaciones = res?.data || [];
 
-          this.total = res.meta?.total || 0;
-          this.pages = res.meta?.pages || 0;
+          // 🔥 META
+          this.total = res?.meta?.total || 0;
+          this.pages = res?.meta?.pages || 0;
 
           this.loading = false;
         },
@@ -98,6 +101,12 @@ export class HabitacionesPage implements OnInit {
           this.loading = false;
         }
       });
+  }
+
+  // ================= FILTROS =================
+  applyFilters() {
+    this.page = 1;
+    this.loadHabitaciones();
   }
 
   // ================= PAGINACIÓN =================

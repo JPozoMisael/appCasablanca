@@ -29,17 +29,23 @@ export const API_ENDPOINTS = {
     bySlug: (slug: string) => `${API_BASE}/hotels/slug/${slug}`,
   },
 
-  // ================= ROOMS (ANTES HABITACIONES) =================
+  // ================= ROOMS =================
   habitaciones: {
     list: `${API_BASE}/rooms`,
     disponibles: `${API_BASE}/rooms/disponibles`,
+
     get: (id: number | string) => `${API_BASE}/rooms/${id}`,
     create: `${API_BASE}/rooms`,
     update: (id: number | string) => `${API_BASE}/rooms/${id}`,
     delete: (id: number | string) => `${API_BASE}/rooms/${id}`,
 
-    // 🔥 CLAVE
     byHotel: (slug: string) => `${API_BASE}/rooms/hotel/${slug}`,
+
+    // 🔥 REVIEWS (CONSISTENTE Y CORRECTO)
+    reviews: (hotelId: number | string) =>
+      `${API_BASE}/rooms/reviews/${hotelId}`,
+
+    createReview: `${API_BASE}/rooms/reviews`,
   },
 
   // ================= ROOM TYPES =================

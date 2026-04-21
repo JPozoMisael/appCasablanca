@@ -7,7 +7,7 @@ import { ApiService } from './api.service';
 import { Habitacion } from '@app/shared/models/habitacion.model';
 
 interface ApiResponse {
-  data: Habitacion[];
+  data: any[];
   meta?: {
     total: number;
     page: number;
@@ -53,15 +53,73 @@ export class HabitacionesService {
     return this.api
       .get<any>(API_ENDPOINTS.habitaciones.disponibles, { params })
       .pipe(
-
         map((res: ApiResponse) => ({
           data: this.safeMapArray(res),
           meta: res.meta || {}
         })),
-
         catchError(err => {
           console.error('ERROR DISPONIBLES:', err);
           return of({ data: [], meta: {} });
+        })
+      );
+  }
+
+  // ================= POR ID =================
+  getById(id: number): Observable<any | null> {
+
+    if (!id) {
+      console.error('ID inválido');
+      return of(null);
+    }
+
+    return this.api
+      .get<any>(API_ENDPOINTS.habitaciones.get(id))
+      .pipe(
+        map(res => res?.data || null),
+        catchError(err => {
+          console.error('ERROR getById:', err);
+          return of(null);
+        })
+      );
+  }
+
+  // ================= REVIEWS =================
+  getReviewsByHotel(hotelId: number): Observable<any[]> {
+
+    if (!hotelId) {
+      console.error('hotelId inválido');
+      return of([]);
+    }
+
+    return this.api
+      .get<any>(API_ENDPOINTS.habitaciones.reviews(hotelId))
+      .pipe(
+        map(res => res?.data || []),
+        catchError(err => {
+          console.error('ERROR REVIEWS:', err);
+          return of([]);
+        })
+      );
+  }
+
+  // ================= CREAR REVIEW =================
+  createReview(payload: {
+    hotel_id: number;
+    puntuacion: number;
+    comentario?: string;
+  }): Observable<any> {
+
+    if (!payload.hotel_id || !payload.puntuacion) {
+      console.error('Payload inválido');
+      return of(null);
+    }
+
+    return this.api
+      .post(API_ENDPOINTS.habitaciones.createReview, payload)
+      .pipe(
+        catchError(err => {
+          console.error('ERROR CREATE REVIEW:', err);
+          throw err;
         })
       );
   }
@@ -116,28 +174,4 @@ export class HabitacionesService {
         item.hotel_slug || ''
     };
   }
-
-  // ================= POR ID =================
-getById(id: number): Observable<Habitacion | null> {
-
-  if (!id) {
-    console.error('ID inválido');
-    return of(null);
-  }
-
-  return this.api
-    .get<any>(API_ENDPOINTS.habitaciones.get(id))
-    .pipe(
-
-      map(res => {
-        if (!res || !res.data) return null;
-        return this.mapHabitacion(res.data);
-      }),
-
-      catchError(err => {
-        console.error('ERROR getById:', err);
-        return of(null);
-      })
-    );
-}
 }

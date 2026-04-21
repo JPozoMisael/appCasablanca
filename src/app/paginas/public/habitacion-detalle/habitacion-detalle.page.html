@@ -1,15 +1,17 @@
 <div class="container" *ngIf="habitacion; else nofound">
 
-  <!-- ===== GALERÍA PRO ===== -->
+  <!-- ===== GALERÍA ===== -->
   <section class="gallery">
+
     <div class="main">
-      <img [src]="selectedImage || habitacion.imagen" />
+      <img [src]="selectedImage || habitacion.imagen || 'assets/img/default.jpg'" />
+
       <div class="badge" *ngIf="availabilityHint">
         {{ availabilityHint }}
       </div>
     </div>
 
-    <div class="thumbs">
+    <div class="thumbs" *ngIf="gallery?.length > 1">
       <img
         *ngFor="let img of gallery"
         [src]="img"
@@ -17,18 +19,23 @@
         (click)="selectImage(img)"
       />
     </div>
+
   </section>
 
   <!-- ===== HEADER ===== -->
   <section class="header">
+
     <div class="title">
       <h1>{{ habitacion.nombre }}</h1>
       <p class="cap">{{ habitacion.capacidad }}</p>
 
-      <!-- RATING BOOKING -->
+      <!-- RATING -->
       <div class="rating" *ngIf="rating > 0">
-        <span class="score">{{ rating.toFixed(1) }}</span>
-        <span class="text">{{ getRatingText(rating) }}</span>
+        <div class="score">{{ rating.toFixed(1) }}</div>
+        <div class="meta">
+          <span class="text">{{ getRatingText(rating) }}</span>
+          <span class="reviews">· {{ totalReviews }} opiniones</span>
+        </div>
       </div>
     </div>
 
@@ -45,6 +52,7 @@
         Reservar ahora
       </ion-button>
     </div>
+
   </section>
 
   <!-- ===== GRID ===== -->
@@ -60,14 +68,28 @@
 
       <div class="card">
         <h2>Servicios</h2>
-        <ul>
-          <li *ngFor="let s of habitacion.servicios">{{ s }}</li>
+        <ul class="services">
+          <li *ngFor="let s of habitacion.servicios">
+            ✔ {{ s }}
+          </li>
         </ul>
       </div>
 
       <div class="card">
         <h2>Ubicación</h2>
         <iframe *ngIf="mapUrlSafe" [src]="mapUrlSafe"></iframe>
+      </div>
+
+      <!-- REVIEWS -->
+      <div class="card" *ngIf="reviews?.length > 0">
+        <h2>Opiniones</h2>
+
+        <div class="review" *ngFor="let r of reviews">
+          <div class="r-score">{{ r.puntuacion }}</div>
+          <div class="r-body">
+            <p>{{ r.comentario }}</p>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -96,7 +118,7 @@
           </div>
         </div>
 
-        <ion-button expand="block" (click)="reservar()">
+        <ion-button expand="block" class="cta" (click)="reservar()">
           Reservar
         </ion-button>
 
@@ -108,8 +130,9 @@
 
 </div>
 
+<!-- ===== NOT FOUND ===== -->
 <ng-template #nofound>
-  <div class="container">
+  <div class="container empty">
     <h2>No se encontró la habitación</h2>
     <ion-button routerLink="/inicio">Volver</ion-button>
   </div>
