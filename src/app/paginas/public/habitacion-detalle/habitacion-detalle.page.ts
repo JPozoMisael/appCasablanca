@@ -4,17 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonContent, IonButton } from '@ionic/angular/standalone';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
-interface HabitacionDetalle {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-  capacidad: string;
-  servicios: string[];
-  lat: number;
-  lng: number;
-  imagen: string;
-}
+import { HabitacionesService } from '@app/core/services/habitaciones.service';
 
 @Component({
   selector: 'app-habitacion-detalle',
@@ -25,8 +15,10 @@ interface HabitacionDetalle {
 })
 export class HabitacionDetallePage implements OnInit {
 
+  // ================= ROUTE =================
   roomId = 0;
 
+  // ================= SEARCH PARAMS =================
   checkIn = '';
   checkOut = '';
   adults = 2;
@@ -34,74 +26,35 @@ export class HabitacionDetallePage implements OnInit {
   rooms = 1;
   withPets = 0;
 
-  habitacion: HabitacionDetalle | null = null;
-
+  // ================= DATA =================
+  habitacion: any = null;
   mapUrlSafe: SafeResourceUrl | null = null;
 
-  // ===== MOCK (luego API) =====
-  private mock: HabitacionDetalle[] = [
-    {
-      id: 1,
-      nombre: 'Habitación Doble Deluxe',
-      descripcion:
-        'Habitación cómoda con acabados modernos, ideal para parejas.',
-      precio: 102,
-      capacidad: '2 adultos · 1 cama queen',
-      servicios: ['Wi-Fi', 'Aire acondicionado', 'TV', 'Baño privado'],
-      lat: -2.2149,
-      lng: -80.951,
-      imagen: 'assets/img/1.PNG',
-    },
-    {
-      id: 2,
-      nombre: 'Habitación Familiar',
-      descripcion:
-        'Espaciosa y confortable, perfecta para familias.',
-      precio: 119,
-      capacidad: '4 adultos · 2 camas',
-      servicios: ['Wi-Fi', 'Estacionamiento', 'TV', 'Baño privado'],
-      lat: -2.2149,
-      lng: -80.951,
-      imagen: 'assets/img/4.PNG',
-    },
-    {
-      id: 3,
-      nombre: 'Suite con Vista al Mar',
-      descripcion:
-        'Suite premium con vista panorámica al océano.',
-      precio: 149,
-      capacidad: '2 adultos · 1 cama king',
-      servicios: ['Wi-Fi', 'Jacuzzi', 'Restaurante', 'TV'],
-      lat: -2.2149,
-      lng: -80.951,
-      imagen: 'assets/img/9.PNG',
-    },
-  ];
+  // ================= UI PRO =================
+  gallery: string[] = [];
+  selectedImage: string = '';
+
+  rating: number = 8.7; // 🔥 luego vendrá de BD
+  availabilityHint: string = 'Quedan pocas habitaciones';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private habitacionesService: HabitacionesService
   ) {}
 
+  // ================= INIT =================
   ngOnInit() {
 
-    // ===== PARAM :id =====
-    this.route.paramMap.subscribe((pm) => {
+    // 🔥 PARAM ID
+    this.route.paramMap.subscribe(pm => {
       this.roomId = Number(pm.get('id'));
-
-      this.habitacion =
-        this.mock.find((x) => x.id === this.roomId) ?? null;
-
-      if (!this.habitacion) return;
-
-      const url = `https://www.google.com/maps?q=${this.habitacion.lat},${this.habitacion.lng}&output=embed`;
-      this.mapUrlSafe =
-        this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      this.loadHabitacion();
     });
 
-    // ===== QUERY PARAMS =====
-    this.route.queryParamMap.subscribe((qp) => {
+    // 🔥 QUERY PARAMS (vienen del search)
+    this.route.queryParamMap.subscribe(qp => {
       this.checkIn = qp.get('checkIn') ?? '';
       this.checkOut = qp.get('checkOut') ?? '';
       this.adults = this.toNum(qp.get('adults'), 2);
@@ -111,48 +64,112 @@ export class HabitacionDetallePage implements OnInit {
     });
   }
 
-  // ===== CALCULOS =====
+  // ================= BACKEND =================
+  loadHabitacion() {
 
+    this.habitacionesService.getById(this.roomId).subscribe({
+
+      next: (res: any) => {
+
+        const h = res?.data || res;
+
+        if (!h) {
+          this.habitacion = null;
+          return;
+        }
+
+        this.habitacion = {
+          id: h.id,
+          nombre: h.tipo || `Habitación ${h.numero}`,
+          descripcion: h.descripcion,
+          precio: h.precioNoche || h.precio,
+          capacidad: `${h.capacidad} personas · ${h.camas} cama(s)`,
+
+          servicios: [
+            'Wi-Fi',
+            'Aire acondicionado',
+            'TV',
+            'Baño privado'
+          ],
+
+          lat: -2.2149,
+          lng: -80.951,
+
+          imagen: h.imagenUrl
+        };
+
+        // 🔥 GALERÍA (temporal)
+        this.gallery = [
+          this.habitacion.imagen,
+          this.habitacion.imagen,
+          this.habitacion.imagen
+        ];
+
+        this.selectedImage = this.gallery[0];
+
+        // 🔥 MAPA
+        const url = `https://www.google.com/maps?q=${this.habitacion.lat},${this.habitacion.lng}&output=embed`;
+
+        this.mapUrlSafe =
+          this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      },
+
+      error: (err: any) => {
+        console.error('ERROR DETALLE:', err);
+        this.habitacion = null;
+      }
+    });
+  }
+
+  // ================= CALCULOS =================
   get nights(): number {
     if (!this.checkIn || !this.checkOut) return 0;
 
-    const a = new Date(this.checkIn + 'T00:00:00').getTime();
-    const b = new Date(this.checkOut + 'T00:00:00').getTime();
+    const a = new Date(this.checkIn).getTime();
+    const b = new Date(this.checkOut).getTime();
 
     const diff = b - a;
-    if (diff <= 0) return 0;
-
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return diff > 0 ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : 0;
   }
 
   get total(): number {
     if (!this.habitacion) return 0;
-    const n = this.nights || 1;
-    return this.habitacion.precio * n;
+    return this.habitacion.precio * (this.nights || 1);
   }
 
-  // ===== RESERVA =====
+  // ================= UI =================
+  selectImage(img: string) {
+    this.selectedImage = img;
+  }
 
+  getRatingText(rating: number): string {
+    if (rating >= 9) return 'Excelente';
+    if (rating >= 8) return 'Muy bien';
+    if (rating >= 7) return 'Bien';
+    return 'Aceptable';
+  }
+
+  // ================= RESERVA =================
   reservar() {
     if (!this.habitacion) return;
 
-    const queryParams = {
-      roomId: this.habitacion.id,
-      checkIn: this.checkIn,
-      checkOut: this.checkOut,
-      adults: this.adults,
-      children: this.children,
-      rooms: this.rooms,
-      withPets: this.withPets,
-    };
-
-    this.router.navigate(['/reservar'], { queryParams });
+    this.router.navigate(['/reservar'], {
+      queryParams: {
+        roomId: this.habitacion.id,
+        checkIn: this.checkIn,
+        checkOut: this.checkOut,
+        adults: this.adults,
+        children: this.children,
+        rooms: this.rooms,
+        withPets: this.withPets,
+      }
+    });
   }
 
-  // ===== UTILS =====
-
+  // ================= UTILS =================
   private toNum(v: string | null, fallback: number): number {
     const n = Number(v);
     return Number.isFinite(n) ? n : fallback;
   }
+
 }

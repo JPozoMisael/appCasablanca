@@ -116,4 +116,28 @@ export class HabitacionesService {
         item.hotel_slug || ''
     };
   }
+
+  // ================= POR ID =================
+getById(id: number): Observable<Habitacion | null> {
+
+  if (!id) {
+    console.error('ID inválido');
+    return of(null);
+  }
+
+  return this.api
+    .get<any>(API_ENDPOINTS.habitaciones.get(id))
+    .pipe(
+
+      map(res => {
+        if (!res || !res.data) return null;
+        return this.mapHabitacion(res.data);
+      }),
+
+      catchError(err => {
+        console.error('ERROR getById:', err);
+        return of(null);
+      })
+    );
+}
 }

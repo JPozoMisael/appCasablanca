@@ -1,150 +1,116 @@
 <div class="container" *ngIf="habitacion; else nofound">
 
-  <!-- ===== HERO / GALERÍA ===== -->
-  <section class="galeria">
-    <img [src]="habitacion.imagen" [alt]="habitacion.nombre" />
-  </section>
-
-  <!-- ===== HEADER PRINCIPAL ===== -->
-  <section class="info-header">
-    <div class="info-text">
-      <h1>{{ habitacion.nombre }}</h1>
-      <p class="subtitulo">{{ habitacion.capacidad }}</p>
-
-      <div class="chips">
-        <span class="chip" *ngIf="checkIn && checkOut">
-          {{ checkIn }} — {{ checkOut }}
-        </span>
-
-        <span class="chip">{{ adults }} adulto(s)</span>
-
-        <span class="chip" *ngIf="children > 0">
-          {{ children }} niño(s)
-        </span>
-
-        <span class="chip">{{ rooms }} habitación(es)</span>
-
-        <span class="chip" *ngIf="withPets">Mascotas</span>
-
-        <span class="chip" *ngIf="nights > 0">
-          {{ nights }} noche{{ nights > 1 ? 's' : '' }}
-        </span>
+  <!-- ===== GALERÍA PRO ===== -->
+  <section class="gallery">
+    <div class="main">
+      <img [src]="selectedImage || habitacion.imagen" />
+      <div class="badge" *ngIf="availabilityHint">
+        {{ availabilityHint }}
       </div>
     </div>
 
-    <!-- ===== PRECIO + RESERVA ===== -->
-    <div class="precio-box">
-      <div class="precio">
-        ${{ habitacion.precio }}
-        <span>/ noche</span>
+    <div class="thumbs">
+      <img
+        *ngFor="let img of gallery"
+        [src]="img"
+        [class.active]="img === selectedImage"
+        (click)="selectImage(img)"
+      />
+    </div>
+  </section>
+
+  <!-- ===== HEADER ===== -->
+  <section class="header">
+    <div class="title">
+      <h1>{{ habitacion.nombre }}</h1>
+      <p class="cap">{{ habitacion.capacidad }}</p>
+
+      <!-- RATING BOOKING -->
+      <div class="rating" *ngIf="rating > 0">
+        <span class="score">{{ rating.toFixed(1) }}</span>
+        <span class="text">{{ getRatingText(rating) }}</span>
+      </div>
+    </div>
+
+    <div class="price-box">
+      <div class="price">
+        ${{ habitacion.precio }} <span>/noche</span>
       </div>
 
       <div class="total" *ngIf="nights > 0">
         Total: ${{ total }}
       </div>
 
-      <ion-button expand="block" class="btn-reservar" (click)="reservar()">
+      <ion-button expand="block" class="cta" (click)="reservar()">
         Reservar ahora
       </ion-button>
     </div>
   </section>
 
-  <!-- ===== CONTENIDO ===== -->
-  <section class="content-grid">
+  <!-- ===== GRID ===== -->
+  <section class="grid">
 
-    <!-- IZQUIERDA -->
+    <!-- LEFT -->
     <div class="left">
 
-      <!-- DESCRIPCIÓN -->
-      <section class="card">
+      <div class="card">
         <h2>Descripción</h2>
         <p>{{ habitacion.descripcion }}</p>
-      </section>
+      </div>
 
-      <!-- SERVICIOS -->
-      <section class="card">
+      <div class="card">
         <h2>Servicios</h2>
-        <ul class="servicios">
+        <ul>
           <li *ngFor="let s of habitacion.servicios">{{ s }}</li>
         </ul>
-      </section>
+      </div>
 
-      <!-- MAPA -->
-      <section class="card">
+      <div class="card">
         <h2>Ubicación</h2>
-        <div class="mapa">
-          <iframe
-            *ngIf="mapUrlSafe"
-            [src]="mapUrlSafe"
-            loading="lazy"
-          ></iframe>
-        </div>
-      </section>
+        <iframe *ngIf="mapUrlSafe" [src]="mapUrlSafe"></iframe>
+      </div>
 
     </div>
 
-    <!-- DERECHA — WIDGET RESERVA -->
+    <!-- RIGHT -->
     <aside class="right">
 
       <div class="widget">
 
-        <div class="widget-head">
-          <div class="price">
-            ${{ habitacion.precio }}
-            <span>/ noche</span>
-          </div>
+        <div class="w-price">
+          ${{ habitacion.precio }} <span>/noche</span>
+        </div>
 
-          <div class="total" *ngIf="nights > 0">
-            Total: ${{ total }}
+        <div class="w-total" *ngIf="nights > 0">
+          Total: ${{ total }}
+        </div>
+
+        <div class="dates">
+          <div>
+            <label>Check-in</label>
+            <span>{{ checkIn || '—' }}</span>
+          </div>
+          <div>
+            <label>Check-out</label>
+            <span>{{ checkOut || '—' }}</span>
           </div>
         </div>
 
-        <div class="widget-body">
+        <ion-button expand="block" (click)="reservar()">
+          Reservar
+        </ion-button>
 
-          <div class="row">
-            <div>
-              <label>Check-in</label>
-              <div>{{ checkIn || '—' }}</div>
-            </div>
-
-            <div>
-              <label>Check-out</label>
-              <div>{{ checkOut || '—' }}</div>
-            </div>
-          </div>
-
-          <div class="row">
-            <label>Huéspedes</label>
-            <div>
-              {{ adults }} adulto(s)
-              <span *ngIf="children > 0">· {{ children }} niño(s)</span>
-            </div>
-          </div>
-
-          <ion-button expand="block" (click)="reservar()">
-            Reservar ahora
-          </ion-button>
-
-        </div>
       </div>
 
     </aside>
 
   </section>
 
-  <!-- ACCIONES -->
-  <div class="acciones">
-    <ion-button fill="clear" routerLink="/habitaciones">
-      ← Volver a resultados
-    </ion-button>
-  </div>
-
 </div>
 
-<!-- ===== NO ENCONTRADO ===== -->
 <ng-template #nofound>
   <div class="container">
     <h2>No se encontró la habitación</h2>
-    <ion-button routerLink="/habitaciones">Volver</ion-button>
+    <ion-button routerLink="/inicio">Volver</ion-button>
   </div>
 </ng-template>
