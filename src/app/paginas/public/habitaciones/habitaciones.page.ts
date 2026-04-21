@@ -15,11 +15,24 @@ import { HabitacionesService } from '@app/core/services/habitaciones.service';
 })
 export class HabitacionesPage implements OnInit {
 
+  // ================= STATE =================
   loading = false;
   habitaciones: any[] = [];
   slug: string = '';
 
   filters: any = {};
+
+  // 🔥 FILTROS UI
+  precioMin: number = 0;
+  precioMax: number = 500;
+  capacidad: number = 1;
+  sort: string = 'precio_asc';
+
+  // 🔥 PAGINACIÓN
+  page: number = 1;
+  limit: number = 10;
+  total: number = 0;
+  pages: number = 0;
 
   constructor(
     private habitacionesService: HabitacionesService,
@@ -27,14 +40,12 @@ export class HabitacionesPage implements OnInit {
     private route: ActivatedRoute
   ) {}
 
+  // ================= INIT =================
   ngOnInit() {
 
     this.slug = this.route.snapshot.paramMap.get('slug') || '';
-    console.log('HOTEL SLUG:', this.slug);
 
     this.route.queryParams.subscribe(params => {
-
-      console.log('FILTROS RECIBIDOS:', params);
 
       this.filters = {
         checkIn: params['checkIn'],
@@ -45,64 +56,75 @@ export class HabitacionesPage implements OnInit {
         withPets: params['withPets']
       };
 
+      this.page = 1; // reset paginación en nueva búsqueda
+
       this.loadHabitaciones();
     });
   }
 
+  // ================= LOAD =================
   loadHabitaciones() {
-  this.loading = true;
 
-  const hasFilters = this.filters?.checkIn && this.filters?.checkOut;
+    this.loading = true;
 
-  const request$ = hasFilters
-    ? this.habitacionesService.getDisponiblesByHotel(this.slug, this.filters)
-    : this.habitacionesService.getByHotel(this.slug);
+    const finalFilters = {
+      ...this.filters,
 
-  request$.subscribe({
+      precioMin: this.precioMin,
+      precioMax: this.precioMax,
+      capacidad: this.capacidad,
+      sort: this.sort,
 
-    next: (res: any[]) => {
-
-      console.log('HABITACIONES RESULTADO:', res);
-
-      this.habitaciones = res.sort(
-        (a: any, b: any) => Number(a.numero) - Number(b.numero)
-      );
-
-      this.loading = false;
-    },
-
-    error: (err) => {
-      console.error('ERROR CARGANDO HABITACIONES:', err);
-      this.loading = false;
-    }
-  });
-}
-
-  mapHabitacion(h: any) {
-    return {
-      id: h.id,
-      numero: h.numero || h.numero_habitacion || h.id,
-      precio: h.precio || h.precioNoche || 0,
-      descripcion:
-        h.descripcion ||
-        'Habitación cómoda con excelente ubicación',
-      capacidad: h.capacidad || 2,
-      camas: h.camas || 1,
-      bano: h.bano ?? true,
-      imagen:
-        h.imagen ||
-        h.imagenUrl ||
-        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'
+      page: this.page,
+      limit: this.limit
     };
+
+    this.habitacionesService
+      .getDisponiblesByHotel(this.slug, finalFilters)
+      .subscribe({
+
+        next: (res) => {
+
+          this.habitaciones = res.data || [];
+
+          this.total = res.meta?.total || 0;
+          this.pages = res.meta?.pages || 0;
+
+          this.loading = false;
+        },
+
+        error: (err) => {
+          console.error('ERROR CARGANDO HABITACIONES:', err);
+          this.loading = false;
+        }
+      });
   }
 
+  // ================= PAGINACIÓN =================
+  nextPage() {
+    if (this.page < this.pages) {
+      this.page++;
+      this.loadHabitaciones();
+    }
+  }
+
+  prevPage() {
+    if (this.page > 1) {
+      this.page--;
+      this.loadHabitaciones();
+    }
+  }
+
+  // ================= NAV =================
   goToDetalle(h: any) {
     this.router.navigate(['/habitacion-detalle', h.id], {
-      queryParams: this.filters 
+      queryParams: this.filters
     });
   }
 
+  // ================= PERF =================
   trackById(index: number, item: any) {
     return item.id;
   }
+
 }

@@ -6,50 +6,30 @@ import { API_ENDPOINTS } from '../config/endpoints';
 import { ApiService } from './api.service';
 import { Habitacion } from '@app/shared/models/habitacion.model';
 
+interface ApiResponse {
+  data: Habitacion[];
+  meta?: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class HabitacionesService {
 
   constructor(private api: ApiService) {}
 
-  // ================= TODAS =================
-  getAll(): Observable<Habitacion[]> {
-    return this.api.get<any>(API_ENDPOINTS.habitaciones.list).pipe(
-      map(res => this.safeMapArray(res)),
-      catchError(err => {
-        console.error('ERROR getAll:', err);
-        return of([]);
-      })
-    );
-  }
-
-  // ================= POR HOTEL =================
-  getByHotel(slug: string): Observable<Habitacion[]> {
-
-    if (!slug) {
-      console.error('SLUG VACÍO');
-      return of([]);
-    }
-
-    return this.api
-      .get<any>(API_ENDPOINTS.habitaciones.byHotel(slug))
-      .pipe(
-        map(res => this.safeMapArray(res)),
-        catchError(err => {
-          console.error('ERROR getByHotel:', err);
-          return of([]);
-        })
-      );
-  }
-
-  // ================= DISPONIBILIDAD REAL =================
+  // ================= DISPONIBLES =================
   getDisponiblesByHotel(
     slug: string,
     filters: any
-  ): Observable<Habitacion[]> {
+  ): Observable<{ data: Habitacion[]; meta: any }> {
 
     if (!slug) {
       console.error('SLUG VACÍO');
-      return of([]);
+      return of({ data: [], meta: {} });
     }
 
     const params: any = {
@@ -59,18 +39,29 @@ export class HabitacionesService {
       adults: filters?.adults,
       children: filters?.children,
       rooms: filters?.rooms,
-      withPets: filters?.withPets
+      withPets: filters?.withPets,
+
+      precioMin: filters?.precioMin,
+      precioMax: filters?.precioMax,
+      capacidad: filters?.capacidad,
+      sort: filters?.sort,
+
+      page: filters?.page || 1,
+      limit: filters?.limit || 10
     };
 
     return this.api
-      .get<any>(API_ENDPOINTS.habitaciones.disponibles, { params }) // 🔥 CORRECTO
+      .get<any>(API_ENDPOINTS.habitaciones.disponibles, { params })
       .pipe(
 
-        map(res => this.safeMapArray(res)),
+        map((res: ApiResponse) => ({
+          data: this.safeMapArray(res),
+          meta: res.meta || {}
+        })),
 
         catchError(err => {
           console.error('ERROR DISPONIBLES:', err);
-          return of([]);
+          return of({ data: [], meta: {} });
         })
       );
   }
@@ -111,13 +102,11 @@ export class HabitacionesService {
 
       camas: item.camas ?? 1,
 
-      // 🔥 CORRECCIÓN CLAVE
       precioNoche:
         Number(item.precio_noche ?? item.precio ?? 0),
 
       estado: item.estado || 'disponible',
 
-      // 🔥 CORRECCIÓN CLAVE
       imagenUrl:
         item.imagen_url ||
         item.imagen ||
