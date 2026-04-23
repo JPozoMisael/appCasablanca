@@ -92,6 +92,53 @@
         </div>
       </div>
 
+      <!-- ===== FORM REVIEW PRO ===== -->
+<div class="card review-form">
+
+  <h2>Escribe tu opinión</h2>
+
+  <!-- ⭐ ESTRELLAS -->
+  <div class="stars">
+
+    <span
+      *ngFor="let s of [1,2,3,4,5]"
+      (click)="setRating(s)"
+      (mouseenter)="hoverRating = s"
+      (mouseleave)="hoverRating = 0"
+      [class.active]="s <= (hoverRating || newReview.puntuacion)"
+    >
+      ★
+    </span>
+
+  </div>
+
+  <!-- TEXTO FEEDBACK -->
+  <div class="rating-text" *ngIf="newReview.puntuacion > 0">
+    {{ getRatingText(newReview.puntuacion * 2) }}
+  </div>
+
+  <!-- TEXTAREA -->
+  <textarea
+    [(ngModel)]="newReview.comentario"
+    placeholder="Cuéntanos tu experiencia..."
+    rows="4"
+  ></textarea>
+
+  <!-- BOTÓN -->
+  <ion-button
+    expand="block"
+    class="btn-review"
+    [disabled]="submittingReview || newReview.puntuacion < 1"
+    (click)="submitReview()"
+  >
+
+    <span *ngIf="!submittingReview">Enviar opinión</span>
+    <span *ngIf="submittingReview">Enviando...</span>
+
+  </ion-button>
+
+</div>
+
     </div>
 
     <!-- RIGHT -->

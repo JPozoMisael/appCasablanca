@@ -50,6 +50,7 @@ export class HabitacionDetallePage implements OnInit {
 
   submittingReview = false;
 
+  hoverRating: number = 0;
   constructor(
     private route: ActivatedRoute,
     private router: Router,

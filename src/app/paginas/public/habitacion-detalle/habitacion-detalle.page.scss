@@ -233,3 +233,90 @@
     text-align: left;
   }
 }
+/* ===== REVIEW FORM ===== */
+.review-form {
+  margin-top: 20px;
+
+  h2 {
+    margin-bottom: 12px;
+  }
+}
+
+/* ===== STARS ===== */
+.stars {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+
+  span {
+    font-size: 28px;
+    cursor: pointer;
+    color: #d1d5db;
+    transition: 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &.active {
+      color: #fbbf24; // dorado
+    }
+  }
+}
+
+/* ===== TEXTO RATING ===== */
+.rating-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #16a34a;
+  margin-bottom: 10px;
+}
+
+/* ===== TEXTAREA ===== */
+textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  resize: none;
+  font-size: 14px;
+  transition: 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #006ce4;
+    box-shadow: 0 0 0 2px rgba(0,108,228,0.1);
+  }
+}
+
+/* ===== BOTÓN ===== */
+.btn-review {
+  margin-top: 10px;
+  font-weight: 700;
+
+  --background: linear-gradient(135deg, #006ce4, #003580);
+}
+
+/* ===== REVIEW ITEMS (MEJORADOS) ===== */
+.review {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+
+  .r-score {
+    background: #003580;
+    color: white;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    min-width: 34px;
+    text-align: center;
+  }
+
+  .r-body {
+    font-size: 14px;
+    color: #333;
+  }
+}
