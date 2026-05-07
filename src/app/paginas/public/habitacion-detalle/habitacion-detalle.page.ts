@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonContent, IonButton } from '@ionic/angular/standalone';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-
+import { FormsModule } from '@angular/forms'; 
 import { HabitacionesService } from '@app/core/services/habitaciones.service';
 
 @Component({
   selector: 'app-habitacion-detalle',
   standalone: true,
-  imports: [CommonModule, IonContent, IonButton, RouterLink],
+  imports: [CommonModule, IonContent, IonButton, RouterLink, FormsModule],
   templateUrl: './habitacion-detalle.page.html',
   styleUrls: ['./habitacion-detalle.page.scss'],
 })
