@@ -4,14 +4,15 @@
   <section class="gallery">
 
     <div class="main">
-      <img [src]="selectedImage || habitacion.imagen || 'assets/img/default.jpg'" />
+      <img [src]="selectedImage || habitacion.imagen || 'assets/img/default.jpg'"
+  [alt]="habitacion.nombre" />
 
       <div class="badge" *ngIf="availabilityHint">
         {{ availabilityHint }}
       </div>
     </div>
 
-    <div class="thumbs" *ngIf="gallery?.length > 1">
+    <div class="thumbs" *ngIf="gallery.length > 1">
       <img
         *ngFor="let img of gallery"
         [src]="img"
@@ -81,7 +82,7 @@
       </div>
 
       <!-- REVIEWS -->
-      <div class="card" *ngIf="reviews?.length > 0">
+      <div class="card" *ngIf="reviews.length > 0">
         <h2>Opiniones</h2>
 
         <div class="review" *ngFor="let r of reviews">
