@@ -202,7 +202,7 @@ export class HotelPage implements OnInit {
 
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error cargando habitaciones:', err);
         this.loading = false;
       }

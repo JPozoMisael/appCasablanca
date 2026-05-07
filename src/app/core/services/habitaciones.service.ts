@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 import { API_ENDPOINTS } from '../config/endpoints';
@@ -16,10 +16,14 @@ interface ApiResponse {
   };
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class HabitacionesService {
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService
+  ) {}
 
   // ================= DISPONIBLES =================
   getDisponiblesByHotel(
@@ -29,13 +33,19 @@ export class HabitacionesService {
 
     if (!slug) {
       console.error('SLUG VACÍO');
-      return of({ data: [], meta: {} });
+
+      return of({
+        data: [],
+        meta: {}
+      });
     }
 
     const params: any = {
       hotel: slug,
+
       checkIn: filters?.checkIn,
       checkOut: filters?.checkOut,
+
       adults: filters?.adults,
       children: filters?.children,
       rooms: filters?.rooms,
@@ -51,15 +61,60 @@ export class HabitacionesService {
     };
 
     return this.api
-      .get<any>(API_ENDPOINTS.habitaciones.disponibles, { params })
+      .get<any>(
+        API_ENDPOINTS.habitaciones.disponibles,
+        { params }
+      )
       .pipe(
+
         map((res: ApiResponse) => ({
           data: this.safeMapArray(res),
           meta: res.meta || {}
         })),
-        catchError(err => {
-          console.error('ERROR DISPONIBLES:', err);
-          return of({ data: [], meta: {} });
+
+        catchError((err: any) => {
+
+          console.error(
+            'ERROR DISPONIBLES:',
+            err
+          );
+
+          return of({
+            data: [],
+            meta: {}
+          });
+        })
+      );
+  }
+
+  // ================= POR HOTEL =================
+  getByHotel(slug: string): Observable<Habitacion[]> {
+
+    if (!slug) {
+
+      console.error('SLUG VACÍO');
+
+      return of([]);
+    }
+
+    return this.api
+      .get<any>(
+        API_ENDPOINTS.habitaciones.byHotel(slug)
+      )
+      .pipe(
+
+        map((res: any) =>
+          this.safeMapArray(res)
+        ),
+
+        catchError((err: any) => {
+
+          console.error(
+            'ERROR getByHotel:',
+            err
+          );
+
+          return of([]);
         })
       );
   }
@@ -68,35 +123,79 @@ export class HabitacionesService {
   getById(id: number): Observable<any | null> {
 
     if (!id) {
+
       console.error('ID inválido');
+
       return of(null);
     }
 
     return this.api
-      .get<any>(API_ENDPOINTS.habitaciones.get(id))
+      .get<any>(
+        API_ENDPOINTS.habitaciones.get(id)
+      )
       .pipe(
-        map(res => res?.data || null),
-        catchError(err => {
-          console.error('ERROR getById:', err);
+
+        map((res: any) => {
+
+          if (!res || !res.data) {
+            return null;
+          }
+
+          return {
+            ...this.mapHabitacion(res.data),
+
+            hotel_id:
+              res.data.hotel_id,
+
+            rating:
+              res.data.rating || 0,
+
+            totalReviews:
+              res.data.totalReviews || 0
+          };
+        }),
+
+        catchError((err: any) => {
+
+          console.error(
+            'ERROR getById:',
+            err
+          );
+
           return of(null);
         })
       );
   }
 
   // ================= REVIEWS =================
-  getReviewsByHotel(hotelId: number): Observable<any[]> {
+  getReviewsByHotel(
+    hotelId: number
+  ): Observable<any[]> {
 
     if (!hotelId) {
+
       console.error('hotelId inválido');
+
       return of([]);
     }
 
     return this.api
-      .get<any>(API_ENDPOINTS.habitaciones.reviews(hotelId))
+      .get<any>(
+        API_ENDPOINTS.habitaciones.reviews(hotelId)
+      )
       .pipe(
-        map(res => res?.data || []),
-        catchError(err => {
-          console.error('ERROR REVIEWS:', err);
+
+        map((res: any) =>
+          res?.data || []
+        ),
+
+        catchError((err: any) => {
+
+          console.error(
+            'ERROR REVIEWS:',
+            err
+          );
+
           return of([]);
         })
       );
@@ -109,37 +208,65 @@ export class HabitacionesService {
     comentario?: string;
   }): Observable<any> {
 
-    if (!payload.hotel_id || !payload.puntuacion) {
-      console.error('Payload inválido');
-      return of(null);
+    if (
+      !payload.hotel_id ||
+      !payload.puntuacion
+    ) {
+
+      console.error(
+        'Payload inválido'
+      );
+
+      return throwError(() =>
+        new Error('Payload inválido')
+      );
     }
 
     return this.api
-      .post(API_ENDPOINTS.habitaciones.createReview, payload)
+      .post(
+        API_ENDPOINTS.habitaciones.createReview,
+        payload
+      )
       .pipe(
-        catchError(err => {
-          console.error('ERROR CREATE REVIEW:', err);
-          throw err;
+
+        catchError((err: any) => {
+
+          console.error(
+            'ERROR CREATE REVIEW:',
+            err
+          );
+
+          return throwError(() => err);
         })
       );
   }
 
   // ================= SAFE MAP =================
-  private safeMapArray(res: any): Habitacion[] {
+  private safeMapArray(
+    res: any
+  ): Habitacion[] {
 
-    if (!res || !res.data || !Array.isArray(res.data)) {
+    if (
+      !res ||
+      !res.data ||
+      !Array.isArray(res.data)
+    ) {
       return [];
     }
 
-    return res.data.map((item: any) =>
-      this.mapHabitacion(item)
+    return res.data.map(
+      (item: any) =>
+        this.mapHabitacion(item)
     );
   }
 
   // ================= MAPPER =================
-  private mapHabitacion(item: any): Habitacion {
+  private mapHabitacion(
+    item: any
+  ): Habitacion {
 
     return {
+
       id: item.id,
 
       numero: String(
@@ -150,20 +277,33 @@ export class HabitacionesService {
 
       tipo:
         item.tipo_nombre ||
-        `Habitación ${item.numero_habitacion || item.numero}`,
+        item.tipo ||
+        `Habitación ${
+          item.numero_habitacion ||
+          item.numero
+        }`,
 
       descripcion:
         item.descripcion ||
         `Piso ${item.piso ?? 'N/A'}`,
 
-      capacidad: item.capacidad ?? 2,
+      capacidad:
+        item.capacidad ??
+        item.tipoHabitacion?.capacidad_maxima ??
+        2,
 
-      camas: item.camas ?? 1,
+      camas:
+        item.camas ?? 1,
 
-      precioNoche:
-        Number(item.precio_noche ?? item.precio ?? 0),
+      precioNoche: Number(
+        item.precio_noche ??
+        item.precio ??
+        0
+      ),
 
-      estado: item.estado || 'disponible',
+      estado:
+        item.estado ||
+        'disponible',
 
       imagenUrl:
         item.imagen_url ||
