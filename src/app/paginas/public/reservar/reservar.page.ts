@@ -157,157 +157,203 @@ export class ReservarPage implements OnInit {
   }
 
   // ================= CONFIRM =================
-  confirmBooking() {
+ confirmBooking() {
 
-    if (this.submitting) return;
+  if (this.submitting) return;
 
-    if (!this.acceptingTerms) {
-      alert('Debes aceptar los términos');
-      return;
-    }
+  // ================= VALIDACIONES =================
 
-    if (
-      !this.guest.nombres ||
-      !this.guest.email
-    ) {
-      alert('Completa los datos obligatorios');
-      return;
-    }
+  if (!this.acceptingTerms) {
 
-    if (!this.room) {
-      alert('Habitación inválida');
-      return;
-    }
+    alert('Debes aceptar los términos');
 
-    this.submitting = true;
+    return;
+  }
 
-    // ================= CLIENTE =================
-    const clientePayload = {
+  if (
+    !this.guest.nombres.trim() ||
+    !this.guest.email.trim()
+  ) {
 
-      nombres: this.guest.nombres,
+    alert('Completa los datos obligatorios');
 
-      apellidos: this.guest.apellidos,
+    return;
+  }
 
-      email: this.guest.email,
+  if (!this.room) {
 
-      telefono: this.guest.telefono,
+    alert('Habitación inválida');
 
-      documento: this.guest.cedulaPasaporte
-    };
+    return;
+  }
 
-    this.huespedesService
-      .create(clientePayload)
-      .subscribe({
+  if (!this.checkIn || !this.checkOut) {
 
-        next: (cliente: any) => {
+    alert('Fechas inválidas');
 
-          if (!cliente) {
+    return;
+  }
 
-            console.error('Cliente null');
+  // ================= EMAIL SIMPLE =================
 
-            this.submitting = false;
+  const emailOk =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      .test(this.guest.email);
 
-            alert('Error al crear huésped');
+  if (!emailOk) {
 
-            return;
-          }
+    alert('Correo inválido');
 
-          // ================= RESERVA =================
-          const reservaPayload = {
+    return;
+  }
 
-            huespedId: cliente.id,
+  this.submitting = true;
 
-            habitacionId: this.room.id,
+  // ================= CLIENTE =================
 
-            checkIn: this.checkIn,
+  const clientePayload = {
 
-            checkOut: this.checkOut,
+    nombres:
+      this.guest.nombres.trim(),
 
-            adultos: this.adults,
+    apellidos:
+      this.guest.apellidos.trim(),
 
-            ninos: this.children,
+    email:
+      this.guest.email.trim(),
 
-            total: this.total
-          };
+    telefono:
+      this.guest.telefono.trim(),
 
-          this.reservasService
-            .create(reservaPayload)
-            .subscribe({
+    documento:
+      this.guest.cedulaPasaporte.trim()
+  };
 
-              next: (reserva: any) => {
+  this.huespedesService
+    .create(clientePayload)
+    .subscribe({
 
-                if (!reserva) {
+      next: (cliente: any) => {
 
-                  this.submitting = false;
+        const clienteData =
+          cliente?.data || cliente;
 
-                  alert('Error al crear la reserva');
+        if (!clienteData?.id) {
 
-                  return;
-                }
+          console.error('Cliente inválido');
+
+          this.submitting = false;
+
+          alert('Error al crear huésped');
+
+          return;
+        }
+
+        // ================= RESERVA =================
+
+        const reservaPayload = {
+
+          huespedId: clienteData.id,
+
+          habitacionId: this.room.id,
+
+          checkIn: this.checkIn,
+
+          checkOut: this.checkOut,
+
+          adultos: this.adults,
+
+          ninos: this.children,
+
+          total: this.total
+        };
+
+        this.reservasService
+          .create(reservaPayload)
+          .subscribe({
+
+            next: (reserva: any) => {
+
+              const reservaData =
+                reserva?.data || reserva;
+
+              if (!reservaData) {
 
                 this.submitting = false;
 
-                // ================= REDIRECT =================
-                this.router.navigate(
-                  ['/reserva-confirmada'],
-                  {
-                    queryParams: {
+                alert('Error al crear reserva');
 
-                      roomId: this.room.id,
+                return;
+              }
 
-                      checkIn: this.checkIn,
+              this.submitting = false;
 
-                      checkOut: this.checkOut,
+              // ================= REDIRECT =================
 
-                      adults: this.adults,
+              this.router.navigate(
+                ['/reserva-confirmada'],
+                {
+                  queryParams: {
 
-                      children: this.children,
+                    roomId: this.room.id,
 
-                      guestName: this.guest.nombres,
+                    checkIn: this.checkIn,
 
-                      guestEmail: this.guest.email,
+                    checkOut: this.checkOut,
 
-                      guestPhone: this.guest.telefono,
+                    adults: this.adults,
 
-                      total: this.total,
+                    children: this.children,
 
-                      code:
+                    guestName: this.guest.nombres,
+
+                    guestEmail: this.guest.email,
+
+                    guestPhone: this.guest.telefono,
+
+                    total: this.total,
+
+                    code:
+                      reservaData.codigo_reserva ||
+                      reservaData.codigo ||
+                      (
                         'CB-' +
                         Math.random()
                           .toString(36)
                           .substring(2, 8)
                           .toUpperCase()
-                    }
+                      )
                   }
-                );
+                }
+              );
 
-              },
+            },
 
-              error: (err: any) => {
+            error: (err: any) => {
 
-                console.error(err);
+              console.error(err);
 
-                this.submitting = false;
+              this.submitting = false;
 
-                alert('Error al crear la reserva');
-              }
+              alert('Error al crear la reserva');
+            }
 
-            });
+          });
 
-        },
+      },
 
-        error: (err: any) => {
+      error: (err: any) => {
 
-          console.error(err);
+        console.error(err);
 
-          this.submitting = false;
+        this.submitting = false;
 
-          alert('Error al crear huésped');
-        }
+        alert('Error al crear huésped');
+      }
 
-      });
+    });
 
-  }
+}
 
   // ================= NAV =================
   backToRooms() {

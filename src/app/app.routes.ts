@@ -15,7 +15,12 @@ export const routes: Routes = [
 
     children: [
 
-      { path: '', redirectTo: 'inicio', pathMatch: 'full' },
+      // ================= DEFAULT =================
+      {
+        path: '',
+        redirectTo: 'inicio',
+        pathMatch: 'full'
+      },
 
       // ================= INICIO =================
       {
@@ -25,8 +30,7 @@ export const routes: Routes = [
             .then(m => m.InicioPage),
       },
 
-      // ================= HOTEL (DINÁMICO) =================
-      // Página principal del hotel
+      // ================= HOTEL =================
       {
         path: 'hotel/:slug',
         loadComponent: () =>
@@ -34,7 +38,7 @@ export const routes: Routes = [
             .then(m => m.HotelPage),
       },
 
-      // Habitaciones de un hotel
+      // ================= HABITACIONES =================
       {
         path: 'hotel/:slug/habitaciones',
         loadComponent: () =>
@@ -42,7 +46,7 @@ export const routes: Routes = [
             .then(m => m.HabitacionesPage),
       },
 
-      // Detalle de habitación dentro del hotel
+      // ================= DETALLE HABITACIÓN =================
       {
         path: 'hotel/:slug/habitacion/:id',
         loadComponent: () =>
@@ -50,16 +54,16 @@ export const routes: Routes = [
             .then(m => m.HabitacionDetallePage),
       },
 
-      // ================= CHECKOUT =================
+      // ================= RESERVAR =================
+      // 🔥 SIN LOGIN (RECOMENDADO)
       {
         path: 'reservar',
-        canActivate: [authGuard],
         loadComponent: () =>
           import('./paginas/public/reservar/reservar.page')
             .then(m => m.ReservarPage),
       },
 
-      // ================= AUTH =================
+      // ================= LOGIN =================
       {
         path: 'login',
         loadComponent: () =>
@@ -67,6 +71,7 @@ export const routes: Routes = [
             .then(m => m.LoginPage),
       },
 
+      // ================= REGISTRO =================
       {
         path: 'registro',
         loadComponent: () =>
@@ -74,7 +79,7 @@ export const routes: Routes = [
             .then(m => m.RegistroPage),
       },
 
-      // ================= USUARIO =================
+      // ================= MIS RESERVAS =================
       {
         path: 'mis-reservas',
         canActivate: [authGuard],
@@ -83,6 +88,7 @@ export const routes: Routes = [
             .then(m => m.MisReservasPage),
       },
 
+      // ================= PERFIL =================
       {
         path: 'perfil',
         canActivate: [authGuard],
@@ -98,14 +104,20 @@ export const routes: Routes = [
   {
     path: 'admin',
     canActivate: [authGuard, adminGuard],
+
     loadComponent: () =>
       import('./layouts/admin-layout/admin-layout.component')
         .then(m => m.AdminLayoutComponent),
 
     children: [
 
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
 
+      // ================= DASHBOARD =================
       {
         path: 'dashboard',
         loadComponent: () =>
@@ -113,6 +125,7 @@ export const routes: Routes = [
             .then(m => m.DashboardPage),
       },
 
+      // ================= CALENDARIO =================
       {
         path: 'calendario',
         loadComponent: () =>
@@ -120,6 +133,7 @@ export const routes: Routes = [
             .then(m => m.CalendarioPage),
       },
 
+      // ================= HABITACIONES ADMIN =================
       {
         path: 'habitaciones',
         loadComponent: () =>
@@ -127,6 +141,7 @@ export const routes: Routes = [
             .then(m => m.AdminHabitacionesPage),
       },
 
+      // ================= HUESPEDES =================
       {
         path: 'huespedes',
         loadComponent: () =>
@@ -134,6 +149,7 @@ export const routes: Routes = [
             .then(m => m.AdminHuespedesPage),
       },
 
+      // ================= RESERVAS ADMIN =================
       {
         path: 'reservas',
         loadComponent: () =>
@@ -141,15 +157,20 @@ export const routes: Routes = [
             .then(m => m.AdminReservasPage),
       },
 
+      // ================= USUARIOS =================
       {
         path: 'usuarios',
         canActivate: [roleGuard],
-        data: { roles: ['ADMIN', 'GERENCIA'] },
+        data: {
+          roles: ['ADMIN', 'GERENCIA']
+        },
+
         loadComponent: () =>
           import('./paginas/admin/usuarios/usuarios.page')
             .then(m => m.AdminUsuariosPage),
       },
 
+      // ================= REPORTES =================
       {
         path: 'reportes',
         loadComponent: () =>
@@ -160,7 +181,7 @@ export const routes: Routes = [
     ],
   },
 
-  // ================= CONFIRMACIÓN =================
+  // ================= RESERVA CONFIRMADA =================
   {
     path: 'reserva-confirmada',
     loadComponent: () =>
@@ -173,5 +194,5 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'inicio',
   },
- 
+
 ];
