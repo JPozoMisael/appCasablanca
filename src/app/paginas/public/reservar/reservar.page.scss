@@ -274,3 +274,15 @@
   font-weight: 950;
   font-size: 18px;
 }
+input:focus {
+  border-color: var(--brand-primary-2);
+  box-shadow: 0 0 0 4px rgba(0, 108, 228, 0.12);
+}
+
+.confirm:hover {
+  transform: translateY(-1px);
+}
+
+.summary {
+  transition: 0.25s ease;
+}
