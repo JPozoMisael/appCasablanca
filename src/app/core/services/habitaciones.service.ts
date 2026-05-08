@@ -8,6 +8,7 @@ import { Habitacion } from '@app/shared/models/habitacion.model';
 
 interface ApiResponse {
   data: any[];
+
   meta?: {
     total: number;
     page: number;
@@ -25,13 +26,16 @@ export class HabitacionesService {
     private api: ApiService
   ) {}
 
-  // ================= DISPONIBLES =================
+  // ======================================================
+  // DISPONIBLES
+  // ======================================================
   getDisponiblesByHotel(
     slug: string,
     filters: any
   ): Observable<{ data: Habitacion[]; meta: any }> {
 
     if (!slug) {
+
       console.error('SLUG VACÍO');
 
       return of({
@@ -41,34 +45,44 @@ export class HabitacionesService {
     }
 
     const params: any = {
+
+      // HOTEL
       hotel: slug,
 
-      checkIn: filters?.checkIn,
-      checkOut: filters?.checkOut,
+      // FECHAS
+      checkIn: filters?.checkIn || '',
+      checkOut: filters?.checkOut || '',
 
-      adults: filters?.adults,
-      children: filters?.children,
-      rooms: filters?.rooms,
-      withPets: filters?.withPets,
+      // HUESPEDES
+      adults: filters?.adults || 2,
+      children: filters?.children || 0,
+      rooms: filters?.rooms || 1,
+      withPets: filters?.withPets || 0,
 
-      precioMin: filters?.precioMin,
-      precioMax: filters?.precioMax,
-      capacidad: filters?.capacidad,
-      sort: filters?.sort,
+      // FILTROS
+      precioMin: filters?.precioMin || 0,
+      precioMax: filters?.precioMax || 500,
+      capacidad: filters?.capacidad || 1,
+      sort: filters?.sort || 'recomendado',
 
+      // PAGINACION
       page: filters?.page || 1,
       limit: filters?.limit || 10
     };
 
+    console.log('PARAMS ENVIADOS:', params);
+
     return this.api
       .get<any>(
         API_ENDPOINTS.habitaciones.disponibles,
-        { params }
+        params // 🔥 CORREGIDO
       )
       .pipe(
 
         map((res: ApiResponse) => ({
+
           data: this.safeMapArray(res),
+
           meta: res.meta || {}
         })),
 
@@ -87,8 +101,12 @@ export class HabitacionesService {
       );
   }
 
-  // ================= POR HOTEL =================
-  getByHotel(slug: string): Observable<Habitacion[]> {
+  // ======================================================
+  // POR HOTEL
+  // ======================================================
+  getByHotel(
+    slug: string
+  ): Observable<Habitacion[]> {
 
     if (!slug) {
 
@@ -119,8 +137,12 @@ export class HabitacionesService {
       );
   }
 
-  // ================= POR ID =================
-  getById(id: number): Observable<any | null> {
+  // ======================================================
+  // POR ID
+  // ======================================================
+  getById(
+    id: number
+  ): Observable<any | null> {
 
     if (!id) {
 
@@ -142,6 +164,7 @@ export class HabitacionesService {
           }
 
           return {
+
             ...this.mapHabitacion(res.data),
 
             hotel_id:
@@ -167,7 +190,9 @@ export class HabitacionesService {
       );
   }
 
-  // ================= REVIEWS =================
+  // ======================================================
+  // REVIEWS
+  // ======================================================
   getReviewsByHotel(
     hotelId: number
   ): Observable<any[]> {
@@ -201,7 +226,9 @@ export class HabitacionesService {
       );
   }
 
-  // ================= CREAR REVIEW =================
+  // ======================================================
+  // CREAR REVIEW
+  // ======================================================
   createReview(payload: {
     hotel_id: number;
     puntuacion: number;
@@ -241,7 +268,9 @@ export class HabitacionesService {
       );
   }
 
-  // ================= SAFE MAP =================
+  // ======================================================
+  // SAFE MAP
+  // ======================================================
   private safeMapArray(
     res: any
   ): Habitacion[] {
@@ -251,6 +280,7 @@ export class HabitacionesService {
       !res.data ||
       !Array.isArray(res.data)
     ) {
+
       return [];
     }
 
@@ -260,7 +290,9 @@ export class HabitacionesService {
     );
   }
 
-  // ================= MAPPER =================
+  // ======================================================
+  // MAPPER
+  // ======================================================
   private mapHabitacion(
     item: any
   ): Habitacion {
@@ -278,6 +310,7 @@ export class HabitacionesService {
       tipo:
         item.tipo_nombre ||
         item.tipo ||
+        item.tipoHabitacion?.nombre ||
         `Habitación ${
           item.numero_habitacion ||
           item.numero
@@ -292,15 +325,15 @@ export class HabitacionesService {
         item.tipoHabitacion?.capacidad_maxima ??
         2,
 
-      camas: 
-      (
-        Number(
-          item.tipoHabitacion?.camas_sencillas || 0
-        ) +
-        Number (
-          item.tipoHabitacion?.camas_dobles || 0
-        )
-      ) || 1,
+      camas:
+        (
+          Number(
+            item.tipoHabitacion?.camas_sencillas || 0
+          ) +
+          Number(
+            item.tipoHabitacion?.camas_dobles || 0
+          )
+        ) || 1,
 
       precioNoche: Number(
         item.precio_noche ??
