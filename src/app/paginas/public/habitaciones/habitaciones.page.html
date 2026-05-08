@@ -1,27 +1,40 @@
 <div class="page">
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================= -->
   <div class="header">
 
     <div class="header-text">
-      <h1>Habitaciones disponibles</h1>
+
+      <h1>
+        Habitaciones disponibles
+      </h1>
 
       <p>
         Encuentra la mejor opción para tu estadía
       </p>
+
     </div>
 
     <div class="header-results">
-      <strong>{{ total }}</strong>
-      <span>habitaciones encontradas</span>
+
+      <strong>
+        {{ total }}
+      </strong>
+
+      <span>
+        habitaciones encontradas
+      </span>
+
     </div>
 
   </div>
 
-  <!-- SORT -->
+  <!-- ================= SORT ================= -->
   <div class="sort-bar">
 
-    <span>Ordenar por:</span>
+    <span>
+      Ordenar por:
+    </span>
 
     <button
       [class.active]="sort === 'recomendado'"
@@ -46,17 +59,22 @@
 
   </div>
 
+  <!-- ================= LAYOUT ================= -->
   <div class="layout">
 
-    <!-- FILTROS -->
+    <!-- ================= FILTROS ================= -->
     <aside class="filters">
 
-      <h3>Filtros</h3>
+      <h3>
+        Filtros
+      </h3>
 
       <!-- PRECIO -->
       <div class="filter">
 
-        <label>Precio máximo</label>
+        <label>
+          Precio máximo
+        </label>
 
         <input
           type="range"
@@ -66,14 +84,18 @@
           max="500"
         />
 
-        <span>${{ precioMax }}</span>
+        <span>
+          ${{ precioMax }}
+        </span>
 
       </div>
 
       <!-- CAPACIDAD -->
       <div class="filter">
 
-        <label>Capacidad</label>
+        <label>
+          Capacidad
+        </label>
 
         <select
           [(ngModel)]="capacidad"
@@ -101,7 +123,7 @@
 
     </aside>
 
-    <!-- LISTA -->
+    <!-- ================= LISTA ================= -->
     <div class="list">
 
       <!-- LOADING -->
@@ -112,7 +134,7 @@
         Cargando habitaciones...
       </div>
 
-      <!-- CARDS -->
+      <!-- ================= CARDS ================= -->
       <div
         *ngFor="let h of habitaciones; trackBy: trackById"
         class="card">
@@ -125,6 +147,7 @@
             [alt]="h.tipo"
           />
 
+          <!-- BADGES -->
           <div
             class="badge recomendado"
             *ngIf="sort === 'recomendado'">
@@ -147,11 +170,15 @@
           <div class="top">
 
             <div>
-              <h2>{{ h.tipo }}</h2>
+
+              <h2>
+                {{ h.tipo }}
+              </h2>
 
               <p class="desc">
                 {{ h.descripcion }}
               </p>
+
             </div>
 
             <!-- RATING -->
@@ -231,21 +258,40 @@
             (click)="goToDetalle(h)">
 
             Ver disponibilidad
+
           </ion-button>
 
         </div>
 
       </div>
 
-      <!-- EMPTY -->
+      <!-- ================= EMPTY ================= -->
       <div
         *ngIf="!loading && habitaciones.length === 0"
-        class="state">
+        class="empty-state">
 
-        No hay habitaciones disponibles para esos filtros
+        <ion-icon name="bed-outline"></ion-icon>
+
+        <h3>
+          No encontramos habitaciones
+        </h3>
+
+        <p>
+          Prueba cambiando las fechas,
+          la capacidad o el precio máximo.
+        </p>
+
+        <button
+          class="reset-btn"
+          (click)="precioMax = 500; capacidad = 1; loadHabitaciones()">
+
+          Restablecer filtros
+
+        </button>
+
       </div>
 
-      <!-- PAGINACIÓN -->
+      <!-- ================= PAGINACION ================= -->
       <div
         class="pagination"
         *ngIf="pages > 1">
@@ -255,6 +301,7 @@
           [disabled]="page === 1">
 
           ←
+
         </button>
 
         <span>
@@ -266,6 +313,7 @@
           [disabled]="page === pages">
 
           →
+
         </button>
 
       </div>
