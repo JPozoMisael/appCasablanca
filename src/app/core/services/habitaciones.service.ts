@@ -292,12 +292,20 @@ export class HabitacionesService {
         item.tipoHabitacion?.capacidad_maxima ??
         2,
 
-      camas:
-        item.camas ?? 1,
+      camas: 
+      (
+        Number(
+          item.tipoHabitacion?.camas_sencillas || 0
+        ) +
+        Number (
+          item.tipoHabitacion?.camas_dobles || 0
+        )
+      ) || 1,
 
       precioNoche: Number(
         item.precio_noche ??
         item.precio ??
+        item.tipoHabitacion?.precio_base ??
         0
       ),
 
