@@ -56,7 +56,7 @@ export class HabitacionesPage implements OnInit {
         withPets: Number(params['withPets'] ?? 0)
       };
 
-      // 🔥 RESET PAGINACIÓN
+      // RESET PAGINACIÓN
       this.page = 1;
 
       this.loadHabitaciones();
