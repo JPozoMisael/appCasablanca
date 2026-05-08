@@ -1,15 +1,35 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { IonContent, IonButton } from '@ionic/angular/standalone';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms'; 
+import {
+  ActivatedRoute,
+  Router,
+  RouterLink
+} from '@angular/router';
+
+import {
+  IonContent,
+  IonButton
+} from '@ionic/angular/standalone';
+
+import {
+  DomSanitizer,
+  SafeResourceUrl
+} from '@angular/platform-browser';
+
+import { FormsModule } from '@angular/forms';
+
 import { HabitacionesService } from '@app/core/services/habitaciones.service';
 
 @Component({
   selector: 'app-habitacion-detalle',
   standalone: true,
-  imports: [CommonModule, IonContent, IonButton, RouterLink, FormsModule],
+  imports: [
+    CommonModule,
+    IonContent,
+    IonButton,
+    RouterLink,
+    FormsModule
+  ],
   templateUrl: './habitacion-detalle.page.html',
   styleUrls: ['./habitacion-detalle.page.scss'],
 })
@@ -21,6 +41,7 @@ export class HabitacionDetallePage implements OnInit {
   // ================= SEARCH PARAMS =================
   checkIn = '';
   checkOut = '';
+
   adults = 2;
   children = 0;
   rooms = 1;
@@ -28,19 +49,25 @@ export class HabitacionDetallePage implements OnInit {
 
   // ================= DATA =================
   habitacion: any = null;
+
   mapUrlSafe: SafeResourceUrl | null = null;
 
   // ================= UI =================
   gallery: string[] = [];
-  selectedImage: string = '';
+
+  selectedImage = '';
+
+  availabilityHint =
+    'Quedan pocas habitaciones';
 
   // ================= REVIEWS =================
-  hotelId: number = 0;
-  rating: number = 0;
-  totalReviews: number = 0;
-  reviews: any[] = [];
+  hotelId = 0;
 
-  availabilityHint: string = 'Quedan pocas habitaciones';
+  rating = 0;
+
+  totalReviews = 0;
+
+  reviews: any[] = [];
 
   // ================= FORM =================
   newReview = {
@@ -50,7 +77,8 @@ export class HabitacionDetallePage implements OnInit {
 
   submittingReview = false;
 
-  hoverRating: number = 0;
+  hoverRating = 0;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -59,204 +87,414 @@ export class HabitacionDetallePage implements OnInit {
   ) {}
 
   // ================= INIT =================
-  ngOnInit() {
+  ngOnInit(): void {
 
     this.route.paramMap.subscribe(pm => {
-      this.roomId = Number(pm.get('id'));
+
+      this.roomId = Number(
+        pm.get('id')
+      );
+
+      if (!this.roomId) {
+
+        console.error(
+          'ID inválido'
+        );
+
+        this.habitacion = null;
+
+        return;
+      }
+
       this.loadHabitacion();
     });
 
     this.route.queryParamMap.subscribe(qp => {
-      this.checkIn = qp.get('checkIn') ?? '';
-      this.checkOut = qp.get('checkOut') ?? '';
-      this.adults = this.toNum(qp.get('adults'), 2);
-      this.children = this.toNum(qp.get('children'), 0);
-      this.rooms = this.toNum(qp.get('rooms'), 1);
-      this.withPets = this.toNum(qp.get('withPets'), 0);
+
+      this.checkIn =
+        qp.get('checkIn') ?? '';
+
+      this.checkOut =
+        qp.get('checkOut') ?? '';
+
+      this.adults =
+        this.toNum(
+          qp.get('adults'),
+          2
+        );
+
+      this.children =
+        this.toNum(
+          qp.get('children'),
+          0
+        );
+
+      this.rooms =
+        this.toNum(
+          qp.get('rooms'),
+          1
+        );
+
+      this.withPets =
+        this.toNum(
+          qp.get('withPets'),
+          0
+        );
     });
   }
 
-  // ================= BACKEND =================
-  loadHabitacion() {
-
-    this.habitacionesService.getById(this.roomId).subscribe({
-
-      next: (h: any) => {
-
-        if (!h) {
-          this.habitacion = null;
-          return;
-        }
-
-        this.hotelId = h.hotel_id ?? h.hotelId ?? 0;
-
-        this.habitacion = {
-          id: h.id,
-          nombre: h.tipo || `Habitación ${h.numero}`,
-          descripcion: h.descripcion || '',
-          precio: h.precioNoche || h.precio || 0,
-          capacidad: `${h.capacidad ?? 2} personas · ${h.camas ?? 1} cama(s)`,
-
-          servicios: [
-            'Wi-Fi',
-            'Aire acondicionado',
-            'TV',
-            'Baño privado'
-          ],
-
-          lat: -2.2149,
-          lng: -80.951,
-          imagen: h.imagenUrl
-        };
-
-        // GALERÍA
-        this.gallery = [
-          this.habitacion.imagen,
-          this.habitacion.imagen,
-          this.habitacion.imagen
-        ];
-
-        this.selectedImage = this.gallery[0];
-
-        // MAPA
-        const url = `https://www.google.com/maps?q=${this.habitacion.lat},${this.habitacion.lng}&output=embed`;
-        this.mapUrlSafe =
-          this.sanitizer.bypassSecurityTrustResourceUrl(url);
-
-        // REVIEWS
-        this.loadReviews();
-      },
-
-      error: (err: any) => {
-        console.error('ERROR DETALLE:', err);
-        this.habitacion = null;
-      }
-    });
-  }
-
-  // ================= REVIEWS =================
-  loadReviews() {
-
-    if (!this.hotelId) return;
+  // ================= LOAD =================
+  loadHabitacion(): void {
 
     this.habitacionesService
-      .getReviewsByHotel(this.hotelId)
-      .subscribe(data => {
+      .getById(this.roomId)
+      .subscribe({
 
-        this.reviews = data || [];
+        next: (h: any) => {
 
-        if (this.reviews.length > 0) {
+          if (!h) {
 
-          const total = this.reviews.reduce(
-            (acc, r) => acc + Number(r.puntuacion || 0),
-            0
+            console.error(
+              'Habitación no encontrada'
+            );
+
+            this.habitacion = null;
+
+            return;
+          }
+
+          this.hotelId =
+            h.hotel_id ??
+            h.hotelId ??
+            0;
+
+          this.rating =
+            Number(h.rating || 0);
+
+          this.totalReviews =
+            Number(h.totalReviews || 0);
+
+          this.habitacion = {
+
+            id: h.id,
+
+            nombre:
+              h.tipo ||
+              h.nombre ||
+              `Habitación ${h.numero}`,
+
+            descripcion:
+              h.descripcion || '',
+
+            precio:
+              Number(
+                h.precioNoche ??
+                h.precio ??
+                h.precio_base ??
+                0
+              ),
+
+            capacidad:
+              `${h.capacidad ?? 2} personas · ${h.camas ?? 1} cama(s)`,
+
+            servicios: [
+              'Wi-Fi',
+              'Aire acondicionado',
+              'TV',
+              'Baño privado'
+            ],
+
+            lat:
+              h.lat ??
+              -2.2149,
+
+            lng:
+              h.lng ??
+              -80.951,
+
+            imagen:
+              h.imagenUrl ||
+              h.imagen ||
+              'assets/img/room-placeholder.jpg'
+          };
+
+          // ================= GALLERY =================
+          this.gallery = [
+            this.habitacion.imagen,
+            this.habitacion.imagen,
+            this.habitacion.imagen
+          ];
+
+          this.selectedImage =
+            this.gallery[0];
+
+          // ================= MAP =================
+          const url =
+            `https://www.google.com/maps?q=${this.habitacion.lat},${this.habitacion.lng}&output=embed`;
+
+          this.mapUrlSafe =
+            this.sanitizer
+              .bypassSecurityTrustResourceUrl(url);
+
+          // ================= REVIEWS =================
+          this.loadReviews();
+        },
+
+        error: (err: any) => {
+
+          console.error(
+            'ERROR DETALLE:',
+            err
           );
 
-          this.rating = Number((total / this.reviews.length).toFixed(1));
-          this.totalReviews = this.reviews.length;
-
-        } else {
-          this.rating = 0;
-          this.totalReviews = 0;
+          this.habitacion = null;
         }
       });
   }
 
-  // ================= FORM REVIEW =================
-  setRating(value: number) {
+  // ================= REVIEWS =================
+  loadReviews(): void {
+
+    if (!this.hotelId) {
+      return;
+    }
+
+    this.habitacionesService
+      .getReviewsByHotel(this.hotelId)
+      .subscribe({
+
+        next: (data: any[]) => {
+
+          this.reviews = data || [];
+
+          if (!this.reviews.length) {
+
+            this.rating = 0;
+            this.totalReviews = 0;
+
+            return;
+          }
+
+          const total =
+            this.reviews.reduce(
+              (acc, r) =>
+                acc + Number(r.puntuacion || 0),
+              0
+            );
+
+          this.rating = Number(
+            (
+              total /
+              this.reviews.length
+            ).toFixed(1)
+          );
+
+          this.totalReviews =
+            this.reviews.length;
+        },
+
+        error: (err: any) => {
+
+          console.error(
+            'ERROR REVIEWS:',
+            err
+          );
+
+          this.reviews = [];
+        }
+      });
+  }
+
+  // ================= REVIEW FORM =================
+  setRating(value: number): void {
+
     this.newReview.puntuacion = value;
   }
 
   isStarActive(i: number): boolean {
+
     return i <= this.newReview.puntuacion;
   }
 
-  submitReview() {
+  submitReview(): void {
 
-    if (this.submittingReview) return;
-
-    if (!this.hotelId) {
-      alert('Error: hotel no identificado');
+    if (this.submittingReview) {
       return;
     }
 
-    if (this.newReview.puntuacion < 1) {
-      alert('Selecciona una puntuación');
+    if (!this.hotelId) {
+
+      alert(
+        'Error: hotel no identificado'
+      );
+
+      return;
+    }
+
+    if (
+      this.newReview.puntuacion < 1
+    ) {
+
+      alert(
+        'Selecciona una puntuación'
+      );
+
       return;
     }
 
     this.submittingReview = true;
 
-    this.habitacionesService.createReview({
-      hotel_id: this.hotelId,
-      puntuacion: this.newReview.puntuacion,
-      comentario: this.newReview.comentario?.trim()
-    }).subscribe({
+    this.habitacionesService
+      .createReview({
 
-      next: () => {
+        hotel_id: this.hotelId,
 
-        this.newReview = { puntuacion: 0, comentario: '' };
+        puntuacion:
+          this.newReview.puntuacion,
 
-        this.loadReviews();
+        comentario:
+          this.newReview.comentario?.trim()
+      })
+      .subscribe({
 
-        this.submittingReview = false;
-      },
+        next: () => {
 
-      error: () => {
-        alert('Error al enviar review');
-        this.submittingReview = false;
-      }
-    });
+          this.newReview = {
+            puntuacion: 0,
+            comentario: ''
+          };
+
+          this.loadReviews();
+
+          this.submittingReview = false;
+        },
+
+        error: (err: any) => {
+
+          console.error(
+            'ERROR CREATE REVIEW:',
+            err
+          );
+
+          alert(
+            'Error al enviar review'
+          );
+
+          this.submittingReview = false;
+        }
+      });
   }
 
   // ================= CALCULOS =================
   get nights(): number {
-    if (!this.checkIn || !this.checkOut) return 0;
 
-    const a = new Date(this.checkIn).getTime();
-    const b = new Date(this.checkOut).getTime();
+    if (
+      !this.checkIn ||
+      !this.checkOut
+    ) {
+      return 0;
+    }
+
+    const a =
+      new Date(this.checkIn).getTime();
+
+    const b =
+      new Date(this.checkOut).getTime();
 
     const diff = b - a;
-    return diff > 0 ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : 0;
+
+    return diff > 0
+      ? Math.ceil(
+          diff /
+          (1000 * 60 * 60 * 24)
+        )
+      : 0;
   }
 
   get total(): number {
-    if (!this.habitacion) return 0;
-    return this.habitacion.precio * (this.nights || 1);
+
+    if (!this.habitacion) {
+      return 0;
+    }
+
+    return (
+      this.habitacion.precio *
+      (this.nights || 1)
+    );
   }
 
   // ================= UI =================
-  selectImage(img: string) {
+  selectImage(img: string): void {
+
     this.selectedImage = img;
   }
 
-  getRatingText(rating: number): string {
-    if (rating >= 9) return 'Excelente';
-    if (rating >= 8) return 'Muy bien';
-    if (rating >= 7) return 'Bien';
+  getRatingText(
+    rating: number
+  ): string {
+
+    if (rating >= 9) {
+      return 'Excelente';
+    }
+
+    if (rating >= 8) {
+      return 'Muy bien';
+    }
+
+    if (rating >= 7) {
+      return 'Bien';
+    }
+
     return 'Aceptable';
   }
 
   // ================= RESERVA =================
-  reservar() {
-    if (!this.habitacion) return;
+  reservar(): void {
 
-    this.router.navigate(['/reservar'], {
-      queryParams: {
-        roomId: this.habitacion.id,
-        checkIn: this.checkIn,
-        checkOut: this.checkOut,
-        adults: this.adults,
-        children: this.children,
-        rooms: this.rooms,
-        withPets: this.withPets,
+    if (!this.habitacion) {
+      return;
+    }
+
+    this.router.navigate(
+      ['/reservar'],
+      {
+        queryParams: {
+
+          roomId:
+            this.habitacion.id,
+
+          checkIn:
+            this.checkIn,
+
+          checkOut:
+            this.checkOut,
+
+          adults:
+            this.adults,
+
+          children:
+            this.children,
+
+          rooms:
+            this.rooms,
+
+          withPets:
+            this.withPets,
+        }
       }
-    });
+    );
   }
 
   // ================= UTILS =================
-  private toNum(v: string | null, fallback: number): number {
+  private toNum(
+    v: string | null,
+    fallback: number
+  ): number {
+
     const n = Number(v);
-    return Number.isFinite(n) ? n : fallback;
+
+    return Number.isFinite(n)
+      ? n
+      : fallback;
   }
 }
