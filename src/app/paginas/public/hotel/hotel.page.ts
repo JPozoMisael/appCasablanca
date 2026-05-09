@@ -179,7 +179,7 @@ export class HotelPage implements OnInit {
 
     this.habitacionesService.getByHotel(this.slug).subscribe({
       next: (rooms) => {
-
+        console.log('Rooms raw:', rooms);
         this.featuredRooms = (rooms || [])
           .map((r: any) => ({
             id: r.id,
