@@ -288,3 +288,67 @@
   }
 
 }
+/** * ================= ROOMS AVAILABILITY =================*/
+.rooms-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.toogle-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px dashed #94a3b8;
+  background: transparent;
+  color: #475569;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  ion-icon {
+    font-size: 16px;
+  }
+
+  &:hover {
+    border-color: #0b7cff;
+    color: #0b7cff;
+  }
+}
+
+.rooms-group-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 24px 0 16px;
+
+  ion-icon {
+    font-size: 16px;
+  }
+
+  .available-label{
+    color: #3B6D11;
+    ion-icon {
+      color: #3B6D11;
+    }
+  }
+
+  .unavailable-label{
+    color: #888780;
+    margin-top: 32px;
+    ion-icon {
+      color: #888780;
+    }
+  }
+
+  .room-card--unavailable {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+}

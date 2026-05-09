@@ -142,50 +142,82 @@
   </section>
 
   <!-- ================= ROOMS ================= -->
-  <section class="rooms-section">
-    <div class="page-shell">
+<section class="rooms-section">
+  <div class="page-shell">
 
-      <div class="section-header">
-        <div>
-          <h2>Habitaciones destacadas</h2>
-          <p>Conoce algunas de las mejores opciones disponibles en este hotel.</p>
-        </div>
+    <div class="section-header">
+      <div>
+        <h2>Habitaciones destacadas</h2>
+        <p>Conoce algunas de las mejores opciones disponibles en este hotel.</p>
+      </div>
 
-        <span class="see-all"
-          [routerLink]="['/hotel', slug, 'habitaciones']">
+      <div class="rooms-header-actions">
+        <button class="toggle-all-btn" (click)="showAll = !showAll">
+          <ion-icon [name]="showAll ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          {{ showAll ? 'Ocultar no disponibles' : 'Ver todas las habitaciones' }}
+        </button>
+
+        <span class="see-all" [routerLink]="['/hotel', slug, 'habitaciones']">
           Ver todas
         </span>
       </div>
+    </div>
+
+    <!-- Disponibles -->
+    <p class="rooms-group-label available-label">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      Disponibles ahora ({{ availableRooms.length }})
+    </p>
+
+    <div class="rooms-grid">
+      <div class="room-card" *ngFor="let r of availableRooms">
+        <div class="room-img">
+          <img [src]="r.image" [alt]="r.name" />
+        </div>
+        <div class="info">
+          <h3>{{ r.name }}</h3>
+          <p>{{ r.desc }}</p>
+          <div class="price">
+            <strong>${{ r.price }}</strong>
+            <span>/ noche</span>
+          </div>
+          <ion-button expand="block" class="secondary-btn"
+            [routerLink]="['/hotel', slug, 'habitaciones']">
+            Ver disponibilidad
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- No disponibles (toggle) -->
+    <ng-container *ngIf="showAll && unavailableRooms.length > 0">
+      <p class="rooms-group-label unavailable-label">
+        <ion-icon name="close-circle-outline"></ion-icon>
+        No disponibles para estas fechas ({{ unavailableRooms.length }})
+      </p>
 
       <div class="rooms-grid">
-
-        <div class="room-card" *ngFor="let r of featuredRooms">
-
+        <div class="room-card room-card--unavailable" *ngFor="let r of unavailableRooms">
           <div class="room-img">
             <img [src]="r.image" [alt]="r.name" />
           </div>
-
           <div class="info">
             <h3>{{ r.name }}</h3>
             <p>{{ r.desc }}</p>
-
             <div class="price">
               <strong>${{ r.price }}</strong>
               <span>/ noche</span>
             </div>
-
-            <ion-button expand="block" class="secondary-btn"
-              [routerLink]="['/hotel', slug, 'habitaciones']">
-              Ver disponibilidad
+            <ion-button expand="block" disabled class="secondary-btn">
+              No disponible
             </ion-button>
           </div>
-
         </div>
-
       </div>
+    </ng-container>
 
-    </div>
-  </section>
+  </div>
+</section>
 
   <!-- ================= GALLERY ================= -->
   <section class="gallery-section">

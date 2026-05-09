@@ -13,8 +13,7 @@ import {
   waterOutline,
   restaurantOutline,
   sunnyOutline,
-  thermometerOutline
-} from 'ionicons/icons';
+  thermometerOutline, bedOutline, shieldCheckmarkOutline, checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
 
 import { HabitacionesService } from '@app/core/services/habitaciones.service';
 import { HotelesService } from '@app/core/services/hotel.service'; 
@@ -38,6 +37,8 @@ export class HotelPage implements OnInit {
   hotel: any = null;
   featuredRooms: any[] = [];
   loading = true;
+  
+  showAll = false;
 
   hotelList = [
     { id: 'chipipe', name: 'Chipipe' },
@@ -51,17 +52,7 @@ export class HotelPage implements OnInit {
     private habitacionesService: HabitacionesService,
     private hotelesService: HotelesService 
   ) {
-    addIcons({
-      locationOutline,
-      searchOutline,
-      calendarOutline,
-      peopleOutline,
-      wifiOutline,
-      waterOutline,
-      restaurantOutline,
-      sunnyOutline,
-      thermometerOutline
-    });
+    addIcons({locationOutline,searchOutline,calendarOutline,peopleOutline,bedOutline,sunnyOutline,waterOutline,shieldCheckmarkOutline,checkmarkCircleOutline,closeCircleOutline,restaurantOutline,thermometerOutline,wifiOutline});
   }
 
   ngOnInit() {
@@ -196,7 +187,8 @@ export class HotelPage implements OnInit {
             name: `Habitación ${r.numero}`,
             desc: r.descripcion || `Piso ${r.piso}`,
             price: r.precioNoche,
-            image: r.imagenUrl
+            image: r.imagenUrl,
+            available: r.disponible ?? true
           }))
           .sort((a: any, b: any) => a.numero - b.numero);
 
@@ -222,5 +214,14 @@ export class HotelPage implements OnInit {
     this.router.navigate(['/hotel', newSlug], {
       queryParamsHandling: 'merge'
     });
+  }
+
+  // Getter que separa disponibles de no disponibles 
+  get availableRooms(){
+    return this.featuredRooms.filter(r => r.available);
+  }
+
+  get unavailableRooms(){
+    return this.featuredRooms.filter(r => !r.available);
   }
 }
