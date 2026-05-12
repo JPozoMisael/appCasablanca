@@ -1,39 +1,64 @@
+/* =========================================================
+   SEARCH BAR — BOOKING STYLE REAL
+========================================================= */
+
 :host {
   display: block;
+  width: 100%;
 }
 
-/* ================= CONTENEDOR ================= */
+/* =========================================================
+   CONTENEDOR
+========================================================= */
 
 .bk-search {
   width: 100%;
   position: relative;
+  z-index: 40;
 }
 
-/* ================= BARRA ================= */
+/* =========================================================
+   BARRA PRINCIPAL
+========================================================= */
 
 .bk-bar {
-  background: #fff;
-  border: 3px solid #febb02;
-  border-radius: 14px;
+  background: #ffffff;
+
+  border: 4px solid #febb02;
+  border-radius: 10px;
 
   display: grid;
-  grid-template-columns: 1.25fr 1fr 1fr 220px;
+  grid-template-columns: 1.4fr 1fr 1fr 240px;
 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  overflow: hidden;
+
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.12),
+    0 2px 8px rgba(0,0,0,0.06);
 }
 
-/* ================= ITEMS ================= */
+/* =========================================================
+   ITEMS
+========================================================= */
 
 .bk-item {
-  padding: 14px 18px;
-  display: grid;
-  gap: 6px;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  min-height: 84px;
+
+  padding: 18px 22px;
 
   cursor: pointer;
-  transition: all 0.18s ease;
 
-  border-right: 1px solid #e6e6e6;
-  position: relative;
+  background: #ffffff;
+
+  transition: background .18s ease;
+
+  border-right: 1px solid #dddddd;
 }
 
 .bk-item:last-child {
@@ -41,161 +66,323 @@
 }
 
 .bk-item:hover {
-  background: #f0f7ff;
+  background: #f7f7f7;
 }
 
 .bk-item.active {
-  background: #eef5ff;
-  box-shadow: inset 0 0 0 2px #0071c2;
+  background: #ffffff;
+
+  box-shadow:
+    inset 0 0 0 3px #0071c2;
+
+  z-index: 3;
 }
 
-/* ================= TEXTO ================= */
+/* =========================================================
+   LABEL
+========================================================= */
 
 .bk-label {
-  font-size: 12px;
-  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 11px;
   font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: .3px;
+
+  color: #6b7280;
+
+  margin-bottom: 6px;
+
+  ion-icon {
+    font-size: 14px;
+  }
 }
 
+/* =========================================================
+   VALUE
+========================================================= */
+
 .bk-value-main {
-  font-size: 15px;
-  font-weight: 800;
-  color: #0f172a;
+  font-size: 20px;
+  font-weight: 700;
+
+  color: #111827;
+
+  line-height: 1.2;
 }
 
 .bk-value-main.empty {
-  color: #9aa0a6;
+  color: #9ca3af;
 }
-/* ================= POPOVER PROFESIONAL ================= */
+
+/* =========================================================
+   BOTON
+========================================================= */
+
+.bk-action {
+  height: 100%;
+}
+
+.bk-btn {
+  --background: #0071c2;
+  --background-hover: #005999;
+
+  --border-radius: 0;
+
+  height: 100%;
+  min-height: 84px;
+
+  margin: 0;
+
+  font-size: 22px;
+  font-weight: 800;
+
+  letter-spacing: -.3px;
+
+  box-shadow: none;
+}
+
+/* =========================================================
+   BACKDROP
+========================================================= */
+
+.bk-backdrop {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0,0,0,0.12);
+
+  z-index: 20;
+}
+
+/* =========================================================
+   POPOVER
+========================================================= */
 
 .bk-pop {
   position: absolute;
-  top: calc(100% + 8px);
 
-  /* 🔥 CLAVE: alineado al campo */
+  top: calc(100% + 10px);
   left: 0;
 
-  background: #fff;
+  background: #ffffff;
+
   border-radius: 14px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
 
-  padding: 14px;
-  z-index: 40;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.22);
 
-  animation: fadeIn 0.16s ease;
+  overflow: hidden;
+
+  z-index: 50;
+
+  animation: popIn .16s ease;
 }
 
-/* ================= TAMAÑOS REALES ================= */
+/* =========================================================
+   SIZES
+========================================================= */
 
 /* SUCURSAL */
 .bk-item:nth-child(1) .bk-pop {
-  width: 360px;
+  width: 380px;
 }
 
 /* FECHAS */
 .bk-item:nth-child(2) .bk-pop {
-  width: 520px;
+  width: 760px;
+  max-width: calc(100vw - 40px);
 }
 
 /* HUÉSPEDES */
 .bk-item:nth-child(3) .bk-pop {
-  width: 300px;
+  width: 340px;
 }
 
-/* ================= ANIMACIÓN LIMPIA ================= */
+/* =========================================================
+   ANIMACION
+========================================================= */
 
-@keyframes fadeIn {
+@keyframes popIn {
   from {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-/* ================= BOTÓN ================= */
 
-.bk-btn {
-  --background: #0071c2;
-  height: 56px;
-  font-weight: 900;
-  font-size: 14px;
-
-  transition: all 0.2s ease;
-}
-
-.bk-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,113,194,0.25);
-}
-
-/* ================= SUCURSALES ================= */
+/* =========================================================
+   SUCURSALES
+========================================================= */
 
 .branch-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  padding: 14px 16px;
-  border-radius: 12px;
+  padding: 18px;
 
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
+  border-bottom: 1px solid #eeeeee;
 
   cursor: pointer;
-  margin-bottom: 8px;
-  transition: all 0.15s ease;
+
+  transition: background .16s ease;
+}
+
+.branch-card:last-child {
+  border-bottom: none;
 }
 
 .branch-card:hover {
-  background: #eef5ff;
-  border-color: #0071c2;
+  background: #f5f9ff;
 }
 
 .branch-card.active {
-  background: #e7f1ff;
-  border-color: #0071c2;
+  background: #eaf3ff;
+}
+
+.branch-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .branch-name {
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
 }
 
 .branch-desc {
   font-size: 13px;
-  color: #64748b;
+  color: #6b7280;
 }
 
-/* ================= HUÉSPEDES ================= */
+.branch-right ion-icon {
+  font-size: 22px;
+  color: #0071c2;
+}
+
+/* =========================================================
+   HUESPEDES
+========================================================= */
 
 .guest-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  padding: 12px;
-  border-radius: 10px;
+  padding: 16px 18px;
 
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
+  border-bottom: 1px solid #eeeeee;
+}
 
-  margin-bottom: 8px;
+.guest-row:last-child {
+  border-bottom: none;
+}
+
+.guest-row span {
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .guest-controls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
 }
 
 .guest-controls button {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
 
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
+  border-radius: 50%;
 
-  background: #fff;
+  border: 1px solid #cbd5e1;
+
+  background: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   cursor: pointer;
+
+  transition: all .15s ease;
+}
+
+.guest-controls button:hover {
+  border-color: #0071c2;
+  color: #0071c2;
+}
+
+.guest-controls span {
+  min-width: 18px;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* =========================================================
+   PETS
+========================================================= */
+
+.pets-row {
+  cursor: pointer;
+}
+
+.pet-toggle {
+  background: #eef2ff;
+
+  color: #0071c2;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  padding: 6px 12px;
+
+  border-radius: 999px;
+}
+
+.pet-toggle.active {
+  background: #0071c2;
+  color: #ffffff;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .bk-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .bk-item {
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .bk-action {
+    height: auto;
+  }
+
+  .bk-btn {
+    min-height: 68px;
+    font-size: 20px;
+  }
+
+  .bk-item:nth-child(1) .bk-pop,
+  .bk-item:nth-child(2) .bk-pop,
+  .bk-item:nth-child(3) .bk-pop {
+    width: 100%;
+  }
 }

@@ -90,7 +90,7 @@ export class SearchBarComponent {
   rooms = 1;
   withPets = false;
 
-  buttonText: string = 'Buscar habitaciones';
+  buttonText: string = 'Buscar';
 
   // ================= DATA SOURCE =================
 

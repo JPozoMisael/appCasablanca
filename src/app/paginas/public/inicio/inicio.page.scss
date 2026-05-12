@@ -16,84 +16,106 @@
 /* ================= HERO ================= */
 
 .hero {
-  background: #0f172a;
-  padding: 60px 24px 50px;
+  background: #003580;
+
+  padding: 70px 24px 140px;
+
   position: relative;
+
   overflow: visible;
 
   .hero-accent {
     position: absolute;
-    top: -80px;
-    right: -80px;
-    width: 400px;
-    height: 400px;
+
+    top: -120px;
+    right: -120px;
+
+    width: 420px;
+    height: 420px;
+
     border-radius: 50%;
-    background: #1a4fa8;
-    opacity: 0.18;
+
+    background: rgba(255,255,255,0.08);
   }
 
   .hero-accent2 {
     position: absolute;
-    bottom: -60px;
+
+    bottom: -80px;
     left: 30%;
-    width: 300px;
-    height: 300px;
+
+    width: 320px;
+    height: 320px;
+
     border-radius: 50%;
-    background: #1e7ab8;
-    opacity: 0.12;
+
+    background: rgba(255,255,255,0.06);
   }
 
   .hero-content {
-    max-width: 600px;
     position: relative;
     z-index: 2;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
   }
 
   .hero-tag {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 5px 14px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.8);
-    margin-bottom: 20px;
+    gap: 8px;
+
+    padding: 8px 16px;
+
+    background: rgba(255,255,255,0.12);
+
+    border-radius: 999px;
+
+    color: rgba(255,255,255,0.92);
+
+    font-size: 13px;
+    font-weight: 600;
+
+    margin-bottom: 22px;
   }
 
   h1 {
-    font-size: 34px;
-    font-weight: 700;
+    font-size: 56px;
+    line-height: 1.05;
+
+    font-weight: 800;
+
     color: #ffffff;
-    line-height: 1.2;
+
+    max-width: 780px;
+
+    margin-bottom: 18px;
+
+    letter-spacing: -1.5px;
 
     em {
-      color: #f0c040;
+      color: #febb02;
       font-style: normal;
     }
   }
 
   p {
-    font-size: 15px;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 28px;
-  }
+    font-size: 18px;
+    color: rgba(255,255,255,0.82);
 
-  /* ================= SEARCH ================= */
+    margin-bottom: 36px;
+  }
 
   .hero-search {
-    position: relative;
-    z-index: 50;
-    margin-top: 20px;
+    position: absolute;
 
-    width: calc(100% + 80px);
-    margin-left: -40px;
-  }
+    left: 0;
+    right: 0;
 
-  .hero-search app-search-bar {
-    display: block;
-    width: 100%;
-    max-width: 1200px;
+    bottom: -48px;
+
+    z-index: 60;
   }
 }
 
@@ -149,6 +171,9 @@ ion-content,
       color: #0071c2;
     }
   }
+  .benefits {
+  margin-top: 70px;
+}
 }
 
 /* ================= TITULOS ================= */
