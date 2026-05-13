@@ -5,9 +5,11 @@
   ======================================================= -->
 
   <section class="search-section">
+
     <div class="container">
       <app-search-bar></app-search-bar>
     </div>
+
   </section>
 
   <!-- ======================================================
@@ -16,103 +18,145 @@
 
   <section class="hero">
 
-    <div class="hero-accent"></div>
+    <div class="hero-overlay"></div>
 
     <div class="hero-content">
 
-      <div class="hero-tag">
-        <ion-icon name="water-outline"></ion-icon>
-        Frente al mar · Salinas, Ecuador
+      <!-- LEFT -->
+
+      <div class="hero-left">
+
+        <div class="hero-tag">
+
+          <ion-icon name="sparkles-outline"></ion-icon>
+
+          Hospedajes frente al mar en Salinas
+
+        </div>
+
+        <h1>
+          Descubre la mejor forma de hospedarte en <em>Salinas</em>
+        </h1>
+
+        <p>
+          Reserva hoteles y suites en las mejores ubicaciones de
+          Salinas, Chipipe y Ballenita con la experiencia Casa Blanca.
+        </p>
+
+        <!-- BENEFITS -->
+
+        <div class="hero-benefits">
+
+          <div class="hero-benefit">
+
+            <ion-icon name="pricetag-outline"></ion-icon>
+
+            <span>
+              Mejor precio garantizado
+            </span>
+
+          </div>
+
+          <div class="hero-benefit">
+
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+
+            <span>
+              Reserva segura
+            </span>
+
+          </div>
+
+          <div class="hero-benefit">
+
+            <ion-icon name="flash-outline"></ion-icon>
+
+            <span>
+              Confirmación inmediata
+            </span>
+
+          </div>
+
+        </div>
+
       </div>
 
-      <h1>
-        Vive Salinas como <em>nunca antes</em>
-      </h1>
+      <!-- RIGHT -->
 
-      <p>
-        Hospédate frente al mar en experiencias únicas
-      </p>
+      <div class="hero-card">
 
-    </div>
+        <div class="hero-card-top">
 
-  </section>
+          <span class="mini-badge">
+            Más reservado esta semana
+          </span>
 
-  <!-- ======================================================
-       BENEFITS
-  ======================================================= -->
-
-  <section class="benefits">
-
-    <div class="container">
-
-      <div class="benefit">
-        <ion-icon name="checkmark-circle-outline"></ion-icon>
-        <span>Mejor precio garantizado</span>
-      </div>
-
-      <div class="benefit">
-        <ion-icon name="time-outline"></ion-icon>
-        <span>Reserva inmediata</span>
-      </div>
-
-      <div class="benefit">
-        <ion-icon name="shield-checkmark-outline"></ion-icon>
-        <span>Pago seguro</span>
-      </div>
-
-      <div class="benefit">
-        <ion-icon name="call-outline"></ion-icon>
-        <span>Soporte 24/7</span>
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- ======================================================
-       POPULAR DESTINATIONS
-  ======================================================= -->
-
-  <section class="popular">
-
-    <div class="container">
-
-      <h2>Destinos populares</h2>
-
-      <p class="subtitle">
-        Lugares más buscados por nuestros huéspedes
-      </p>
-
-      <div class="popular-grid">
-
-        <div class="popular-card large">
           <img src="assets/img/1.PNG" />
-          <div class="overlay"></div>
 
-          <div class="info">
-            <h3>Salinas</h3>
-            <span>124 alojamientos</span>
-          </div>
         </div>
 
-        <div class="popular-card">
-          <img src="assets/img/4.PNG" />
-          <div class="overlay"></div>
+        <div class="hero-card-body">
 
-          <div class="info">
-            <h3>Chipipe</h3>
-            <span>48 alojamientos</span>
+          <div class="hero-card-header">
+
+            <div>
+
+              <h3>
+                Casa Blanca Chipipe
+              </h3>
+
+              <p>
+                Chipipe · Salinas
+              </p>
+
+            </div>
+
+            <div class="hero-rating">
+
+              <strong>
+                9.1
+              </strong>
+
+              <span>
+                Fantástico
+              </span>
+
+            </div>
+
           </div>
-        </div>
 
-        <div class="popular-card">
-          <img src="assets/img/8.PNG" />
-          <div class="overlay"></div>
+          <div class="hero-features">
 
-          <div class="info">
-            <h3>Ballenita</h3>
-            <span>32 alojamientos</span>
+            <span>Frente al mar</span>
+            <span>Desayuno incluido</span>
+            <span>Piscina</span>
+
           </div>
+
+          <div class="hero-card-bottom">
+
+            <div class="hero-price">
+
+              <small>
+                Desde
+              </small>
+
+              <strong>
+                $89
+              </strong>
+
+              <span>
+                / noche
+              </span>
+
+            </div>
+
+            <button>
+              Ver hotel
+            </button>
+
+          </div>
+
         </div>
 
       </div>
@@ -122,91 +166,247 @@
   </section>
 
   <!-- ======================================================
-       HOTELS
+       LOCATIONS
   ======================================================= -->
 
-  <section class="branches">
+  <section class="locations">
 
     <div class="container">
 
-      <h2>Hospedajes recomendados</h2>
+      <div class="section-head">
 
-      <p class="subtitle">
-        Opciones destacadas para tu próxima estadía
-      </p>
+        <div>
 
-      <div class="grid">
+          <h2>
+            Explora nuestras ubicaciones
+          </h2>
+
+          <p class="subtitle">
+            Tres experiencias únicas frente al mar
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="locations-grid">
+
+        <!-- CHIPIPE -->
 
         <div
-          class="hotel-card"
-          *ngFor="let h of hoteles; trackBy: trackById"
+          class="location-card"
+          [routerLink]="['/hotel/chipipe']"
+        >
+
+          <img src="assets/img/1.PNG" />
+
+          <div class="overlay"></div>
+
+          <div class="location-content">
+
+            <div class="location-top">
+
+              <span class="location-badge">
+                Familiar
+              </span>
+
+            </div>
+
+            <div>
+
+              <h3>
+                Casa Blanca Chipipe
+              </h3>
+
+              <p>
+                Playa tranquila ideal para familias y descanso
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- PALMERAS -->
+
+        <div
+          class="location-card"
+          [routerLink]="['/hotel/palmeras']"
+        >
+
+          <img src="assets/img/4.PNG" />
+
+          <div class="overlay"></div>
+
+          <div class="location-content">
+
+            <div class="location-top">
+
+              <span class="location-badge">
+                Vida nocturna
+              </span>
+
+            </div>
+
+            <div>
+
+              <h3>
+                Casa Blanca Palmeras
+              </h3>
+
+              <p>
+                Cerca del malecón y la zona más activa de Salinas
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- BALLENITA -->
+
+        <div
+          class="location-card"
+          [routerLink]="['/hotel/ballenita']"
+        >
+
+          <img src="assets/img/8.PNG" />
+
+          <div class="overlay"></div>
+
+          <div class="location-content">
+
+            <div class="location-top">
+
+              <span class="location-badge">
+                Vista panorámica
+              </span>
+
+            </div>
+
+            <div>
+
+              <h3>
+                Casa Blanca Ballenita
+              </h3>
+
+              <p>
+                Atardeceres únicos y experiencia relajada
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ======================================================
+       ESCAPADAS
+  ======================================================= -->
+
+  <section class="weekend">
+
+    <div class="container">
+
+      <div class="section-head">
+
+        <div>
+
+          <h2>
+            Escapadas recomendadas
+          </h2>
+
+          <p class="subtitle">
+            Las habitaciones más reservadas del momento
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="weekend-grid">
+
+        <div
+          class="weekend-card"
+          *ngFor="let h of hoteles"
           [routerLink]="['/hotel', h.slug]"
         >
 
           <!-- IMAGE -->
 
-          <div class="hotel-image">
+          <div class="weekend-image">
 
             <img [src]="getImage(h.imagen)" />
 
-            <div class="hotel-badge">
-              Excelente ubicación
+            <div class="discount">
+              Oferta especial
             </div>
 
           </div>
 
           <!-- BODY -->
 
-          <div class="hotel-body">
+          <div class="weekend-body">
 
-            <div class="hotel-top">
+            <div class="weekend-head">
 
               <div>
-                <h3>{{ h.nombre }}</h3>
 
-                <p class="location">
-                  <ion-icon name="location-outline"></ion-icon>
-                  Salinas · Santa Elena
+                <h3>
+                  {{ h.nombre }}
+                </h3>
+
+                <p>
+                  Salinas · Ecuador
                 </p>
+
               </div>
 
               <div class="rating-box">
 
-                <span class="score">
+                <strong>
                   {{ h.rating || '9.1' }}
-                </span>
-
-                <small>
-                  Fantástico
-                </small>
+                </strong>
 
               </div>
 
             </div>
 
-            <div class="hotel-features">
+            <div class="weekend-features">
 
               <span>Wifi gratis</span>
-              <span>Desayuno incluido</span>
               <span>Piscina</span>
+              <span>Frente al mar</span>
 
             </div>
 
-            <div class="hotel-bottom">
+            <div class="weekend-footer">
 
-              <div class="price">
+              <div class="weekend-price">
 
-                Desde
+                <small>
+                  Desde
+                </small>
 
                 <strong>
                   ${{ h.precio_desde }}
                 </strong>
 
-                / noche
+                <span>
+                  / noche
+                </span>
 
               </div>
 
-              <button class="view-btn">
+              <button>
                 Ver disponibilidad
               </button>
 
@@ -223,25 +423,84 @@
   </section>
 
   <!-- ======================================================
-       GALLERY
+       EXPERIENCE
   ======================================================= -->
 
-  <section class="gallery">
+  <section class="experience">
 
     <div class="container">
 
-      <h2>Explora la experiencia</h2>
+      <div class="section-head">
 
-      <p class="subtitle">
-        Descubre cada rincón de Casa Blanca
-      </p>
+        <div>
 
-      <div class="gallery-grid">
+          <h2>
+            Vive la experiencia Casa Blanca
+          </h2>
 
-        <img src="assets/img/1.PNG">
-        <img src="assets/img/4.PNG">
-        <img src="assets/img/9.PNG">
-        <img src="assets/img/8.PNG">
+          <p class="subtitle">
+            Mucho más que solo hospedarte
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="experience-grid">
+
+        <div class="experience-item">
+
+          <img src="assets/img/1.PNG" />
+
+          <div class="experience-info">
+
+            <h3>
+              Frente al mar
+            </h3>
+
+            <p>
+              Despierta con vistas únicas de Salinas
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="experience-item">
+
+          <img src="assets/img/9.PNG" />
+
+          <div class="experience-info">
+
+            <h3>
+              Piscina & relax
+            </h3>
+
+            <p>
+              Espacios diseñados para desconectarte
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="experience-item">
+
+          <img src="assets/img/4.PNG" />
+
+          <div class="experience-info">
+
+            <h3>
+              Gastronomía
+            </h3>
+
+            <p>
+              Restaurantes y experiencias cerca de ti
+            </p>
+
+          </div>
+
+        </div>
 
       </div>
 
@@ -257,11 +516,21 @@
 
     <div class="container">
 
-      <h2>Nuestros servicios</h2>
+      <div class="section-head">
 
-      <p class="subtitle">
-        Todo lo que necesitas para tu estadía
-      </p>
+        <div>
+
+          <h2>
+            Servicios incluidos
+          </h2>
+
+          <p class="subtitle">
+            Todo lo necesario para una estadía perfecta
+          </p>
+
+        </div>
+
+      </div>
 
       <div class="services-grid">
 
@@ -272,7 +541,9 @@
 
           <ion-icon [name]="s.icon"></ion-icon>
 
-          <span>{{ s.name }}</span>
+          <span>
+            {{ s.name }}
+          </span>
 
         </div>
 
@@ -290,7 +561,21 @@
 
     <div class="container">
 
-      <h2>¿Dónde estamos?</h2>
+      <div class="section-head">
+
+        <div>
+
+          <h2>
+            Encuéntranos en Salinas
+          </h2>
+
+          <p class="subtitle">
+            Las mejores ubicaciones frente al mar
+          </p>
+
+        </div>
+
+      </div>
 
       <iframe [src]="mapEmbedUrl"></iframe>
 

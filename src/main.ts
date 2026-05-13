@@ -1,10 +1,29 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { RouteReuseStrategy, provideRouter, withPreloading, PreloadAllModules } from '@angular/router';
-import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import { addIcons } from 'ionicons';
+
 import {
+  RouteReuseStrategy,
+  provideRouter,
+  withPreloading,
+  PreloadAllModules
+} from '@angular/router';
+
+import {
+  IonicRouteStrategy,
+  provideIonicAngular
+} from '@ionic/angular/standalone';
+
+import {
+  provideHttpClient,
+  withInterceptors
+} from '@angular/common/http';
+
+import { provideAnimations } from '@angular/platform-browser/animations';
+
+import { addIcons } from 'ionicons';
+
+import {
+
+  // EXISTENTES
   wifiOutline,
   bedOutline,
   locationOutline,
@@ -13,18 +32,36 @@ import {
   funnelOutline,
   optionsOutline,
   calendarOutline,
+
+  // NUEVOS
+  waterOutline,
+  snowOutline,
+  restaurantOutline,
+  sunnyOutline,
+  carOutline,
+  timeOutline,
+  shieldCheckmarkOutline,
+  flashOutline,
+  pricetagOutline,
+  sparklesOutline,
+  star,
+  starOutline
+
 } from 'ionicons/icons';
 
 import { routes } from './app/app.routes';
+
 import { AppComponent } from './app/app.component';
+
 import { authInterceptor } from './app/core/interceptors/auth.interceptor';
 
-/*
-|--------------------------------------------------------------------------
-| REGISTER ICONS (OBLIGATORIO)
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   REGISTER ICONS
+========================================================= */
+
 addIcons({
+
+  // BASE
   'wifi-outline': wifiOutline,
   'bed-outline': bedOutline,
   'location-outline': locationOutline,
@@ -33,19 +70,51 @@ addIcons({
   'funnel-outline': funnelOutline,
   'options-outline': optionsOutline,
   'calendar-outline': calendarOutline,
+
+  // NUEVOS
+  'water-outline': waterOutline,
+  'snow-outline': snowOutline,
+  'restaurant-outline': restaurantOutline,
+  'sunny-outline': sunnyOutline,
+  'car-outline': carOutline,
+  'time-outline': timeOutline,
+  'shield-checkmark-outline': shieldCheckmarkOutline,
+  'flash-outline': flashOutline,
+  'pricetag-outline': pricetagOutline,
+  'sparkles-outline': sparklesOutline,
+
+  // STARS
+  'star': star,
+  'star-outline': starOutline,
+
 });
 
-/*
-|--------------------------------------------------------------------------
-| BOOTSTRAP
-|--------------------------------------------------------------------------
-*/
+/* =========================================================
+   BOOTSTRAP
+========================================================= */
+
 bootstrapApplication(AppComponent, {
+
   providers: [
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+
+    {
+      provide: RouteReuseStrategy,
+      useClass: IonicRouteStrategy
+    },
+
     provideIonicAngular(),
-    provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideHttpClient(withInterceptors([authInterceptor])),
+
+    provideRouter(
+      routes,
+      withPreloading(PreloadAllModules)
+    ),
+
+    provideHttpClient(
+      withInterceptors([authInterceptor])
+    ),
+
     provideAnimations()
+
   ],
+
 });

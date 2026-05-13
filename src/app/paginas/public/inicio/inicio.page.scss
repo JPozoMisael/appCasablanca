@@ -7,6 +7,8 @@
   font-family: 'Inter', sans-serif;
 
   overflow-x: hidden;
+
+  color: #0f172a;
 }
 
 /* =========================================================
@@ -23,7 +25,7 @@
 }
 
 /* =========================================================
-   SEARCH SECTION
+   SEARCH
 ========================================================= */
 
 .search-section {
@@ -41,11 +43,43 @@
 }
 
 /* =========================================================
+   TITLES
+========================================================= */
+
+.section-head {
+  margin-bottom: 28px;
+}
+
+h2 {
+  margin: 0 0 8px;
+
+  font-size: 30px;
+  line-height: 1.1;
+
+  font-weight: 900;
+
+  letter-spacing: -1px;
+
+  color: #0f172a;
+}
+
+.subtitle {
+  margin: 0;
+
+  font-size: 16px;
+  line-height: 1.5;
+
+  color: #64748b;
+}
+
+/* =========================================================
    HERO
 ========================================================= */
 
 .hero {
   position: relative;
+
+  overflow: hidden;
 
   background:
     linear-gradient(
@@ -55,245 +89,367 @@
     );
 
   padding:
-    58px
-    24px
+    54px
+    0
     72px;
+}
 
-  overflow: hidden;
+.hero-overlay {
+  position: absolute;
+  inset: 0;
 
-  .hero-accent {
-    position: absolute;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255,255,255,.08),
+      transparent 40%
+    );
+}
 
-    top: -180px;
-    right: -120px;
+.hero-content {
+  position: relative;
+  z-index: 5;
 
-    width: 500px;
-    height: 500px;
+  width: 100%;
+  max-width: 1280px;
 
-    border-radius: 50%;
+  margin: 0 auto;
 
-    background: rgba(255,255,255,.05);
-  }
+  padding: 0 24px;
 
-  .hero-content {
-    position: relative;
-    z-index: 5;
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
 
-    width: 100%;
-    max-width: 1280px;
+  gap: 42px;
 
-    margin: 0 auto;
-  }
-
-  .hero-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-
-    padding: 9px 16px;
-
-    border-radius: 999px;
-
-    background: rgba(255,255,255,.12);
-
-    color: rgba(255,255,255,.96);
-
-    font-size: 13px;
-    font-weight: 700;
-
-    margin-bottom: 22px;
-
-    ion-icon {
-      font-size: 14px;
-    }
-  }
-
-  h1 {
-    max-width: 760px;
-
-    margin: 0 0 16px;
-
-    font-size: 56px;
-    line-height: 1.02;
-
-    font-weight: 900;
-
-    letter-spacing: -2px;
-
-    color: #ffffff;
-
-    em {
-      color: #febb02;
-      font-style: normal;
-    }
-  }
-
-  p {
-    max-width: 620px;
-
-    margin: 0;
-
-    font-size: 18px;
-    line-height: 1.5;
-
-    color: rgba(255,255,255,.88);
-  }
+  align-items: center;
 }
 
 /* =========================================================
-   BENEFITS
+   HERO LEFT
 ========================================================= */
 
-.benefits {
-  background: #ffffff;
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 
-  padding: 24px 0;
+  padding: 10px 16px;
 
-  border-bottom: 1px solid #e5e7eb;
+  border-radius: 999px;
 
-  .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background: rgba(255,255,255,.12);
 
-    gap: 28px;
+  color: #ffffff;
 
-    flex-wrap: wrap;
-  }
+  font-size: 13px;
+  font-weight: 700;
 
-  .benefit {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  margin-bottom: 24px;
 
+  ion-icon {
     font-size: 14px;
-    font-weight: 600;
-
-    color: #334155;
-
-    ion-icon {
-      font-size: 18px;
-      color: #0071c2;
-    }
   }
 }
 
-/* =========================================================
-   TITLES
-========================================================= */
+.hero-left h1 {
+  margin: 0 0 18px;
 
-h2 {
-  margin: 0 0 8px;
+  max-width: 720px;
 
-  font-size: 34px;
+  font-size: 64px;
+  line-height: 1.02;
+
+  letter-spacing: -2px;
+
   font-weight: 900;
 
-  line-height: 1.1;
+  color: #ffffff;
 
-  letter-spacing: -1px;
-
-  color: #0f172a;
+  em {
+    color: #febb02;
+    font-style: normal;
+  }
 }
 
-.subtitle {
-  margin-bottom: 28px;
+.hero-left p {
+  margin: 0;
 
-  font-size: 15px;
+  max-width: 620px;
 
-  color: #64748b;
+  font-size: 18px;
+  line-height: 1.6;
+
+  color: rgba(255,255,255,.9);
+}
+
+/* BENEFITS */
+
+.hero-benefits {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 14px;
+
+  margin-top: 34px;
+}
+
+.hero-benefit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 11px 16px;
+
+  border-radius: 999px;
+
+  background: rgba(255,255,255,.1);
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  transition:
+    transform .15s ease,
+    background .15s ease;
+
+  ion-icon {
+    font-size: 16px;
+    color: #febb02;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+
+    background: rgba(255,255,255,.14);
+  }
 }
 
 /* =========================================================
-   SECTIONS
+   HERO CARD
 ========================================================= */
 
-.popular,
-.branches,
-.gallery,
-.services,
-.map {
-  padding: 56px 0;
-}
+.hero-card {
+  background: #ffffff;
 
-/* =========================================================
-   POPULAR
-========================================================= */
-
-.popular-grid {
-  display: grid;
-
-  grid-template-columns:
-    2fr
-    1fr
-    1fr;
-
-  gap: 18px;
-}
-
-.popular-card {
-  position: relative;
-
-  height: 260px;
-
-  border-radius: 20px;
+  border-radius: 24px;
 
   overflow: hidden;
 
-  cursor: pointer;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.18);
+}
+
+.hero-card-top {
+  position: relative;
+
+  height: 280px;
+
+  background: #dbeafe;
 
   img {
     width: 100%;
     height: 100%;
 
     object-fit: cover;
+  }
+}
 
-    transition: .25s ease;
+.mini-badge {
+  position: absolute;
+
+  left: 16px;
+  top: 16px;
+
+  z-index: 5;
+
+  background: #008009;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+}
+
+.hero-card-body {
+  padding: 20px;
+}
+
+.hero-card-header {
+  display: flex;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  margin-bottom: 18px;
+
+  h3 {
+    margin: 0 0 6px;
+
+    font-size: 26px;
+    font-weight: 800;
   }
 
-  &:hover img {
-    transform: scale(1.04);
+  p {
+    margin: 0;
+
+    font-size: 14px;
+
+    color: #64748b;
+  }
+}
+
+.hero-rating {
+  min-width: 74px;
+
+  background: #003b95;
+
+  color: #ffffff;
+
+  border-radius: 12px;
+
+  padding: 10px;
+
+  text-align: center;
+
+  strong {
+    display: block;
+
+    font-size: 22px;
+    font-weight: 900;
   }
 
-  .overlay {
-    position: absolute;
-    inset: 0;
+  span {
+    font-size: 11px;
+    opacity: .9;
+  }
+}
 
-    background:
-      linear-gradient(
-        to top,
-        rgba(0,0,0,.72),
-        rgba(0,0,0,.18),
-        transparent
-      );
+.hero-features {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-bottom: 20px;
+
+  span {
+    background: #f1f5f9;
+
+    color: #334155;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+  }
+}
+
+.hero-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  gap: 16px;
+}
+
+.hero-price {
+  small {
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 12px;
+
+    color: #64748b;
   }
 
-  .info {
-    position: absolute;
+  strong {
+    font-size: 36px;
+    line-height: 1;
 
-    left: 20px;
-    bottom: 20px;
+    font-weight: 900;
 
-    color: #ffffff;
+    color: #0f172a;
+  }
 
-    h3 {
-      margin: 0 0 4px;
+  span {
+    font-size: 14px;
 
-      font-size: 30px;
-      font-weight: 800;
-    }
+    color: #64748b;
+  }
+}
 
-    span {
-      font-size: 14px;
-      opacity: .92;
-    }
+.hero-card-bottom button {
+  height: 46px;
+
+  padding: 0 20px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #006ce4;
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .15s ease;
+
+  &:hover {
+    background: #0057b8;
   }
 }
 
 /* =========================================================
-   HOTELS
+   SECTIONS
 ========================================================= */
 
-.grid {
+.locations,
+.weekend,
+.experience,
+.services,
+.map {
+  position: relative;
+
+  padding: 64px 0;
+}
+
+.locations::after,
+.weekend::after,
+.experience::after {
+  content: '';
+
+  position: absolute;
+
+  left: 50%;
+  bottom: 0;
+
+  transform: translateX(-50%);
+
+  width: calc(100% - 48px);
+  max-width: 1280px;
+
+  height: 1px;
+
+  background: #e5e7eb;
+}
+
+/* =========================================================
+   LOCATIONS
+========================================================= */
+
+.locations-grid {
   display: grid;
 
   grid-template-columns: repeat(3, 1fr);
@@ -301,34 +457,30 @@ h2 {
   gap: 22px;
 }
 
-.hotel-card {
-  background: #ffffff;
+.location-card {
+  position: relative;
 
-  border-radius: 20px;
+  height: 380px;
+
+  border-radius: 24px;
 
   overflow: hidden;
 
+  cursor: pointer;
+
   box-shadow:
-    0 8px 24px rgba(0,0,0,.08);
+    0 10px 28px rgba(0,0,0,.08);
 
   transition:
     transform .18s ease,
     box-shadow .18s ease;
 
-  cursor: pointer;
-
   &:hover {
     transform: translateY(-4px);
 
     box-shadow:
-      0 18px 40px rgba(0,0,0,.12);
+      0 18px 42px rgba(0,0,0,.14);
   }
-}
-
-.hotel-image {
-  position: relative;
-
-  height: 220px;
 
   img {
     width: 100%;
@@ -338,7 +490,121 @@ h2 {
   }
 }
 
-.hotel-badge {
+.location-card .overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0,0,0,.82),
+      rgba(0,0,0,.25),
+      transparent
+    );
+}
+
+.location-content {
+  position: absolute;
+
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+
+  z-index: 5;
+
+  color: #ffffff;
+}
+
+.location-top {
+  margin-bottom: 14px;
+}
+
+.location-badge {
+  background: rgba(255,255,255,.16);
+
+  padding: 8px 12px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.location-content h3 {
+  margin: 0 0 8px;
+
+  font-size: 32px;
+  line-height: 1.05;
+
+  font-weight: 900;
+}
+
+.location-content p {
+  margin: 0;
+
+  font-size: 15px;
+  line-height: 1.5;
+
+  color: rgba(255,255,255,.92);
+}
+
+/* =========================================================
+   WEEKEND
+========================================================= */
+
+.weekend-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 22px;
+}
+
+.weekend-card {
+  background: #ffffff;
+
+  border-radius: 22px;
+
+  overflow: hidden;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow:
+    0 8px 24px rgba(0,0,0,.05);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+
+    border-color: #cbd5e1;
+
+    box-shadow:
+      0 18px 38px rgba(0,0,0,.1);
+  }
+}
+
+.weekend-image {
+  position: relative;
+
+  height: 240px;
+
+  background: #dbeafe;
+
+  img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+  }
+}
+
+.discount {
   position: absolute;
 
   left: 14px;
@@ -356,71 +622,53 @@ h2 {
   border-radius: 999px;
 }
 
-.hotel-body {
+.weekend-body {
   padding: 18px;
 }
 
-.hotel-top {
+.weekend-head {
   display: flex;
   justify-content: space-between;
 
   gap: 14px;
 
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 
   h3 {
-    margin: 0 0 4px;
+    margin: 0 0 6px;
 
     font-size: 24px;
     font-weight: 800;
-
-    color: #0f172a;
   }
-}
 
-.location {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  p {
+    margin: 0;
 
-  margin: 0;
+    font-size: 13px;
 
-  font-size: 13px;
-
-  color: #64748b;
-
-  ion-icon {
-    font-size: 14px;
+    color: #64748b;
   }
 }
 
 .rating-box {
-  min-width: 64px;
+  width: 44px;
+  height: 44px;
+
+  border-radius: 10px;
 
   background: #003b95;
 
   color: #ffffff;
 
-  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  padding: 10px;
-
-  text-align: center;
-
-  .score {
-    display: block;
-
-    font-size: 20px;
-    font-weight: 800;
-  }
-
-  small {
-    font-size: 11px;
-    opacity: .9;
-  }
+  font-size: 16px;
+  font-weight: 800;
 }
 
-.hotel-features {
+.weekend-features {
   display: flex;
   flex-wrap: wrap;
 
@@ -434,7 +682,7 @@ h2 {
     color: #334155;
 
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
 
     padding: 6px 10px;
 
@@ -442,29 +690,41 @@ h2 {
   }
 }
 
-.hotel-bottom {
+.weekend-footer {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
 
-  gap: 14px;
+  gap: 16px;
 }
 
-.price {
-  font-size: 13px;
+.weekend-price {
+  small {
+    display: block;
 
-  color: #64748b;
+    margin-bottom: 4px;
+
+    font-size: 12px;
+
+    color: #64748b;
+  }
 
   strong {
-    font-size: 26px;
-    font-weight: 900;
+    font-size: 34px;
+    line-height: 1;
 
-    color: #0f172a;
+    font-weight: 900;
+  }
+
+  span {
+    font-size: 14px;
+
+    color: #64748b;
   }
 }
 
-.view-btn {
-  height: 42px;
+.weekend-footer button {
+  height: 44px;
 
   padding: 0 18px;
 
@@ -488,29 +748,65 @@ h2 {
 }
 
 /* =========================================================
-   GALLERY
+   EXPERIENCE
 ========================================================= */
 
-.gallery-grid {
+.experience-grid {
   display: grid;
 
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 
-  gap: 16px;
+  gap: 22px;
+}
+
+.experience-item {
+  background: #ffffff;
+
+  border-radius: 22px;
+
+  overflow: hidden;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow:
+    0 8px 24px rgba(0,0,0,.05);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+      0 18px 38px rgba(0,0,0,.1);
+  }
 
   img {
     width: 100%;
-    height: 220px;
+    height: 240px;
 
     object-fit: cover;
+  }
+}
 
-    border-radius: 18px;
+.experience-info {
+  padding: 18px;
 
-    transition: .2s ease;
+  h3 {
+    margin: 0 0 8px;
+
+    font-size: 24px;
+    font-weight: 800;
   }
 
-  img:hover {
-    transform: scale(1.02);
+  p {
+    margin: 0;
+
+    font-size: 14px;
+    line-height: 1.6;
+
+    color: #64748b;
   }
 }
 
@@ -523,7 +819,7 @@ h2 {
 
   grid-template-columns: repeat(4, 1fr);
 
-  gap: 20px;
+  gap: 16px;
 }
 
 .service {
@@ -531,33 +827,44 @@ h2 {
 
   border-radius: 18px;
 
-  padding: 26px 20px;
+  padding: 24px 18px;
+
+  min-height: 150px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   text-align: center;
 
-  box-shadow:
-    0 8px 24px rgba(0,0,0,.06);
+  border: 1px solid #e5e7eb;
 
-  transition: .18s ease;
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease;
 
   &:hover {
     transform: translateY(-4px);
+
+    border-color: #cbd5e1;
+
+    box-shadow:
+      0 14px 34px rgba(0,0,0,.08);
   }
 
   ion-icon {
-    font-size: 30px;
-    color: #0071c2;
+    font-size: 34px;
+
+    color: #006ce4;
+
+    margin-bottom: 14px;
   }
 
   span {
-    display: block;
-
-    margin-top: 12px;
-
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
-
-    color: #0f172a;
   }
 }
 
@@ -567,13 +874,13 @@ h2 {
 
 .map iframe {
   width: 100%;
-  height: 360px;
+  height: 380px;
 
   border: none;
-  border-radius: 20px;
+  border-radius: 24px;
 
   box-shadow:
-    0 12px 30px rgba(0,0,0,.1);
+    0 14px 34px rgba(0,0,0,.1);
 }
 
 /* =========================================================
@@ -582,13 +889,19 @@ h2 {
 
 @media (max-width: 1200px) {
 
-  .grid,
-  .services-grid {
+  .hero-content {
+    grid-template-columns: 1fr;
+
+    gap: 32px;
+  }
+
+  .locations-grid,
+  .weekend-grid,
+  .experience-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .popular-grid,
-  .gallery-grid {
+  .services-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -596,35 +909,42 @@ h2 {
 
 @media (max-width: 768px) {
 
-  .container {
+  .container,
+  .hero-content {
     padding: 0 18px;
   }
 
   .hero {
     padding:
       44px
-      18px
+      0
       54px;
   }
 
-  .hero h1 {
-    font-size: 38px;
+  .hero-left h1 {
+    font-size: 42px;
+    line-height: 1.08;
   }
 
-  .hero p {
+  .hero-left p {
     font-size: 16px;
   }
 
-  .grid,
-  .services-grid,
-  .gallery-grid,
-  .popular-grid {
+  .locations-grid,
+  .weekend-grid,
+  .experience-grid,
+  .services-grid {
     grid-template-columns: 1fr;
   }
 
-  .hotel-bottom {
+  .hero-card-bottom,
+  .weekend-footer {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  h2 {
+    font-size: 28px;
   }
 
 }
