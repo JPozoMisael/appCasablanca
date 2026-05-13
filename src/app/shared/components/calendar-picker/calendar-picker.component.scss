@@ -7,17 +7,24 @@
 ========================================================= */
 
 .booking-calendar {
-  width: 640px;
-  max-width: 90vw;
+  width: 700px;
+  max-width: calc(100vw - 24px);
 
   background: #ffffff;
 
-  border-radius: 18px;
+  border-radius: 16px;
 
   overflow: hidden;
 
+  position: relative;
+
+  /* 🔥 separa del searchbar */
+  margin-top: 8px;
+
   box-shadow:
-    0 24px 70px rgba(0,0,0,.18);
+    0 8px 24px rgba(0,0,0,.16);
+
+  border: 1px solid #e7e7e7;
 }
 
 /* =========================================================
@@ -29,10 +36,12 @@
   grid-template-columns: 1fr 1fr;
 
   border-bottom: 1px solid #e5e7eb;
+
+  background: #fff;
 }
 
 .tab {
-  height: 58px;
+  height: 56px;
 
   display: flex;
   align-items: center;
@@ -76,9 +85,9 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
 
-  gap: 18px;
+  gap: 12px;
 
-  padding: 18px 22px 22px;
+  padding: 14px 18px 10px;
 }
 
 /* =========================================================
@@ -98,13 +107,13 @@
   align-items: center;
   justify-content: space-between;
 
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 
 .month-header h3 {
   margin: 0;
 
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
 
   color: #111827;
@@ -117,8 +126,8 @@
 ========================================================= */
 
 .nav-btn {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
 
   border: none;
   border-radius: 50%;
@@ -139,7 +148,7 @@
 }
 
 .nav-btn ion-icon {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 /* =========================================================
@@ -150,14 +159,14 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
 
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
 .weekdays span {
   text-align: center;
 
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
 
   color: #6b7280;
 }
@@ -170,7 +179,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
 
-  gap: 2px;
+  gap: 1px;
 }
 
 /* =========================================================
@@ -178,8 +187,8 @@
 ========================================================= */
 
 .day {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
 
   margin: 0 auto;
 
@@ -189,9 +198,9 @@
 
   position: relative;
 
-  border-radius: 10px;
+  border-radius: 8px;
 
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
 
   color: #111827;
@@ -200,11 +209,13 @@
 
   transition:
     background .12s ease,
-    color .12s ease;
+    color .12s ease,
+   
 }
 
 .day:hover {
   background: #f3f4f6;
+
 }
 
 .day.empty {
@@ -226,6 +237,7 @@
 .day.range,
 .day.preview {
   background: #e7f0fe;
+
   border-radius: 0;
 }
 
@@ -252,13 +264,15 @@
   display: flex;
   align-items: center;
 
-  gap: 10px;
+  gap: 8px;
 
   flex-wrap: wrap;
 
-  padding: 16px 22px 20px;
+  padding: 12px 18px 14px;
 
   border-top: 1px solid #e5e7eb;
+
+  background: #fff;
 }
 
 /* =========================================================
@@ -266,9 +280,9 @@
 ========================================================= */
 
 .footer-btn {
-  height: 42px;
+  height: 34px;
 
-  padding: 0 18px;
+  padding: 0 16px;
 
   border-radius: 999px;
 
@@ -276,7 +290,7 @@
 
   background: #ffffff;
 
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
 
   color: #111827;
@@ -320,15 +334,51 @@
    MOBILE
 ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
 
   .booking-calendar {
     width: 100%;
     max-width: 100%;
+
+    border-radius: 14px;
   }
 
   .months-wrapper {
     grid-template-columns: 1fr;
+
+    gap: 18px;
+
+    padding: 14px;
+  }
+
+  .day {
+    width: 34px;
+    height: 34px;
+
+    font-size: 13px;
+  }
+
+}
+
+/* =========================================================
+   EXTRA SMALL
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .months-wrapper {
+    padding: 18px 14px;
+  }
+
+  .calendar-footer {
+    padding: 14px;
+  }
+
+  .day {
+    width: 34px;
+    height: 34px;
+
+    font-size: 13px;
   }
 
 }

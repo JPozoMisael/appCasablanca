@@ -10,7 +10,7 @@
 .bk-search {
   width: 100%;
   position: relative;
-  z-index: 9999;
+  z-index: 999;
 }
 
 /* =========================================================
@@ -19,11 +19,12 @@
 
 .bk-bar {
   display: grid;
+
   grid-template-columns:
     1.3fr
     1fr
     1fr
-    220px;
+    200px;
 
   background: #ffffff;
 
@@ -33,7 +34,7 @@
   overflow: visible;
 
   box-shadow:
-    0 12px 34px rgba(0,0,0,.16);
+    0 8px 24px rgba(0,0,0,.14);
 }
 
 /* =========================================================
@@ -43,9 +44,9 @@
 .bk-item {
   position: relative;
 
-  min-height: 86px;
+  min-height: 72px;
 
-  padding: 16px 22px;
+  padding: 12px 18px;
 
   display: flex;
   flex-direction: column;
@@ -55,9 +56,10 @@
 
   background: #ffffff;
 
-  transition: background .15s ease;
+  transition:
+    background .15s ease;
 
-  border-right: 1px solid #e5e7eb;
+  border-right: 1px solid #e7e7e7;
 
   overflow: visible;
 }
@@ -74,7 +76,7 @@
   background: #f4f8ff;
 
   box-shadow:
-    inset 0 0 0 3px #0071c2;
+    inset 0 0 0 2px #0071c2;
 
   z-index: 200;
 }
@@ -88,17 +90,17 @@
   align-items: center;
   gap: 6px;
 
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
 
   text-transform: uppercase;
 
   color: #6b7280;
 
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 
   ion-icon {
-    font-size: 14px;
+    font-size: 13px;
   }
 }
 
@@ -107,7 +109,7 @@
 ========================================================= */
 
 .bk-value-main {
-  font-size: 21px;
+  font-size: 16px;
   font-weight: 700;
 
   line-height: 1.2;
@@ -136,12 +138,12 @@
   margin: 0;
 
   height: 100%;
-  min-height: 86px;
+  min-height: 72px;
 
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 800;
 
-  letter-spacing: -.5px;
+  letter-spacing: -.3px;
 
   box-shadow: none;
 }
@@ -153,7 +155,7 @@
 .bk-pop {
   position: absolute;
 
-  top: calc(100% + 10px);
+  top: calc(100% + 8px);
   left: 0;
 
   background: #ffffff;
@@ -163,11 +165,13 @@
   overflow: hidden;
 
   box-shadow:
-    0 24px 70px rgba(0,0,0,.22);
+    0 8px 24px rgba(0,0,0,.16);
+
+  border: 1px solid #e7e7e7;
 
   z-index: 10000;
 
-  animation: popIn .16s ease;
+  animation: popIn .14s ease;
 }
 
 /* =========================================================
@@ -175,19 +179,22 @@
 ========================================================= */
 
 /* SUCURSAL */
+
 .bk-item:nth-child(1) .bk-pop {
-  width: 380px;
+  width: 320px;
 }
 
 /* FECHAS */
+
 .bk-item:nth-child(2) .bk-pop {
-  width: 760px;
-  max-width: calc(100vw - 30px);
+  width: 700px;
+  max-width: calc(100vw - 24px);
 }
 
 /* HUÉSPEDES */
+
 .bk-item:nth-child(3) .bk-pop {
-  width: 340px;
+  width: 320px;
 }
 
 /* =========================================================
@@ -195,15 +202,17 @@
 ========================================================= */
 
 @keyframes popIn {
+
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
 
   to {
     opacity: 1;
     transform: translateY(0);
   }
+
 }
 
 /* =========================================================
@@ -215,13 +224,13 @@
   justify-content: space-between;
   align-items: center;
 
-  padding: 18px;
+  padding: 14px 16px;
 
   border-bottom: 1px solid #eeeeee;
 
   cursor: pointer;
 
-  transition: all .15s ease;
+  transition: .15s ease;
 }
 
 .branch-card:last-child {
@@ -237,18 +246,21 @@
 }
 
 .branch-name {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
+
   color: #111827;
 }
 
 .branch-desc {
-  font-size: 13px;
+  font-size: 12px;
+
   color: #64748b;
 }
 
 .branch-right ion-icon {
-  font-size: 22px;
+  font-size: 20px;
+
   color: #0071c2;
 }
 
@@ -261,7 +273,7 @@
   justify-content: space-between;
   align-items: center;
 
-  padding: 16px 18px;
+  padding: 14px 16px;
 
   border-bottom: 1px solid #eeeeee;
 }
@@ -271,19 +283,20 @@
 }
 
 .guest-row span {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .guest-controls {
   display: flex;
   align-items: center;
-  gap: 14px;
+
+  gap: 12px;
 }
 
 .guest-controls button {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
 
   border-radius: 50%;
 
@@ -297,7 +310,7 @@
 
   cursor: pointer;
 
-  transition: all .15s ease;
+  transition: .15s ease;
 }
 
 .guest-controls button:hover {
@@ -307,7 +320,9 @@
 
 .guest-controls span {
   min-width: 18px;
+
   text-align: center;
+
   font-weight: 700;
 }
 
@@ -324,10 +339,10 @@
 
   color: #0071c2;
 
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 
-  padding: 6px 12px;
+  padding: 5px 10px;
 
   border-radius: 999px;
 }
@@ -345,7 +360,7 @@
   position: fixed;
   inset: 0;
 
-  background: rgba(0,0,0,.12);
+  background: rgba(0,0,0,.10);
 
   z-index: 50;
 }
@@ -362,17 +377,59 @@
 
   .bk-item {
     border-right: none;
+
     border-bottom: 1px solid #e5e7eb;
   }
 
   .bk-btn {
-    min-height: 72px;
-    font-size: 20px;
+    min-height: 64px;
+
+    font-size: 18px;
   }
 
   .bk-item:nth-child(1) .bk-pop,
   .bk-item:nth-child(2) .bk-pop,
   .bk-item:nth-child(3) .bk-pop {
     width: 100%;
+    max-width: 100%;
   }
+
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+  .bk-bar {
+    border-radius: 10px;
+  }
+
+  .bk-item {
+    min-height: 66px;
+
+    padding: 12px 14px;
+  }
+
+  .bk-value-main {
+    font-size: 15px;
+  }
+
+  .bk-btn {
+    min-height: 66px;
+
+    font-size: 17px;
+  }
+
+  .bk-pop {
+    left: 0;
+    right: 0;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    border-radius: 14px;
+  }
+
 }

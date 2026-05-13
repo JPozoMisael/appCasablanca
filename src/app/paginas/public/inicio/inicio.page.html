@@ -1,10 +1,22 @@
 <div class="home">
 
-  <!-- ================= HERO ================= -->
+  <!-- ======================================================
+       SEARCH
+  ======================================================= -->
+
+  <section class="search-section">
+    <div class="container">
+      <app-search-bar></app-search-bar>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       HERO
+  ======================================================= -->
+
   <section class="hero">
 
     <div class="hero-accent"></div>
-    <div class="hero-accent2"></div>
 
     <div class="hero-content">
 
@@ -21,15 +33,16 @@
         Hospédate frente al mar en experiencias únicas
       </p>
 
-      <div class="hero-search">
-        <app-search-bar></app-search-bar>
-      </div>
-
     </div>
+
   </section>
 
-  <!-- ================= BENEFICIOS ================= -->
+  <!-- ======================================================
+       BENEFITS
+  ======================================================= -->
+
   <section class="benefits">
+
     <div class="container">
 
       <div class="benefit">
@@ -53,51 +66,149 @@
       </div>
 
     </div>
+
   </section>
 
-  <!-- ================= HOTELES DINÁMICOS ================= -->
-  <section class="branches">
+  <!-- ======================================================
+       POPULAR DESTINATIONS
+  ======================================================= -->
+
+  <section class="popular">
+
     <div class="container">
 
-      <h2>Destinos recomendados</h2>
+      <h2>Destinos populares</h2>
+
       <p class="subtitle">
-        Explora nuestras mejores ubicaciones
+        Lugares más buscados por nuestros huéspedes
+      </p>
+
+      <div class="popular-grid">
+
+        <div class="popular-card large">
+          <img src="assets/img/1.PNG" />
+          <div class="overlay"></div>
+
+          <div class="info">
+            <h3>Salinas</h3>
+            <span>124 alojamientos</span>
+          </div>
+        </div>
+
+        <div class="popular-card">
+          <img src="assets/img/4.PNG" />
+          <div class="overlay"></div>
+
+          <div class="info">
+            <h3>Chipipe</h3>
+            <span>48 alojamientos</span>
+          </div>
+        </div>
+
+        <div class="popular-card">
+          <img src="assets/img/8.PNG" />
+          <div class="overlay"></div>
+
+          <div class="info">
+            <h3>Ballenita</h3>
+            <span>32 alojamientos</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ======================================================
+       HOTELS
+  ======================================================= -->
+
+  <section class="branches">
+
+    <div class="container">
+
+      <h2>Hospedajes recomendados</h2>
+
+      <p class="subtitle">
+        Opciones destacadas para tu próxima estadía
       </p>
 
       <div class="grid">
 
         <div
-          class="card"
+          class="hotel-card"
           *ngFor="let h of hoteles; trackBy: trackById"
           [routerLink]="['/hotel', h.slug]"
         >
 
-          <!-- 🔥 imagen segura -->
-          <img [src]="getImage(h.imagen)" />
+          <!-- IMAGE -->
 
-          <div class="overlay"></div>
+          <div class="hotel-image">
 
-          <div class="content">
+            <img [src]="getImage(h.imagen)" />
 
-            <h3>{{ h.nombre }}</h3>
+            <div class="hotel-badge">
+              Excelente ubicación
+            </div>
 
-            <p class="price">
-              Desde <strong>${{ h.precio_desde }}</strong> / noche
-            </p>
+          </div>
 
-            <!-- 🔥 RATING REAL -->
-            <div class="rating">
+          <!-- BODY -->
 
-              <div class="stars">
-                <ion-icon
-                  *ngFor="let s of getStars(h.rating || 0)"
-                  [name]="s">
-                </ion-icon>
+          <div class="hotel-body">
+
+            <div class="hotel-top">
+
+              <div>
+                <h3>{{ h.nombre }}</h3>
+
+                <p class="location">
+                  <ion-icon name="location-outline"></ion-icon>
+                  Salinas · Santa Elena
+                </p>
               </div>
 
-              <span class="text">
-                {{ getRatingText(h.rating || 0) }}
-              </span>
+              <div class="rating-box">
+
+                <span class="score">
+                  {{ h.rating || '9.1' }}
+                </span>
+
+                <small>
+                  Fantástico
+                </small>
+
+              </div>
+
+            </div>
+
+            <div class="hotel-features">
+
+              <span>Wifi gratis</span>
+              <span>Desayuno incluido</span>
+              <span>Piscina</span>
+
+            </div>
+
+            <div class="hotel-bottom">
+
+              <div class="price">
+
+                Desde
+
+                <strong>
+                  ${{ h.precio_desde }}
+                </strong>
+
+                / noche
+
+              </div>
+
+              <button class="view-btn">
+                Ver disponibilidad
+              </button>
 
             </div>
 
@@ -108,48 +219,83 @@
       </div>
 
     </div>
+
   </section>
 
-  <!-- ================= GALERÍA ================= -->
+  <!-- ======================================================
+       GALLERY
+  ======================================================= -->
+
   <section class="gallery">
+
     <div class="container">
 
       <h2>Explora la experiencia</h2>
-      <p class="subtitle">Momentos únicos en cada rincón</p>
+
+      <p class="subtitle">
+        Descubre cada rincón de Casa Blanca
+      </p>
 
       <div class="gallery-grid">
+
         <img src="assets/img/1.PNG">
         <img src="assets/img/4.PNG">
         <img src="assets/img/9.PNG">
         <img src="assets/img/8.PNG">
+
       </div>
 
     </div>
+
   </section>
 
-  <!-- ================= SERVICIOS ================= -->
+  <!-- ======================================================
+       SERVICES
+  ======================================================= -->
+
   <section class="services">
+
     <div class="container">
 
       <h2>Nuestros servicios</h2>
-      <p class="subtitle">Todo lo que necesitas</p>
+
+      <p class="subtitle">
+        Todo lo que necesitas para tu estadía
+      </p>
 
       <div class="services-grid">
-        <div class="service" *ngFor="let s of services">
+
+        <div
+          class="service"
+          *ngFor="let s of services"
+        >
+
           <ion-icon [name]="s.icon"></ion-icon>
+
           <span>{{ s.name }}</span>
+
         </div>
+
       </div>
 
     </div>
+
   </section>
 
-  <!-- ================= MAPA ================= -->
+  <!-- ======================================================
+       MAP
+  ======================================================= -->
+
   <section class="map">
+
     <div class="container">
+
       <h2>¿Dónde estamos?</h2>
+
       <iframe [src]="mapEmbedUrl"></iframe>
+
     </div>
+
   </section>
 
 </div>
