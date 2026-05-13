@@ -1,6 +1,54 @@
 <div class="page">
 
-  <!-- ================= HEADER ================= -->
+  <!-- =========================================================
+       SEARCH SUMMARY
+  ========================================================== -->
+
+  <div class="search-summary">
+
+    <div class="summary-item">
+
+      <ion-icon name="business-outline"></ion-icon>
+
+      <div>
+        <strong>Casa Blanca Palmeras</strong>
+        <span>Salinas, Ecuador</span>
+      </div>
+
+    </div>
+
+    <div class="summary-item">
+
+      <ion-icon name="calendar-outline"></ion-icon>
+
+      <div>
+        <strong>{{ checkIn }} - {{ checkOut }}</strong>
+        <span>2 noches</span>
+      </div>
+
+    </div>
+
+    <div class="summary-item">
+
+      <ion-icon name="people-outline"></ion-icon>
+
+      <div>
+        <strong>{{ adults }} adultos</strong>
+        <span>{{ rooms }} habitación</span>
+      </div>
+
+    </div>
+
+    <button class="edit-search">
+      Modificar búsqueda
+    </button>
+
+  </div>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+
   <div class="header">
 
     <div class="header-text">
@@ -10,66 +58,64 @@
       </h1>
 
       <p>
-        Encuentra la mejor opción para tu estadía
+        {{ total }} opciones encontradas para tus fechas
       </p>
 
     </div>
 
-    <div class="header-results">
+  </div>
 
-      <strong>
-        {{ total }}
-      </strong>
+  <!-- =========================================================
+       SORT
+  ========================================================== -->
 
-      <span>
-        habitaciones encontradas
-      </span>
+  <div class="sort-bar">
+
+    <div class="sort-left">
+
+      <span>Ordenar por:</span>
+
+      <button
+        [class.active]="sort === 'recomendado'"
+        (click)="sort='recomendado'; loadHabitaciones()">
+
+        Recomendado
+      </button>
+
+      <button
+        [class.active]="sort === 'precio_asc'"
+        (click)="sort='precio_asc'; loadHabitaciones()">
+
+        Precio menor
+      </button>
+
+      <button
+        [class.active]="sort === 'precio_desc'"
+        (click)="sort='precio_desc'; loadHabitaciones()">
+
+        Precio mayor
+      </button>
 
     </div>
 
   </div>
 
-  <!-- ================= SORT ================= -->
-  <div class="sort-bar">
+  <!-- =========================================================
+       CONTENT
+  ========================================================== -->
 
-    <span>
-      Ordenar por:
-    </span>
-
-    <button
-      [class.active]="sort === 'recomendado'"
-      (click)="sort='recomendado'; loadHabitaciones()">
-
-      Recomendado
-    </button>
-
-    <button
-      [class.active]="sort === 'precio_asc'"
-      (click)="sort='precio_asc'; loadHabitaciones()">
-
-      Precio menor
-    </button>
-
-    <button
-      [class.active]="sort === 'precio_desc'"
-      (click)="sort='precio_desc'; loadHabitaciones()">
-
-      Precio mayor
-    </button>
-
-  </div>
-
-  <!-- ================= LAYOUT ================= -->
   <div class="layout">
 
-    <!-- ================= FILTROS ================= -->
+    <!-- =========================================================
+         FILTERS
+    ========================================================== -->
+
     <aside class="filters">
 
-      <h3>
-        Filtros
-      </h3>
+      <h3>Filtrar por</h3>
 
-      <!-- PRECIO -->
+      <!-- PRICE -->
+
       <div class="filter">
 
         <label>
@@ -84,62 +130,91 @@
           max="500"
         />
 
-        <span>
-          ${{ precioMax }}
-        </span>
+        <div class="price-value">
+          Hasta ${{ precioMax }}
+        </div>
 
       </div>
 
-      <!-- CAPACIDAD -->
+      <!-- CAPACITY -->
+
       <div class="filter">
 
-        <label>
-          Capacidad
-        </label>
+        <label>Capacidad</label>
 
         <select
           [(ngModel)]="capacidad"
           (change)="loadHabitaciones()">
 
-          <option [value]="1">
-            1+ personas
-          </option>
-
-          <option [value]="2">
-            2+ personas
-          </option>
-
-          <option [value]="3">
-            3+ personas
-          </option>
-
-          <option [value]="4">
-            4+ personas
-          </option>
+          <option [value]="1">1+ personas</option>
+          <option [value]="2">2+ personas</option>
+          <option [value]="3">3+ personas</option>
+          <option [value]="4">4+ personas</option>
 
         </select>
 
       </div>
 
+      <!-- BENEFITS -->
+
+      <div class="filter">
+
+        <label>Beneficios</label>
+
+        <div class="check">
+
+          <input type="checkbox">
+
+          <span>Cancelación gratis</span>
+
+        </div>
+
+        <div class="check">
+
+          <input type="checkbox">
+
+          <span>Desayuno incluido</span>
+
+        </div>
+
+        <div class="check">
+
+          <input type="checkbox">
+
+          <span>Piscina</span>
+
+        </div>
+
+      </div>
+
     </aside>
 
-    <!-- ================= LISTA ================= -->
+    <!-- =========================================================
+         LIST
+    ========================================================== -->
+
     <div class="list">
 
       <!-- LOADING -->
+
       <div
         *ngIf="loading"
         class="state">
 
         Cargando habitaciones...
+
       </div>
 
-      <!-- ================= CARDS ================= -->
+      <!-- =========================================================
+           CARDS
+      ========================================================== -->
+
       <div
         *ngFor="let h of habitaciones; trackBy: trackById"
         class="card">
 
-        <!-- IMG -->
+        <!-- IMAGE -->
+
         <div class="img">
 
           <img
@@ -147,24 +222,16 @@
             [alt]="h.tipo"
           />
 
-          <!-- BADGES -->
-          <div
-            class="badge recomendado"
-            *ngIf="sort === 'recomendado'">
+          <div class="favorite">
 
-            Recomendado
-          </div>
+            <ion-icon name="heart-outline"></ion-icon>
 
-          <div
-            class="badge popular"
-            *ngIf="h.score > 900">
-
-            Más popular
           </div>
 
         </div>
 
         <!-- INFO -->
+
         <div class="info">
 
           <div class="top">
@@ -175,28 +242,36 @@
                 {{ h.tipo }}
               </h2>
 
-              <p class="desc">
-                {{ h.descripcion }}
+              <p class="location">
+                Salinas · Frente al mar
               </p>
 
             </div>
 
             <!-- RATING -->
+
             <div class="rating">
+
+              <div class="rating-text">
+
+                <strong>Fantástico</strong>
+
+                <span>
+                  321 comentarios
+                </span>
+
+              </div>
 
               <div class="pill">
                 {{ h.rating || 8.5 }}
               </div>
-
-              <span class="rev">
-                Muy bien
-              </span>
 
             </div>
 
           </div>
 
           <!-- FEATURES -->
+
           <div class="features">
 
             <div class="feature">
@@ -217,39 +292,65 @@
           </div>
 
           <!-- BENEFITS -->
+
           <div class="benefits">
 
             <span>
-              ✔ Cancelación gratis
+              <ion-icon name="checkmark-outline"></ion-icon>
+              Cancelación gratis
             </span>
 
             <span>
-              ✔ Reserva flexible
+              <ion-icon name="checkmark-outline"></ion-icon>
+              Reserva flexible
             </span>
 
             <span>
-              ✔ Confirmación inmediata
+              <ion-icon name="checkmark-outline"></ion-icon>
+              Confirmación inmediata
             </span>
 
           </div>
 
-          <!-- URGENCY -->
-          <div class="urgency">
-            🔥 Alta demanda para estas fechas
+          <!-- TRUST -->
+
+          <div class="trust">
+
+            <div class="trust-item green">
+              Alta demanda para estas fechas
+            </div>
+
+            <div class="trust-item blue">
+              Última reserva hace 2 horas
+            </div>
+
           </div>
 
         </div>
 
         <!-- PRICE -->
+
         <div class="price">
 
-          <div class="amount">
+          <div class="price-top">
 
-            ${{ h.precioNoche }}
+            <span class="from">
+              Desde
+            </span>
 
-            <span>
+            <div class="amount">
+
+              ${{ h.precioNoche }}
+
+            </div>
+
+            <span class="night">
               por noche
             </span>
+
+            <small>
+              impuestos incluidos
+            </small>
 
           </div>
 
@@ -262,59 +363,6 @@
           </ion-button>
 
         </div>
-
-      </div>
-
-      <!-- ================= EMPTY ================= -->
-      <div
-        *ngIf="!loading && habitaciones.length === 0"
-        class="empty-state">
-
-        <ion-icon name="bed-outline"></ion-icon>
-
-        <h3>
-          No encontramos habitaciones
-        </h3>
-
-        <p>
-          Prueba cambiando las fechas,
-          la capacidad o el precio máximo.
-        </p>
-
-        <button
-          class="reset-btn"
-          (click)="precioMax = 500; capacidad = 1; loadHabitaciones()">
-
-          Restablecer filtros
-
-        </button>
-
-      </div>
-
-      <!-- ================= PAGINACION ================= -->
-      <div
-        class="pagination"
-        *ngIf="pages > 1">
-
-        <button
-          (click)="prevPage()"
-          [disabled]="page === 1">
-
-          ←
-
-        </button>
-
-        <span>
-          Página {{ page }} de {{ pages }}
-        </span>
-
-        <button
-          (click)="nextPage()"
-          [disabled]="page === pages">
-
-          →
-
-        </button>
 
       </div>
 
