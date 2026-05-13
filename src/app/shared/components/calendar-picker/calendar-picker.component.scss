@@ -1,56 +1,334 @@
-.cal {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+:host {
+  display: block;
 }
 
-.row {
+/* =========================================================
+   CALENDAR WRAPPER
+========================================================= */
+
+.booking-calendar {
+  width: 640px;
+  max-width: 90vw;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.18);
+}
+
+/* =========================================================
+   TOP TABS
+========================================================= */
+
+.calendar-top {
   display: grid;
   grid-template-columns: 1fr 1fr;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab {
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  color: #111827;
+
+  cursor: pointer;
+
+  transition: .15s ease;
+}
+
+.tab.active {
+  color: #006ce4;
+}
+
+.tab.active::after {
+  content: '';
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 3px;
+
+  background: #006ce4;
+}
+
+/* =========================================================
+   MONTHS WRAPPER
+========================================================= */
+
+.months-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 18px;
+
+  padding: 18px 22px 22px;
+}
+
+/* =========================================================
+   MONTH
+========================================================= */
+
+.month {
+  width: 100%;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.month-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 18px;
+}
+
+.month-header h3 {
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  color: #111827;
+
+  text-transform: capitalize;
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.nav-btn {
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: .15s ease;
+}
+
+.nav-btn:hover {
+  background: #f3f4f6;
+}
+
+.nav-btn ion-icon {
+  font-size: 20px;
+}
+
+/* =========================================================
+   WEEKDAYS
+========================================================= */
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+
+  margin-bottom: 10px;
+}
+
+.weekdays span {
+  text-align: center;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #6b7280;
+}
+
+/* =========================================================
+   DAYS GRID
+========================================================= */
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+
+  gap: 2px;
+}
+
+/* =========================================================
+   DAY
+========================================================= */
+
+.day {
+  width: 42px;
+  height: 42px;
+
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  border-radius: 10px;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  color: #111827;
+
+  cursor: pointer;
+
+  transition:
+    background .12s ease,
+    color .12s ease;
+}
+
+.day:hover {
+  background: #f3f4f6;
+}
+
+.day.empty {
+  visibility: hidden;
+}
+
+/* =========================================================
+   TODAY
+========================================================= */
+
+.day.today {
+  border: 1px solid #d1d5db;
+}
+
+/* =========================================================
+   RANGE
+========================================================= */
+
+.day.range,
+.day.preview {
+  background: #e7f0fe;
+  border-radius: 0;
+}
+
+/* =========================================================
+   START / END
+========================================================= */
+
+.day.start,
+.day.end {
+  background: #006ce4;
+
+  color: #ffffff;
+
+  font-weight: 700;
+
+  border-radius: 10px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.calendar-footer {
+  display: flex;
+  align-items: center;
+
   gap: 10px;
 
-  @media (max-width: 520px) {
-    grid-template-columns: 1fr;
-  }
+  flex-wrap: wrap;
+
+  padding: 16px 22px 20px;
+
+  border-top: 1px solid #e5e7eb;
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+/* =========================================================
+   FOOTER BUTTONS
+========================================================= */
 
-.label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  font-size: 13px;
-  color: #2b2b2b;
-}
+.footer-btn {
+  height: 42px;
 
-input[type='date'] {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #e6e6e6;
-  border-radius: 12px;
-  background: #fff;
+  padding: 0 18px;
+
+  border-radius: 999px;
+
+  border: 1px solid #cbd5e1;
+
+  background: #ffffff;
+
   font-size: 14px;
+  font-weight: 600;
+
+  color: #111827;
+
+  cursor: pointer;
+
+  transition: .15s ease;
 }
 
-.clear {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  border: 1px solid #e6e6e6;
-  background: #fff;
-  font-weight: 800;
+.footer-btn:hover {
+  border-color: #006ce4;
+}
+
+.footer-btn.active {
+  border-color: #006ce4;
+
+  color: #006ce4;
+
+  background: #f0f7ff;
+}
+
+/* =========================================================
+   CLEAR
+========================================================= */
+
+.clear-btn {
+  margin-left: auto;
+
+  border: none;
+  background: transparent;
+
+  color: #006ce4;
+
+  font-size: 14px;
+  font-weight: 700;
+
   cursor: pointer;
 }
 
-.clear:hover {
-  background: #f6f7f9;
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .booking-calendar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .months-wrapper {
+    grid-template-columns: 1fr;
+  }
+
 }

@@ -1,40 +1,39 @@
-/* =========================================================
-   SEARCH BAR — BOOKING STYLE REAL
-========================================================= */
-
 :host {
   display: block;
   width: 100%;
 }
 
 /* =========================================================
-   CONTENEDOR
+   SEARCH
 ========================================================= */
 
 .bk-search {
   width: 100%;
   position: relative;
-  z-index: 40;
+  z-index: 9999;
 }
 
 /* =========================================================
-   BARRA PRINCIPAL
+   BAR
 ========================================================= */
 
 .bk-bar {
+  display: grid;
+  grid-template-columns:
+    1.3fr
+    1fr
+    1fr
+    220px;
+
   background: #ffffff;
 
   border: 4px solid #febb02;
-  border-radius: 10px;
+  border-radius: 12px;
 
-  display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 240px;
-
-  overflow: hidden;
+  overflow: visible;
 
   box-shadow:
-    0 8px 24px rgba(0,0,0,0.12),
-    0 2px 8px rgba(0,0,0,0.06);
+    0 12px 34px rgba(0,0,0,.16);
 }
 
 /* =========================================================
@@ -44,21 +43,23 @@
 .bk-item {
   position: relative;
 
+  min-height: 86px;
+
+  padding: 16px 22px;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
-
-  min-height: 84px;
-
-  padding: 18px 22px;
 
   cursor: pointer;
 
   background: #ffffff;
 
-  transition: background .18s ease;
+  transition: background .15s ease;
 
-  border-right: 1px solid #dddddd;
+  border-right: 1px solid #e5e7eb;
+
+  overflow: visible;
 }
 
 .bk-item:last-child {
@@ -66,16 +67,16 @@
 }
 
 .bk-item:hover {
-  background: #f7f7f7;
+  background: #f8fafc;
 }
 
 .bk-item.active {
-  background: #ffffff;
+  background: #f4f8ff;
 
   box-shadow:
     inset 0 0 0 3px #0071c2;
 
-  z-index: 3;
+  z-index: 200;
 }
 
 /* =========================================================
@@ -91,7 +92,6 @@
   font-weight: 700;
 
   text-transform: uppercase;
-  letter-spacing: .3px;
 
   color: #6b7280;
 
@@ -107,12 +107,12 @@
 ========================================================= */
 
 .bk-value-main {
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 700;
 
-  color: #111827;
-
   line-height: 1.2;
+
+  color: #111827;
 }
 
 .bk-value-main.empty {
@@ -120,7 +120,7 @@
 }
 
 /* =========================================================
-   BOTON
+   BUTTON
 ========================================================= */
 
 .bk-action {
@@ -133,30 +133,17 @@
 
   --border-radius: 0;
 
-  height: 100%;
-  min-height: 84px;
-
   margin: 0;
+
+  height: 100%;
+  min-height: 86px;
 
   font-size: 22px;
   font-weight: 800;
 
-  letter-spacing: -.3px;
+  letter-spacing: -.5px;
 
   box-shadow: none;
-}
-
-/* =========================================================
-   BACKDROP
-========================================================= */
-
-.bk-backdrop {
-  position: fixed;
-  inset: 0;
-
-  background: rgba(0,0,0,0.12);
-
-  z-index: 20;
 }
 
 /* =========================================================
@@ -171,20 +158,20 @@
 
   background: #ffffff;
 
-  border-radius: 14px;
-
-  box-shadow:
-    0 20px 60px rgba(0,0,0,0.22);
+  border-radius: 16px;
 
   overflow: hidden;
 
-  z-index: 50;
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.22);
+
+  z-index: 10000;
 
   animation: popIn .16s ease;
 }
 
 /* =========================================================
-   SIZES
+   WIDTHS
 ========================================================= */
 
 /* SUCURSAL */
@@ -195,7 +182,7 @@
 /* FECHAS */
 .bk-item:nth-child(2) .bk-pop {
   width: 760px;
-  max-width: calc(100vw - 40px);
+  max-width: calc(100vw - 30px);
 }
 
 /* HUÉSPEDES */
@@ -204,7 +191,7 @@
 }
 
 /* =========================================================
-   ANIMACION
+   ANIMATION
 ========================================================= */
 
 @keyframes popIn {
@@ -220,7 +207,7 @@
 }
 
 /* =========================================================
-   SUCURSALES
+   BRANCHES
 ========================================================= */
 
 .branch-card {
@@ -234,7 +221,7 @@
 
   cursor: pointer;
 
-  transition: background .16s ease;
+  transition: all .15s ease;
 }
 
 .branch-card:last-child {
@@ -249,12 +236,6 @@
   background: #eaf3ff;
 }
 
-.branch-left {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
 .branch-name {
   font-size: 16px;
   font-weight: 700;
@@ -263,7 +244,7 @@
 
 .branch-desc {
   font-size: 13px;
-  color: #6b7280;
+  color: #64748b;
 }
 
 .branch-right ion-icon {
@@ -272,7 +253,7 @@
 }
 
 /* =========================================================
-   HUESPEDES
+   GUESTS
 ========================================================= */
 
 .guest-row {
@@ -357,6 +338,19 @@
 }
 
 /* =========================================================
+   BACKDROP
+========================================================= */
+
+.bk-backdrop {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0,0,0,.12);
+
+  z-index: 50;
+}
+
+/* =========================================================
    RESPONSIVE
 ========================================================= */
 
@@ -371,12 +365,8 @@
     border-bottom: 1px solid #e5e7eb;
   }
 
-  .bk-action {
-    height: auto;
-  }
-
   .bk-btn {
-    min-height: 68px;
+    min-height: 72px;
     font-size: 20px;
   }
 

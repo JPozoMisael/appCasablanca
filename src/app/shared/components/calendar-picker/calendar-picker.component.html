@@ -1,24 +1,173 @@
-<div class="cal">
-  <div class="row">
-    <label class="field">
-      <span class="label">
-        <ion-icon name="calendar-outline"></ion-icon>
-        Check-in
-      </span>
-      <input type="date" [ngModel]="checkInStr" (ngModelChange)="onCheckIn($event)" />
-    </label>
+<div class="booking-calendar">
 
-    <label class="field">
-      <span class="label">
-        <ion-icon name="calendar-outline"></ion-icon>
-        Check-out
-      </span>
-      <input type="date" [ngModel]="checkOutStr" (ngModelChange)="onCheckOut($event)" />
-    </label>
+  <!-- HEADER -->
+  <div class="calendar-top">
+
+    <div class="tab active">
+      Calendario
+    </div>
+
+    <div class="tab">
+      Fechas flexibles
+    </div>
+
   </div>
 
-  <button type="button" class="clear" (click)="onClear()">
-    <ion-icon name="close-outline"></ion-icon>
-    Limpiar
-  </button>
+  <!-- MONTHS -->
+  <div class="months-wrapper">
+
+    <!-- LEFT -->
+    <div class="month">
+
+      <div class="month-header">
+
+        <button
+          class="nav-btn"
+          (click)="prevMonth()">
+
+          <ion-icon name="chevron-back-outline"></ion-icon>
+
+        </button>
+
+        <h3>
+          {{ getMonthName(currentMonth) }}
+        </h3>
+
+      </div>
+
+      <!-- WEEK -->
+      <div class="weekdays">
+
+        <span *ngFor="let day of weekDays">
+          {{ day }}
+        </span>
+
+      </div>
+
+      <!-- DAYS -->
+      <div class="days-grid">
+
+        <div
+          *ngFor="let day of leftMonthDays"
+
+          class="day"
+
+          [class.empty]="!day.currentMonth"
+
+          [class.start]="isStart(day.date)"
+          [class.end]="isEnd(day.date)"
+
+          [class.range]="isInRange(day.date)"
+          [class.preview]="isPreview(day.date)"
+
+          [class.today]="isToday(day.date)"
+
+          (mouseenter)="hoverDate(day)"
+
+          (click)="selectDate(day)">
+
+          {{ day.label || '' }}
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="month">
+
+      <div class="month-header right">
+
+        <h3>
+          {{ getMonthName(nextMonthDate) }}
+        </h3>
+
+        <button
+          class="nav-btn"
+          (click)="nextMonth()">
+
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+
+        </button>
+
+      </div>
+
+      <!-- WEEK -->
+      <div class="weekdays">
+
+        <span *ngFor="let day of weekDays">
+          {{ day }}
+        </span>
+
+      </div>
+
+      <!-- DAYS -->
+      <div class="days-grid">
+
+        <div
+          *ngFor="let day of rightMonthDays"
+
+          class="day"
+
+          [class.empty]="!day.currentMonth"
+
+          [class.start]="isStart(day.date)"
+          [class.end]="isEnd(day.date)"
+
+          [class.range]="isInRange(day.date)"
+          [class.preview]="isPreview(day.date)"
+
+          [class.today]="isToday(day.date)"
+
+          (mouseenter)="hoverDate(day)"
+
+          (click)="selectDate(day)">
+
+          {{ day.label || '' }}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="calendar-footer">
+
+    <button
+      class="footer-btn active">
+
+      Fechas exactas
+
+    </button>
+
+    <button class="footer-btn">
+      ± 1 día
+    </button>
+
+    <button class="footer-btn">
+      ± 2 días
+    </button>
+
+    <button class="footer-btn">
+      ± 3 días
+    </button>
+
+    <button class="footer-btn">
+      ± 7 días
+    </button>
+
+    <button
+      class="clear-btn"
+      (click)="clearDates()">
+
+      Limpiar
+
+    </button>
+
+  </div>
+
 </div>
