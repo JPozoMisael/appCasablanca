@@ -2,77 +2,103 @@
 
   <div class="wrap">
 
-    <!-- LOGO + BRAND -->
+    <!-- BRAND -->
     <a class="brand" routerLink="/inicio">
-      <div class="logo">{{ logoText }}</div>
+
+      <div class="logo">
+        {{ logoText }}
+      </div>
+
       <div class="txt">
-        <div class="t">{{ title }}</div>
+
+        <div class="t">
+          {{ title }}
+        </div>
+
         <div class="s">
           <ion-icon name="location-outline"></ion-icon>
           {{ subtitle }}
         </div>
+
       </div>
+
     </a>
 
     <!-- NAV -->
     <nav class="nav">
-      <a routerLink="/inicio"
-         routerLinkActive="active"
-         [routerLinkActiveOptions]="{ exact: true }">
+
+      <a
+        routerLink="/inicio"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <ion-icon name="home-outline"></ion-icon>
         Inicio
       </a>
 
       <a routerLink="/inicio#sucursales">
+        <ion-icon name="business-outline"></ion-icon>
         Sucursales
       </a>
 
       <a routerLink="/habitaciones">
+        <ion-icon name="bed-outline"></ion-icon>
         Habitaciones
       </a>
 
       <a routerLink="/ofertas">
+        <ion-icon name="pricetag-outline"></ion-icon>
         Ofertas
       </a>
+
     </nav>
 
     <!-- ACTIONS -->
     <div class="actions">
 
       <a class="login-btn" routerLink="/login">
+        <ion-icon name="person-outline"></ion-icon>
         Iniciar sesión
-      </a>
-
-      <a class="reserve-btn" routerLink="/hotel/palmeras/habitaciones">
-        Reservar ahora
       </a>
 
     </div>
 
-    <!-- MOBILE BUTTON -->
+    <!-- MOBILE -->
     <button class="menu-btn" (click)="toggleMenu()">
-      <ion-icon name="menu-outline"></ion-icon>
+      <ion-icon
+        [name]="menuOpen ? 'close-outline' : 'menu-outline'">
+      </ion-icon>
     </button>
 
   </div>
 
 </header>
 
-<!-- MOBILE MENU -->
+<!-- MOBILE DRAWER -->
 <div class="drawer" [class.open]="menuOpen">
+
   <div class="drawer-content">
 
-    <a routerLink="/inicio" (click)="closeMenu()">Inicio</a>
-    <a routerLink="/inicio#sucursales" (click)="closeMenu()">Sucursales</a>
-    <a routerLink="/habitaciones" (click)="closeMenu()">Habitaciones</a>
-    <a routerLink="/ofertas" (click)="closeMenu()">Ofertas</a>
+    <a routerLink="/inicio" (click)="closeMenu()">
+      Inicio
+    </a>
 
-    <a routerLink="/login" (click)="closeMenu()">Iniciar sesión</a>
+    <a routerLink="/inicio#sucursales" (click)="closeMenu()">
+      Sucursales
+    </a>
 
-    <a routerLink="/hotel/palmeras/habitaciones"
-       class="reserve-drawer"
-       (click)="closeMenu()">
-      Reservar ahora
+    <a routerLink="/habitaciones" (click)="closeMenu()">
+      Habitaciones
+    </a>
+
+    <a routerLink="/ofertas" (click)="closeMenu()">
+      Ofertas
+    </a>
+
+    <a routerLink="/login" (click)="closeMenu()">
+      Iniciar sesión
     </a>
 
   </div>
+
 </div>

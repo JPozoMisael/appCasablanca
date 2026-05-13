@@ -45,7 +45,10 @@ import {
   pricetagOutline,
   sparklesOutline,
   star,
-  starOutline
+  starOutline,
+  homeOutline,
+  businessOutline,
+  
 
 } from 'ionicons/icons';
 
@@ -86,6 +89,8 @@ addIcons({
   // STARS
   'star': star,
   'star-outline': starOutline,
+  'homeOutline': homeOutline,
+  'businessOutline': businessOutline
 
 });
 
