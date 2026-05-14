@@ -291,7 +291,7 @@ export class InicioPage implements OnInit {
 
     return img && img.trim() !== ''
       ? img
-      : 'assets/img/default.jpg';
+      : 'assets/img/2.PNG';
 
   }
 
