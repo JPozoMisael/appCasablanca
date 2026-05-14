@@ -1,81 +1,204 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, map, catchError, of } from 'rxjs';
 
-import { environment } from 'src/environments/environment';
-import { Hotel } from '@app/shared/models/hotel.model';
+import {
+  HttpClient
+} from '@angular/common/http';
+
+import {
+  Observable,
+  map,
+  catchError,
+  of
+} from 'rxjs';
+
+import {
+  environment
+} from 'src/environments/environment';
+
+import {
+  Hotel
+} from '@app/shared/models/hotel.model';
+
+/* ======================================================
+   API RESPONSE
+====================================================== */
 
 interface ApiResponse<T> {
+
   ok: boolean;
+
   data: T;
+
   meta?: any;
 }
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class HotelesService {
 
-  private API = `${environment.apiUrl}/hotels`;
+  /* ======================================================
+     API
+  ====================================================== */
 
-  constructor(private http: HttpClient) {}
+  private API =
+    `${environment.apiUrl}/hotels`;
 
-  // ================= GET ALL =================
+  constructor(
+    private http: HttpClient
+  ) {}
+
+  /* ======================================================
+     GET ALL
+  ====================================================== */
+
   getAll(): Observable<Hotel[]> {
+
     return this.http
-      .get<ApiResponse<Hotel[]>>(this.API)
+      .get<ApiResponse<Hotel[]>>(
+        this.API
+      )
       .pipe(
-        map(res => res.data || []),
+
+        map(
+          res => res.data || []
+        ),
+
         catchError(err => {
-          console.error('Error getAll hoteles:', err);
+
+          console.error(
+            'Error getAll hoteles:',
+            err
+          );
+
           return of([]);
         })
       );
   }
 
-  // ================= RESUMEN =================
+  /* ======================================================
+     RESUMEN
+  ====================================================== */
+
   getResumen(): Observable<Hotel[]> {
+
     return this.http
-      .get<ApiResponse<Hotel[]>>(`${this.API}/resumen`)
+      .get<ApiResponse<Hotel[]>>(
+        `${this.API}/resumen`
+      )
       .pipe(
-        map(res => res.data || []),
+
+        map(
+          res => res.data || []
+        ),
+
         catchError(err => {
-          console.error('Error getResumen:', err);
+
+          console.error(
+            'Error getResumen:',
+            err
+          );
+
           return of([]);
         })
       );
   }
 
-  // ================= BY ID =================
-  getById(id: number): Observable<Hotel | null> {
+  /* ======================================================
+     FEATURED
+  ====================================================== */
+
+  getFeatured(): Observable<any | null> {
+
     return this.http
-      .get<ApiResponse<Hotel>>(`${this.API}/${id}`)
+      .get<ApiResponse<any>>(
+        `${this.API}/featured`
+      )
       .pipe(
-        map(res => res.data || null),
+
+        map(
+          res => res.data || null
+        ),
+
         catchError(err => {
-          console.error('Error getById:', err);
+
+          console.error(
+            'Error getFeatured:',
+            err
+          );
+
           return of(null);
         })
       );
   }
 
-  // ================= BY SLUG =================
-  getBySlug(slug: string): Observable<Hotel | null> {
+  /* ======================================================
+     BY ID
+  ====================================================== */
+
+  getById(
+    id: number
+  ): Observable<Hotel | null> {
+
+    return this.http
+      .get<ApiResponse<Hotel>>(
+        `${this.API}/${id}`
+      )
+      .pipe(
+
+        map(
+          res => res.data || null
+        ),
+
+        catchError(err => {
+
+          console.error(
+            'Error getById:',
+            err
+          );
+
+          return of(null);
+        })
+      );
+  }
+
+  /* ======================================================
+     BY SLUG
+  ====================================================== */
+
+  getBySlug(
+    slug: string
+  ): Observable<Hotel | null> {
 
     if (!slug) {
-      console.error('Slug vacío');
+
+      console.error(
+        'Slug vacío'
+      );
+
       return of(null);
     }
 
     return this.http
-      .get<ApiResponse<Hotel>>(`${this.API}/slug/${slug}`)
+      .get<ApiResponse<Hotel>>(
+        `${this.API}/slug/${slug}`
+      )
       .pipe(
-        map(res => res.data || null),
+
+        map(
+          res => res.data || null
+        ),
+
         catchError(err => {
-          console.error('Error getBySlug:', err);
+
+          console.error(
+            'Error getBySlug:',
+            err
+          );
+
           return of(null);
         })
       );
   }
-
 }

@@ -28,6 +28,7 @@ export class InicioPage implements OnInit {
 
   hoteles: Hotel[] = [];
 
+  featuredHotel: any = null; 
   loading = true;
 
   /* ======================================================
@@ -102,6 +103,8 @@ export class InicioPage implements OnInit {
 
   ngOnInit(): void {
     this.loadHoteles();
+
+    this.featuredHotel();
   }
 
   /* ======================================================
@@ -142,6 +145,48 @@ export class InicioPage implements OnInit {
     });
 
   }
+
+  /* ======================================================
+   FEATURED HOTEL
+====================================================== */
+
+loadFeaturedHotel(): void {
+
+  this.hotelesService
+    .getFeatured()
+    .subscribe({
+
+      next: (hotel) => {
+
+        if (!hotel) {
+          return;
+        }
+
+        this.featuredHotel = {
+
+          ...hotel,
+
+          imagen:
+            this.getImage(
+              hotel.imagen
+            ),
+
+          rating:
+            Number(
+              hotel.rating
+            ) || 4
+        };
+      },
+
+      error: (err) => {
+
+        console.error(
+          'Error featured hotel:',
+          err
+        );
+      }
+    });
+}
 
   /* ======================================================
      IMAGE
