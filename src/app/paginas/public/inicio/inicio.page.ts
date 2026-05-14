@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import {
+  DomSanitizer,
+  SafeResourceUrl
+} from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 
 import { SearchBarComponent } from '@app/shared/components/search-bar/search-bar.component';
@@ -28,7 +31,8 @@ export class InicioPage implements OnInit {
 
   hoteles: Hotel[] = [];
 
-  featuredHotel: any = null; 
+  featuredHotel: Hotel | null = null;
+
   loading = true;
 
   /* ======================================================
@@ -80,69 +84,78 @@ export class InicioPage implements OnInit {
   ];
 
   /* ======================================================
-   EXPERIENCIAS
-====================================================== */
+     EXPERIENCIAS
+  ====================================================== */
 
-experiencias = [
+  experiencias = [
 
-  {
-    title: 'Frente al mar',
+    {
+      title: 'Frente al mar',
 
-    desc:
-      'Despierta con vistas únicas de Salinas',
+      desc:
+        'Despierta con vistas únicas de Salinas',
 
-    image:
-      'assets/img/exp-mar.jpg',
+      image:
+        'assets/img/exp-mar.jpg',
 
-    badge:
-      'Más reservado',
+      badge:
+        'Más reservado',
 
-    button:
-      'Ver habitaciones',
+      button:
+        'Ver habitaciones',
 
-    route:
-      '/hotel/chipipe'
-  },
+      route:
+        '/hotel/chipipe',
 
-  {
-    title: 'Piscina & relax',
+      badgeClass:
+        ''
+    },
 
-    desc:
-      'Suites diseñadas para desconectarte',
+    {
+      title: 'Piscina & relax',
 
-    image:
-      'assets/img/exp-piscina.jpg',
+      desc:
+        'Suites diseñadas para desconectarte',
 
-    badge:
-      'Relax premium',
+      image:
+        'assets/img/exp-piscina.jpg',
 
-    button:
-      'Explorar suites',
+      badge:
+        'Relax premium',
 
-    route:
-      '/rooms/disponibles?tipo=suite'
-  },
+      button:
+        'Explorar suites',
 
-  {
-    title: 'Gastronomía',
+      route:
+        '/hotel/palmeras',
 
-    desc:
-      'Restaurantes y experiencias frente al mar',
+      badgeClass:
+        'secondary'
+    },
 
-    image:
-      'assets/img/exp-food.jpg',
+    {
+      title: 'Gastronomía',
 
-    badge:
-      'Experiencia top',
+      desc:
+        'Restaurantes y experiencias frente al mar',
 
-    button:
-      'Descubrir',
+      image:
+        'assets/img/exp-food.jpg',
 
-    route:
-      '/hotel/palmeras'
-  }
+      badge:
+        'Experiencia top',
 
-];
+      button:
+        'Descubrir',
+
+      route:
+        '/hotel/palmeras',
+
+      badgeClass:
+        'dark'
+    }
+
+  ];
 
   /* ======================================================
      MAP
@@ -167,9 +180,11 @@ experiencias = [
   ====================================================== */
 
   ngOnInit(): void {
+
     this.loadHoteles();
 
-    this.featuredHotel();
+    this.loadFeaturedHotel();
+
   }
 
   /* ======================================================
@@ -180,78 +195,93 @@ experiencias = [
 
     this.loading = true;
 
-    this.hotelesService.getResumen().subscribe({
+    this.hotelesService
+      .getResumen()
+      .subscribe({
 
-      next: (hoteles) => {
+        next: (hoteles) => {
 
-        this.hoteles = hoteles.map(h => ({
+          this.hoteles = hoteles.map(h => ({
 
-          ...h,
+            ...h,
 
-          imagen: this.getImage(h.imagen),
+            imagen:
+              this.getImage(
+                h.imagen
+              ),
 
-          rating: Number((h as any).rating) || 4
+            rating:
+              Number(
+                (h as any).rating
+              ) || 4
 
-        }));
+          }));
 
-        this.loading = false;
-      },
+          this.loading = false;
+        },
 
-      error: (err) => {
+        error: (err) => {
 
-        console.error(
-          'Error cargando hoteles:',
-          err
-        );
+          console.error(
+            'Error cargando hoteles:',
+            err
+          );
 
-        this.loading = false;
-      }
+          this.loading = false;
+        }
 
-    });
+      });
 
   }
 
   /* ======================================================
-   FEATURED HOTEL
-====================================================== */
+     FEATURED HOTEL
+  ====================================================== */
 
-loadFeaturedHotel(): void {
+  loadFeaturedHotel(): void {
 
-  this.hotelesService
-    .getFeatured()
-    .subscribe({
+    this.hotelesService
+      .getFeatured()
+      .subscribe({
 
-      next: (hotel) => {
+        next: (hotel) => {
 
-        if (!hotel) {
-          return;
+          if (!hotel) {
+
+            this.featuredHotel = null;
+
+            return;
+          }
+
+          this.featuredHotel = {
+
+            ...hotel,
+
+            imagen:
+              this.getImage(
+                hotel.imagen
+              ),
+
+            rating:
+              Number(
+                (hotel as any).rating
+              ) || 4
+          };
+        },
+
+        error: (err) => {
+
+          console.error(
+            'Error featured hotel:',
+            err
+          );
+
+          this.featuredHotel = null;
         }
 
-        this.featuredHotel = {
+      });
 
-          ...hotel,
-
-          imagen:
-            this.getImage(
-              hotel.imagen
-            ),
-
-          rating:
-            Number(
-              hotel.rating
-            ) || 4
-        };
-      },
-
-      error: (err) => {
-
-        console.error(
-          'Error featured hotel:',
-          err
-        );
-      }
-    });
-}
+  }
 
   /* ======================================================
      IMAGE
@@ -273,14 +303,17 @@ loadFeaturedHotel(): void {
 
     const stars: string[] = [];
 
-    const fullStars = Math.round(rating);
+    const fullStars =
+      Math.round(rating);
 
     for (let i = 0; i < 5; i++) {
 
       stars.push(
+
         i < fullStars
           ? 'star'
           : 'star-outline'
+
       );
 
     }
@@ -295,13 +328,21 @@ loadFeaturedHotel(): void {
 
   getRatingText(rating: number): string {
 
-    if (rating >= 4.5) return 'Excepcional';
+    if (rating >= 4.5) {
+      return 'Excepcional';
+    }
 
-    if (rating >= 4) return 'Muy bueno';
+    if (rating >= 4) {
+      return 'Muy bueno';
+    }
 
-    if (rating >= 3) return 'Bueno';
+    if (rating >= 3) {
+      return 'Bueno';
+    }
 
-    if (rating >= 2) return 'Aceptable';
+    if (rating >= 2) {
+      return 'Aceptable';
+    }
 
     return 'Básico';
 
@@ -314,7 +355,9 @@ loadFeaturedHotel(): void {
   openMap(event?: Event): void {
 
     if (event) {
+
       event.preventDefault();
+
     }
 
     window.open(
