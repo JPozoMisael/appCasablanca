@@ -1,300 +1,465 @@
 <div class="hotel-page" *ngIf="hotel">
 
-  <!-- ================= HERO ================= -->
-  <section class="hero-pro">
+  <!-- ======================================================
+       HERO / HEADER
+  ======================================================= -->
 
-    <div class="hero-bg">
-      <img [src]="hotel.heroImage" [alt]="hotel.name" />
-    </div>
+  <section class="hotel-hero">
 
-    <div class="hero-overlay"></div>
-
-    <div class="hero-content">
-
-      <div class="hero-left">
-        <div class="hotel-badge">Hotel Casa Blanca</div>
-
-        <h1>{{ hotel.name }}</h1>
-
-        <div class="location">
-          <ion-icon name="location-outline"></ion-icon>
-          <span>{{ hotel.location }}</span>
-        </div>
-
-        <p class="hero-description">
-          {{ hotel.description }}
-        </p>
-
-        <div class="hero-actions">
-          <ion-button class="primary-btn"
-            [routerLink]="['/hotel', slug, 'habitaciones']">
-            <ion-icon name="search-outline" slot="start"></ion-icon>
-            Ver habitaciones
-          </ion-button>
-
-          <div class="hotel-switch">
-
-  <button
-    *ngFor="let h of hotelList"
-    [class.active]="slug === h.id"
-    (click)="changeHotel(h.id)">
-
-    {{ h.name }}
-
-  </button>
-
-</div>
-        </div>
-      </div>
-
-      <div class="hero-card">
-        <div class="hero-card-top">
-          <span class="small-label">Desde</span>
-          <div class="hero-price">
-            <strong>$85</strong>
-            <span>/ noche</span>
-          </div>
-        </div>
-
-        <div class="hero-card-features">
-          <div>Mejor tarifa disponible</div>
-          <div>Reserva inmediata</div>
-          <div>Confirmación rápida</div>
-        </div>
-
-        <button class="cta-btn" (click)="goToAvailability()">
-          Buscar disponibilidad
-        </button>
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- ================= QUICK BAR ================= -->
-  <section class="quick-bar">
-    <div class="quick-bar-container">
-
-      <div class="quick-item">
-        <ion-icon name="calendar-outline"></ion-icon>
-        <div>
-          <span class="label">Fechas</span>
-          <strong>Entrada — Salida</strong>
-        </div>
-      </div>
-
-      <div class="quick-item">
-        <ion-icon name="people-outline"></ion-icon>
-        <div>
-          <span class="label">Huéspedes</span>
-          <strong>2 adultos</strong>
-        </div>
-      </div>
-
-      <div class="quick-item">
-        <ion-icon name="bed-outline"></ion-icon>
-        <div>
-          <span class="label">Disponibilidad</span>
-          <strong>{{ featuredRooms.length}} opciones</strong>
-        </div>
-      </div>
-
-      <button class="quick-btn" (click)="goToAvailability()">
-        <ion-icon name="search-outline"></ion-icon>
-        Ver disponibilidad
-      </button>
-
-    </div>
-  </section>
-
-  <!-- ================= HIGHLIGHTS ================= -->
-  <section class="highlights">
     <div class="page-shell">
 
-      <div class="section-header center">
-        <h2>¿Por qué elegir {{ hotel.name }}?</h2>
-        <p>Una experiencia diseñada para descanso, comodidad y ubicación estratégica.</p>
-      </div>
+      <!-- TOP -->
 
-      <div class="highlights-grid">
+      <div class="hotel-top">
 
-        <div class="highlight-card">
-          <ion-icon name="sunny-outline"></ion-icon>
-          <h3>Ubicación privilegiada</h3>
-          <p>Cerca del mar y de los mejores puntos de interés de Salinas.</p>
-        </div>
+        <div class="hotel-main-info">
 
-        <div class="highlight-card">
-          <ion-icon name="water-outline"></ion-icon>
-          <h3>Ambiente relajante</h3>
-          <p>Espacios pensados para desconectarte y disfrutar la vista.</p>
-        </div>
-
-        <div class="highlight-card">
-          <ion-icon name="shield-checkmark-outline"></ion-icon>
-          <h3>Reserva segura</h3>
-          <p>Un proceso simple, claro y enfocado en la confianza del huésped.</p>
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ================= ROOMS ================= -->
-<section class="rooms-section">
-  <div class="page-shell">
-
-    <div class="section-header">
-      <div>
-        <h2>Habitaciones destacadas</h2>
-        <p>Conoce algunas de las mejores opciones disponibles en este hotel.</p>
-      </div>
-
-      <div class="rooms-header-actions">
-        <button class="toggle-all-btn" (click)="showAll = !showAll">
-          <ion-icon [name]="showAll ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
-          {{ showAll ? 'Ocultar no disponibles' : 'Ver todas las habitaciones' }}
-        </button>
-
-        <span class="see-all" [routerLink]="['/hotel', slug, 'habitaciones']">
-          Ver todas
-        </span>
-      </div>
-    </div>
-
-    <!-- Disponibles -->
-    <p class="rooms-group-label available-label">
-      <ion-icon name="checkmark-circle-outline"></ion-icon>
-      Disponibles ahora ({{ availableRooms.length }})
-    </p>
-
-    <div class="rooms-grid">
-      <div class="room-card" *ngFor="let r of availableRooms">
-        <div class="room-img">
-          <img [src]="r.image" [alt]="r.name" />
-        </div>
-        <div class="info">
-          <h3>{{ r.name }}</h3>
-          <p>{{ r.desc }}</p>
-          <div class="price">
-            <strong>${{ r.price }}</strong>
-            <span>/ noche</span>
+          <div class="hotel-label">
+            HOTEL CASA BLANCA
           </div>
-          <ion-button expand="block" class="secondary-btn"
-            [routerLink]="['/hotel', slug, 'habitaciones']">
-            Ver disponibilidad
-          </ion-button>
-        </div>
-      </div>
-    </div>
 
-    <!-- No disponibles (toggle) -->
-    <ng-container *ngIf="showAll && unavailableRooms.length > 0">
-      <p class="rooms-group-label unavailable-label">
-        <ion-icon name="close-circle-outline"></ion-icon>
-        No disponibles para estas fechas ({{ unavailableRooms.length }})
-      </p>
+          <h1>
+            {{ hotel.name }}
+          </h1>
 
-      <div class="rooms-grid">
-        <div class="room-card room-card--unavailable" *ngFor="let r of unavailableRooms">
-          <div class="room-img">
-            <img [src]="r.image" [alt]="r.name" />
-          </div>
-          <div class="info">
-            <h3>{{ r.name }}</h3>
-            <p>{{ r.desc }}</p>
-            <div class="price">
-              <strong>${{ r.price }}</strong>
-              <span>/ noche</span>
+          <div class="hotel-meta">
+
+            <div class="hotel-location">
+
+              <ion-icon name="location-outline"></ion-icon>
+
+              <span>
+                {{ hotel.location }}
+              </span>
+
             </div>
-            <ion-button expand="block" disabled class="secondary-btn">
-              No disponible
-            </ion-button>
+
+            <button class="map-link">
+              Ver mapa
+            </button>
+
           </div>
+
         </div>
-      </div>
-    </ng-container>
 
-  </div>
-</section>
+        <!-- RATING -->
 
-  <!-- ================= GALLERY ================= -->
-  <section class="gallery-section">
-    <div class="page-shell">
+        <div class="hotel-rating-box">
 
-      <div class="section-header">
-        <div>
-          <h2>Galería</h2>
-          <p>Explora los espacios y la atmósfera de {{ hotel.name }}.</p>
+          <div class="rating-score">
+            9.1
+          </div>
+
+          <div class="rating-info">
+
+            <strong>
+              Fantástico
+            </strong>
+
+            <span>
+              +324 comentarios
+            </span>
+
+          </div>
+
         </div>
+
       </div>
 
-      <div class="gallery-grid">
-        <img *ngFor="let img of hotel.gallery" [src]="img" [alt]="hotel.name" />
-      </div>
+      <!-- QUICK FEATURES -->
 
-    </div>
-  </section>
+      <div class="hotel-features-bar">
 
-  <!-- ================= SERVICES ================= -->
-  <section class="services-section">
-    <div class="page-shell">
-
-      <div class="section-header">
-        <div>
-          <h2>Servicios</h2>
-          <p>Todo lo que necesitas para una estadía cómoda y memorable.</p>
+        <div class="feature-pill">
+          <ion-icon name="wifi-outline"></ion-icon>
+          Wifi gratis
         </div>
-      </div>
 
-      <div class="services-grid">
-
-        <div class="service" *ngFor="let s of hotel.services">
-  <ion-icon [name]="s.icon"></ion-icon>
-  <span>{{ s.name }}</span>
-</div>
-
-        <div class="service">
+        <div class="feature-pill">
           <ion-icon name="water-outline"></ion-icon>
-          <span>Piscina</span>
+          Piscina
         </div>
 
-        <div class="service">
+        <div class="feature-pill">
           <ion-icon name="restaurant-outline"></ion-icon>
-          <span>Desayuno incluido</span>
+          Desayuno incluido
         </div>
 
-        <div class="service">
-          <ion-icon name="thermometer-outline"></ion-icon>
-          <span>Aire acondicionado</span>
+        <div class="feature-pill">
+          <ion-icon name="car-outline"></ion-icon>
+          Parqueadero
         </div>
 
-        <div class="service">
+        <div class="feature-pill">
           <ion-icon name="sunny-outline"></ion-icon>
-          <span>Frente al mar</span>
+          Frente al mar
         </div>
 
       </div>
 
     </div>
+
   </section>
 
-  <!-- ================= CTA FINAL ================= -->
-  <section class="final-cta">
-    <div class="page-shell narrow">
-      <div class="cta-box">
-        <div>
-          <h2>¿Listo para reservar en {{ hotel.name }}?</h2>
-          <p>Consulta disponibilidad y elige la habitación ideal para tu estadía.</p>
+  <!-- ======================================================
+       GALLERY
+  ======================================================= -->
+
+  <section class="gallery-section">
+
+    <div class="page-shell">
+
+      <div class="gallery-layout">
+
+        <!-- MAIN -->
+
+        <div class="gallery-main">
+
+          <img
+            [src]="hotel.heroImage"
+            [alt]="hotel.name"
+          />
+
         </div>
 
-        <ion-button class="primary-btn"
-          [routerLink]="['/hotel', slug, 'habitaciones']">
-          Reservar ahora
-        </ion-button>
+        <!-- SIDE -->
+
+        <div class="gallery-side">
+
+          <img
+            *ngFor="let img of hotel.gallery | slice:0:4"
+            [src]="img"
+            [alt]="hotel.name"
+          />
+
+        </div>
+
       </div>
+
     </div>
+
+  </section>
+
+  <!-- ======================================================
+       HOTEL CONTENT
+  ======================================================= -->
+
+  <section class="hotel-content">
+
+    <div class="page-shell">
+
+      <div class="content-layout">
+
+        <!-- ======================================================
+             LEFT
+        ======================================================= -->
+
+        <div class="content-main">
+
+          <!-- DESCRIPTION -->
+
+          <div class="content-card">
+
+            <h2>
+              Sobre el hotel
+            </h2>
+
+            <p>
+              {{ hotel.description }}
+            </p>
+
+          </div>
+
+          <!-- HIGHLIGHTS -->
+
+          <div class="content-card">
+
+            <h2>
+              Lo más destacado
+            </h2>
+
+            <div class="highlights-grid">
+
+              <div class="highlight-item">
+
+                <ion-icon name="walk-outline"></ion-icon>
+
+                <div>
+
+                  <strong>
+                    Excelente ubicación
+                  </strong>
+
+                  <span>
+                    Cerca del mar y del malecón
+                  </span>
+
+                </div>
+
+              </div>
+
+              <div class="highlight-item">
+
+                <ion-icon name="shield-checkmark-outline"></ion-icon>
+
+                <div>
+
+                  <strong>
+                    Reserva segura
+                  </strong>
+
+                  <span>
+                    Confirmación inmediata
+                  </span>
+
+                </div>
+
+              </div>
+
+              <div class="highlight-item">
+
+                <ion-icon name="bed-outline"></ion-icon>
+
+                <div>
+
+                  <strong>
+                    Habitaciones premium
+                  </strong>
+
+                  <span>
+                    Cómodas y modernas
+                  </span>
+
+                </div>
+
+              </div>
+
+              <div class="highlight-item">
+
+                <ion-icon name="cafe-outline"></ion-icon>
+
+                <div>
+
+                  <strong>
+                    Desayuno disponible
+                  </strong>
+
+                  <span>
+                    Opciones incluidas
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ROOMS -->
+
+          <div class="content-card rooms-card">
+
+            <div class="section-head-inline">
+
+              <div>
+
+                <h2>
+                  Habitaciones disponibles
+                </h2>
+
+                <p>
+                  Selecciona la opción ideal para tu estadía.
+                </p>
+
+              </div>
+
+              <button
+                class="see-all-btn"
+                [routerLink]="['/hotel', slug, 'habitaciones']">
+
+                Ver todas
+
+              </button>
+
+            </div>
+
+            <!-- ROOM -->
+
+            <div
+              class="booking-room"
+              *ngFor="let r of featuredRooms">
+
+              <!-- IMAGE -->
+
+              <div class="booking-room-image">
+
+                <img
+                  [src]="r.image"
+                  [alt]="r.name"
+                />
+
+              </div>
+
+              <!-- INFO -->
+
+              <div class="booking-room-info">
+
+                <h3>
+                  {{ r.name }}
+                </h3>
+
+                <p>
+                  {{ r.desc }}
+                </p>
+
+                <div class="room-benefits">
+
+                  <span>
+                    Wifi gratis
+                  </span>
+
+                  <span>
+                    Aire acondicionado
+                  </span>
+
+                  <span>
+                    Cancelación flexible
+                  </span>
+
+                </div>
+
+              </div>
+
+              <!-- PRICE -->
+
+              <div class="booking-room-price">
+
+                <small>
+                  1 noche
+                </small>
+
+                <strong>
+                  ${{ r.price }}
+                </strong>
+
+                <span>
+                  impuestos incluidos
+                </span>
+
+                <button
+                  [routerLink]="['/hotel', slug, 'habitaciones']">
+
+                  Reservar
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- SERVICES -->
+
+          <div class="content-card">
+
+            <h2>
+              Servicios del hotel
+            </h2>
+
+            <div class="services-list">
+
+              <div
+                class="service-item"
+                *ngFor="let s of hotel.services">
+
+                <ion-icon [name]="s.icon"></ion-icon>
+
+                <span>
+                  {{ s.name }}
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- MAP -->
+
+          <div class="content-card">
+
+            <h2>
+              Ubicación
+            </h2>
+
+            <div class="map-box">
+
+              <iframe [src]="mapUrl"></iframe>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ======================================================
+             SIDEBAR
+        ======================================================= -->
+
+        <aside class="content-sidebar">
+
+          <div class="booking-box">
+
+            <div class="booking-price">
+
+              <small>
+                Desde
+              </small>
+
+              <strong>
+                $85
+              </strong>
+
+              <span>
+                / noche
+              </span>
+
+            </div>
+
+            <div class="booking-benefits">
+
+              <div>
+                ✓ Mejor tarifa disponible
+              </div>
+
+              <div>
+                ✓ Confirmación inmediata
+              </div>
+
+              <div>
+                ✓ Reserva segura
+              </div>
+
+            </div>
+
+            <button
+              class="booking-btn"
+              (click)="goToAvailability()">
+
+              Ver disponibilidad
+
+            </button>
+
+          </div>
+
+        </aside>
+
+      </div>
+
+    </div>
+
   </section>
 
 </div>

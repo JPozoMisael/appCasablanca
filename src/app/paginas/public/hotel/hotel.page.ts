@@ -1,9 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import {
+  ActivatedRoute,
+  Router,
+  RouterModule
+} from '@angular/router';
+
+import {
+  DomSanitizer,
+  SafeResourceUrl
+} from '@angular/platform-browser';
+
+import {
+  IonButton,
+  IonIcon
+} from '@ionic/angular/standalone';
+
 import { addIcons } from 'ionicons';
+
 import {
   locationOutline,
   searchOutline,
@@ -13,10 +28,18 @@ import {
   waterOutline,
   restaurantOutline,
   sunnyOutline,
-  thermometerOutline, bedOutline, shieldCheckmarkOutline, checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
+  thermometerOutline,
+  bedOutline,
+  shieldCheckmarkOutline,
+  checkmarkCircleOutline,
+  closeCircleOutline,
+  walkOutline,
+  cafeOutline,
+  carOutline
+} from 'ionicons/icons';
 
 import { HabitacionesService } from '@app/core/services/habitaciones.service';
-import { HotelesService } from '@app/core/services/hotel.service'; 
+import { HotelesService } from '@app/core/services/hotel.service';
 
 @Component({
   selector: 'app-hotel',
@@ -27,201 +50,555 @@ import { HotelesService } from '@app/core/services/hotel.service';
     CommonModule,
     RouterModule,
     IonButton,
-    IonIcon,
+    IonIcon
   ]
 })
 export class HotelPage implements OnInit {
 
+  /* ======================================================
+     STATE
+  ====================================================== */
+
   slug: string = '';
 
   hotel: any = null;
+
   featuredRooms: any[] = [];
+
   loading = true;
-  
+
   showAll = false;
 
+  mapUrl!: SafeResourceUrl;
+
+  /* ======================================================
+     HOTEL SWITCH
+  ====================================================== */
+
   hotelList = [
-    { id: 'chipipe', name: 'Chipipe' },
-    { id: 'palmeras', name: 'Palmeras' },
-    { id: 'ballenita', name: 'Ballenita' },
+
+    {
+      id: 'chipipe',
+      name: 'Chipipe'
+    },
+
+    {
+      id: 'palmeras',
+      name: 'Palmeras'
+    },
+
+    {
+      id: 'ballenita',
+      name: 'Ballenita'
+    }
+
   ];
+
+  /* ======================================================
+     CONSTRUCTOR
+  ====================================================== */
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private habitacionesService: HabitacionesService,
-    private hotelesService: HotelesService 
+    private hotelesService: HotelesService,
+    private sanitizer: DomSanitizer
   ) {
-    addIcons({locationOutline,searchOutline,calendarOutline,peopleOutline,bedOutline,sunnyOutline,waterOutline,shieldCheckmarkOutline,checkmarkCircleOutline,closeCircleOutline,restaurantOutline,thermometerOutline,wifiOutline});
+
+    addIcons({
+
+      locationOutline,
+      searchOutline,
+      calendarOutline,
+      peopleOutline,
+      bedOutline,
+      sunnyOutline,
+      waterOutline,
+      shieldCheckmarkOutline,
+      checkmarkCircleOutline,
+      closeCircleOutline,
+      restaurantOutline,
+      thermometerOutline,
+      wifiOutline,
+      walkOutline,
+      cafeOutline,
+      carOutline
+
+    });
+
   }
 
-  ngOnInit() {
+  /* ======================================================
+     INIT
+  ====================================================== */
+
+  ngOnInit(): void {
+
     this.route.paramMap.subscribe(params => {
-      this.slug = params.get('slug') || '';
+
+      this.slug =
+        params.get('slug') || '';
 
       if (!this.slug) {
-        console.error('Slug vacío');
+
+        console.error(
+          'Slug vacío'
+        );
+
         return;
       }
 
       this.loadHotel();
+
       this.loadRooms();
+
     });
+
   }
 
-  // ================= HOTEL =================
+  /* ======================================================
+     HOTEL
+  ====================================================== */
 
-  loadHotel() {
+  loadHotel(): void {
 
-    this.hotelesService.getAll().subscribe({
-      next: (res: any) => {
+    this.hotelesService
+      .getAll()
+      .subscribe({
 
-        const hoteles = res.data || [];
+        next: (res: any) => {
 
-        const found = hoteles.find((h: any) =>
-          h.slug === this.slug ||
-          h.nombre.toLowerCase().includes(this.slug)
-        );
+          const hoteles =
+            res.data || [];
 
-        if (found) {
-          this.hotel = {
-            name: found.nombre,
-            location: `${found.ciudad}`,
-            description: found.descripcion,
-            heroImage: 'assets/img/default.jpg', // puedes mejorar esto luego
+          const found =
+            hoteles.find((h: any) =>
 
-            features: [
-              'Ubicación privilegiada',
-              'Alta valoración',
-              'Confort garantizado'
-            ],
+              h.slug === this.slug ||
 
-            services: [
-              { name: 'WiFi', icon: 'wifi-outline' },
-              { name: 'Piscina', icon: 'water-outline' },
-              { name: 'Restaurante', icon: 'restaurant-outline' }
-            ],
+              h.nombre
+                .toLowerCase()
+                .includes(this.slug)
 
-            gallery: [
-              'assets/img/default.jpg',
-              'assets/img/default.jpg',
-              'assets/img/default.jpg'
-            ]
-          };
+            );
 
-        } else {
+          if (found) {
+
+            this.hotel = {
+
+              name:
+                found.nombre,
+
+              location:
+                `${found.ciudad}`,
+
+              description:
+                found.descripcion,
+
+              heroImage:
+                found.imagen ||
+                'assets/img/default.jpg',
+
+              features: [
+
+                'Ubicación privilegiada',
+                'Alta valoración',
+                'Confort garantizado'
+
+              ],
+
+              services: [
+
+                {
+                  name: 'WiFi gratis',
+                  icon: 'wifi-outline'
+                },
+
+                {
+                  name: 'Piscina',
+                  icon: 'water-outline'
+                },
+
+                {
+                  name: 'Restaurante',
+                  icon: 'restaurant-outline'
+                },
+
+                {
+                  name: 'Parqueadero',
+                  icon: 'car-outline'
+                }
+
+              ],
+
+              gallery: [
+
+                found.imagen || 'assets/img/default.jpg',
+                found.imagen || 'assets/img/default.jpg',
+                found.imagen || 'assets/img/default.jpg',
+                found.imagen || 'assets/img/default.jpg',
+                found.imagen || 'assets/img/default.jpg'
+
+              ]
+
+            };
+
+            this.buildMap();
+
+          } else {
+
+            this.loadHotelFallback();
+
+          }
+
+        },
+
+        error: () => {
+
+          console.warn(
+            'Backend no disponible, usando fallback'
+          );
+
           this.loadHotelFallback();
+
         }
-      },
-      error: () => {
-        console.warn('Backend no disponible, usando fallback');
-        this.loadHotelFallback();
-      }
-    });
+
+      });
+
   }
 
-  loadHotelFallback() {
+  /* ======================================================
+     FALLBACK
+  ====================================================== */
+
+  loadHotelFallback(): void {
 
     const hotelesMock: any = {
 
       chipipe: {
-        name: 'Casa Blanca Chipipe',
-        location: 'Chipipe, Salinas',
-        description: 'Frente a la playa más tranquila de Salinas',
-        heroImage: 'assets/img/26.jpeg',
-        features: ['Ambiente familiar', 'Playa tranquila', 'Ideal para descanso'],
-        services: [
-          { name: 'Piscina', icon: 'water-outline' },
-          { name: 'WiFi', icon: 'wifi-outline' },
-          { name: 'Aire acondicionado', icon: 'thermometer-outline' }
+
+        name:
+          'Casa Blanca Chipipe',
+
+        location:
+          'Chipipe, Salinas',
+
+        description:
+          'Frente a la playa más tranquila de Salinas.',
+
+        heroImage:
+          'assets/img/26.jpeg',
+
+        features: [
+
+          'Ambiente familiar',
+          'Playa tranquila',
+          'Ideal para descanso'
+
         ],
-        gallery: ['assets/img/26.jpeg', 'assets/img/26.jpeg']
+
+        services: [
+
+          {
+            name: 'Piscina',
+            icon: 'water-outline'
+          },
+
+          {
+            name: 'WiFi',
+            icon: 'wifi-outline'
+          },
+
+          {
+            name: 'Aire acondicionado',
+            icon: 'thermometer-outline'
+          },
+
+          {
+            name: 'Frente al mar',
+            icon: 'sunny-outline'
+          }
+
+        ],
+
+        gallery: [
+
+          'assets/img/26.jpeg',
+          'assets/img/26.jpeg',
+          'assets/img/26.jpeg',
+          'assets/img/26.jpeg',
+          'assets/img/26.jpeg'
+
+        ]
+
       },
 
       palmeras: {
-        name: 'Casa Blanca Palmeras',
-        location: 'Centro, Salinas',
-        description: 'Zona céntrica, restaurantes y vida nocturna',
-        heroImage: 'assets/img/25.jpeg',
-        features: ['Zona céntrica', 'Cerca de bares', 'Ambiente activo'],
-        services: [
-          { name: 'Restaurante', icon: 'restaurant-outline' },
-          { name: 'Bar', icon: 'wine-outline' },
-          { name: 'WiFi', icon: 'wifi-outline' }
+
+        name:
+          'Casa Blanca Palmeras',
+
+        location:
+          'Centro, Salinas',
+
+        description:
+          'Zona céntrica, restaurantes y vida nocturna.',
+
+        heroImage:
+          'assets/img/25.jpeg',
+
+        features: [
+
+          'Zona céntrica',
+          'Cerca de bares',
+          'Ambiente activo'
+
         ],
-        gallery: ['assets/img/25.jpeg', 'assets/img/25.jpeg']
+
+        services: [
+
+          {
+            name: 'Restaurante',
+            icon: 'restaurant-outline'
+          },
+
+          {
+            name: 'WiFi',
+            icon: 'wifi-outline'
+          },
+
+          {
+            name: 'Frente al mar',
+            icon: 'sunny-outline'
+          }
+
+        ],
+
+        gallery: [
+
+          'assets/img/25.jpeg',
+          'assets/img/25.jpeg',
+          'assets/img/25.jpeg',
+          'assets/img/25.jpeg',
+          'assets/img/25.jpeg'
+
+        ]
+
       },
 
       ballenita: {
-        name: 'Casa Blanca Ballenita',
-        location: 'Ballenita, Santa Elena',
-        description: 'Vista panorámica y máxima tranquilidad',
-        heroImage: 'assets/img/27.jpeg',
-        features: ['Vista al mar', 'Zona tranquila', 'Atardeceres únicos'],
-        services: [
-          { name: 'Piscina', icon: 'water-outline' },
-          { name: 'Vista al mar', icon: 'sunny-outline' },
-          { name: 'WiFi', icon: 'wifi-outline' }
+
+        name:
+          'Casa Blanca Ballenita',
+
+        location:
+          'Ballenita, Santa Elena',
+
+        description:
+          'Vista panorámica y máxima tranquilidad.',
+
+        heroImage:
+          'assets/img/27.jpeg',
+
+        features: [
+
+          'Vista al mar',
+          'Zona tranquila',
+          'Atardeceres únicos'
+
         ],
-        gallery: ['assets/img/27.jpeg', 'assets/img/27.jpeg']
+
+        services: [
+
+          {
+            name: 'Piscina',
+            icon: 'water-outline'
+          },
+
+          {
+            name: 'Vista al mar',
+            icon: 'sunny-outline'
+          },
+
+          {
+            name: 'WiFi',
+            icon: 'wifi-outline'
+          }
+
+        ],
+
+        gallery: [
+
+          'assets/img/27.jpeg',
+          'assets/img/27.jpeg',
+          'assets/img/27.jpeg',
+          'assets/img/27.jpeg',
+          'assets/img/27.jpeg'
+
+        ]
+
       }
 
     };
 
-    this.hotel = hotelesMock[this.slug] || null;
+    this.hotel =
+      hotelesMock[this.slug] || null;
+
+    this.buildMap();
+
   }
 
-  // ================= ROOMS =================
+  /* ======================================================
+     MAP
+  ====================================================== */
 
-  loadRooms() {
+  buildMap(): void {
+
+    const query =
+      encodeURIComponent(
+
+        this.hotel?.location ||
+        'Salinas Ecuador'
+
+      );
+
+    this.mapUrl =
+      this.sanitizer
+        .bypassSecurityTrustResourceUrl(
+
+          `https://www.google.com/maps?q=${query}&output=embed`
+
+        );
+
+  }
+
+  /* ======================================================
+     ROOMS
+  ====================================================== */
+
+  loadRooms(): void {
 
     this.loading = true;
 
-    this.habitacionesService.getByHotel(this.slug).subscribe({
-      next: (rooms) => {
-        console.log('Rooms raw:', rooms);
-        this.featuredRooms = (rooms || [])
-          .map((r: any) => ({
-            id: r.id,
-            numero: Number(r.numero),
-            name: `Habitación ${r.numero}`,
-            desc: r.descripcion || `Piso ${r.piso}`,
-            price: r.precioNoche,
-            image: r.imagenUrl,
-            available: r.disponible ?? true
-          }))
-          .sort((a: any, b: any) => a.numero - b.numero);
+    this.habitacionesService
+      .getByHotel(this.slug)
+      .subscribe({
 
-        this.loading = false;
-      },
-      error: (err: any) => {
-        console.error('Error cargando habitaciones:', err);
-        this.loading = false;
-      }
-    });
+        next: (rooms) => {
+
+          console.log(
+            'Rooms raw:',
+            rooms
+          );
+
+          this.featuredRooms =
+            (rooms || [])
+
+            .map((r: any) => ({
+
+              id:
+                r.id,
+
+              numero:
+                Number(r.numero),
+
+              name:
+                `Habitación ${r.numero}`,
+
+              desc:
+                r.descripcion ||
+                `Piso ${r.piso}`,
+
+              price:
+                r.precioNoche,
+
+              image:
+                r.imagenUrl ||
+                'assets/img/default-room.jpg',
+
+              available:
+                r.disponible ?? true
+
+            }))
+
+            .sort(
+
+              (a: any, b: any) =>
+                a.numero - b.numero
+
+            );
+
+          this.loading = false;
+
+        },
+
+        error: (err: any) => {
+
+          console.error(
+            'Error cargando habitaciones:',
+            err
+          );
+
+          this.loading = false;
+
+        }
+
+      });
+
   }
 
-  // ================= NAV =================
+  /* ======================================================
+     NAVIGATION
+  ====================================================== */
 
-  goToAvailability() {
-    this.router.navigate(['/hotel', this.slug, 'habitaciones']);
+  goToAvailability(): void {
+
+    this.router.navigate([
+
+      '/hotel',
+      this.slug,
+      'habitaciones'
+
+    ]);
+
   }
 
-  changeHotel(newSlug: string) {
+  changeHotel(newSlug: string): void {
 
-    if (newSlug === this.slug) return;
+    if (newSlug === this.slug) {
+      return;
+    }
 
-    this.router.navigate(['/hotel', newSlug], {
+    this.router.navigate([
+
+      '/hotel',
+      newSlug
+
+    ], {
+
       queryParamsHandling: 'merge'
+
     });
+
   }
 
-  // Getter que separa disponibles de no disponibles 
-  get availableRooms(){
-    return this.featuredRooms.filter(r => r.available);
+  /* ======================================================
+     ROOMS GETTERS
+  ====================================================== */
+
+  get availableRooms() {
+
+    return this.featuredRooms
+      .filter(r => r.available);
+
   }
 
-  get unavailableRooms(){
-    return this.featuredRooms.filter(r => !r.available);
+  get unavailableRooms() {
+
+    return this.featuredRooms
+      .filter(r => !r.available);
+
   }
+
 }
