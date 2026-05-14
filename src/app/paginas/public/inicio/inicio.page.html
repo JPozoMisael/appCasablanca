@@ -423,91 +423,159 @@
   </section>
 
   <!-- ======================================================
-       EXPERIENCE
-  ======================================================= -->
+     EXPERIENCE
+======================================================= -->
 
-  <section class="experience">
+<section class="experience-section">
 
-    <div class="container">
+  <div class="container">
 
-      <div class="section-head">
+    <div class="section-head">
 
-        <div>
+      <div>
 
-          <h2>
-            Vive la experiencia Casa Blanca
-          </h2>
+        <h2>
+          Vive la experiencia Casa Blanca
+        </h2>
 
-          <p class="subtitle">
-            Mucho más que solo hospedarte
-          </p>
-
-        </div>
+        <p class="subtitle">
+          Mucho más que solo hospedarte
+        </p>
 
       </div>
 
-      <div class="experience-grid">
+    </div>
 
-        <div class="experience-item">
+    <div class="experience-grid">
+
+      <!-- ITEM -->
+
+      <a
+        class="experience-card"
+        [routerLink]="['/hotel/chipipe']"
+      >
+
+        <div class="experience-image">
 
           <img src="assets/img/1.PNG" />
 
-          <div class="experience-info">
+          <div class="experience-overlay"></div>
+
+          <span class="experience-badge">
+            Más reservado
+          </span>
+
+        </div>
+
+        <div class="experience-body">
+
+          <div class="experience-content">
 
             <h3>
               Frente al mar
             </h3>
 
             <p>
-              Despierta con vistas únicas de Salinas
+              Despierta con vistas únicas de Salinas y acceso directo a la playa.
             </p>
 
           </div>
 
+          <button>
+            Ver habitaciones
+          </button>
+
         </div>
 
-        <div class="experience-item">
+      </a>
+
+      <!-- ITEM -->
+
+      <a
+        class="experience-card"
+        [routerLink]="['/habitaciones']"
+      >
+
+        <div class="experience-image">
 
           <img src="assets/img/9.PNG" />
 
-          <div class="experience-info">
+          <div class="experience-overlay"></div>
+
+          <span class="experience-badge secondary">
+            Relax premium
+          </span>
+
+        </div>
+
+        <div class="experience-body">
+
+          <div class="experience-content">
 
             <h3>
               Piscina & relax
             </h3>
 
             <p>
-              Espacios diseñados para desconectarte
+              Suites y espacios diseñados para desconectarte completamente.
             </p>
 
           </div>
 
+          <button>
+            Explorar suites
+          </button>
+
         </div>
 
-        <div class="experience-item">
+      </a>
+
+      <!-- ITEM -->
+
+      <a
+        class="experience-card"
+        [routerLink]="['/hotel/palmeras']"
+      >
+
+        <div class="experience-image">
 
           <img src="assets/img/4.PNG" />
 
-          <div class="experience-info">
+          <div class="experience-overlay"></div>
+
+          <span class="experience-badge dark">
+            Experiencia top
+          </span>
+
+        </div>
+
+        <div class="experience-body">
+
+          <div class="experience-content">
 
             <h3>
               Gastronomía
             </h3>
 
             <p>
-              Restaurantes y experiencias cerca de ti
+              Restaurantes, bares y experiencias frente al mar cerca de ti.
             </p>
 
           </div>
 
+          <button>
+            Descubrir
+          </button>
+
         </div>
 
-      </div>
+      </a>
 
     </div>
 
-  </section>
+  </div>
 
+</section>
   <!-- ======================================================
        SERVICES
   ======================================================= -->

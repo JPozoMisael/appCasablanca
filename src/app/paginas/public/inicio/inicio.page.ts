@@ -80,6 +80,71 @@ export class InicioPage implements OnInit {
   ];
 
   /* ======================================================
+   EXPERIENCIAS
+====================================================== */
+
+experiencias = [
+
+  {
+    title: 'Frente al mar',
+
+    desc:
+      'Despierta con vistas únicas de Salinas',
+
+    image:
+      'assets/img/exp-mar.jpg',
+
+    badge:
+      'Más reservado',
+
+    button:
+      'Ver habitaciones',
+
+    route:
+      '/hotel/chipipe'
+  },
+
+  {
+    title: 'Piscina & relax',
+
+    desc:
+      'Suites diseñadas para desconectarte',
+
+    image:
+      'assets/img/exp-piscina.jpg',
+
+    badge:
+      'Relax premium',
+
+    button:
+      'Explorar suites',
+
+    route:
+      '/rooms/disponibles?tipo=suite'
+  },
+
+  {
+    title: 'Gastronomía',
+
+    desc:
+      'Restaurantes y experiencias frente al mar',
+
+    image:
+      'assets/img/exp-food.jpg',
+
+    badge:
+      'Experiencia top',
+
+    button:
+      'Descubrir',
+
+    route:
+      '/hotel/palmeras'
+  }
+
+];
+
+  /* ======================================================
      MAP
   ====================================================== */
 
