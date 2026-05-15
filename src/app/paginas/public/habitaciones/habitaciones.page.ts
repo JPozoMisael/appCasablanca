@@ -1,457 +1,492 @@
-import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 
-import { HabitacionesService } from '@app/core/services/habitaciones.service';
+import {
+  IonIcon,
+  IonButton
+} from '@ionic/angular/standalone';
+
+import { addIcons } from 'ionicons';
+
+import {
+
+  peopleOutline,
+  bedOutline,
+  wifiOutline,
+  waterOutline,
+  snowOutline,
+  starOutline,
+  searchOutline,
+  businessOutline,
+  calendarOutline,
+  heartOutline,
+  checkmarkOutline,
+  locationOutline,
+  checkmarkCircleOutline,
+  sparklesOutline
+
+} from 'ionicons/icons';
+
+/* ======================================================
+   TYPES
+====================================================== */
+
+interface Habitacion {
+
+  id: number;
+  tipo: string;
+  capacidad: number;
+  camas: number;
+  precioNoche: number;
+  tarifa?: number;
+  rating: number;
+  imagenUrl: string;
+  imagen?:string;
+  descripcion: string;
+  amenities: string[];
+  totalReviews?: number;
+
+}
+
+/* ======================================================
+   COMPONENT
+====================================================== */
 
 @Component({
+
   selector: 'app-habitaciones',
-  templateUrl: './habitaciones.page.html',
-  styleUrls: ['./habitaciones.page.scss'],
+
   standalone: true,
+
   imports: [
-    IonicModule,
+
     CommonModule,
-    FormsModule
-  ]
+    FormsModule,
+    IonIcon,
+    IonButton
+
+  ],
+
+  templateUrl: './habitaciones.page.html',
+
+  styleUrls: ['./habitaciones.page.scss']
+
 })
-export class HabitacionesPage implements OnInit {
 
-  // =====================================================
-  // STATE
-  // =====================================================
+export class HabitacionesPage {
 
-  loading = false;
+  /* ======================================================
+     SEARCH INFO
+  ====================================================== */
 
-  habitaciones: any[] = [];
+  checkIn = '15 May';
 
-  slug: string = '';
-
-  filters: any = {};
-
-  // =====================================================
-  // UI FILTERS
-  // =====================================================
-
-  precioMin: number = 0;
-
-  precioMax: number = 500;
-
-  capacidad: number = 1;
-
-  sort: string = 'recomendado';
-
-  cancelacionGratis = false;
-
-  desayunoIncluido = false;
-
-  // =====================================================
-  // PAGINATION
-  // =====================================================
-
-  page: number = 1;
-
-  limit: number = 10;
-
-  total: number = 0;
-
-  pages: number = 0;
-
-  // =====================================================
-  // SEARCH INFO
-  // =====================================================
-
-  checkIn = '';
-
-  checkOut = '';
+  checkOut = '17 May';
 
   adults = 2;
 
-  children = 0;
-
   rooms = 1;
 
-  nights = 1;
+  hotelName = 'Casa Blanca Chipipe';
 
-  // =====================================================
-  // HOTEL INFO
-  // =====================================================
+  nights = 2;
 
-  hotelName = 'Casa Blanca';
+  /* ======================================================
+     FILTERS
+  ====================================================== */
 
-  hotelLocation = 'Salinas, Ecuador';
+  loading = false;
 
-  constructor(
-    private habitacionesService: HabitacionesService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
+  sort:
+    | 'recomendado'
+    | 'precio_asc'
+    | 'precio_desc'
+    = 'recomendado';
 
-  // =====================================================
-  // INIT
-  // =====================================================
+  precioMax = 500;
 
-  ngOnInit(): void {
+  capacidad = 1;
 
-    this.slug =
-      this.route.snapshot.paramMap.get('slug') || '';
+  /* ======================================================
+     HOTEL ACTUAL
+     🔥 CAMBIAR AQUÍ:
+     chipipe
+     palmeras
+     ballenita
+  ====================================================== */
 
-    this.resolveHotelInfo();
+  hotelSlug = 'chipipe';
 
-    this.route.queryParams.subscribe(params => {
+  /* ======================================================
+     DATA
+  ====================================================== */
 
-      // =================================================
-      // SEARCH FILTERS
-      // =================================================
+  habitaciones = signal<Habitacion[]>([
 
-      this.filters = {
+    /* ==================================================
+       CHIPIPE
+    =================================================== */
 
-        checkIn: params['checkIn'],
+    {
 
-        checkOut: params['checkOut'],
+      id: 1,
 
-        adults: Number(params['adults'] ?? 2),
+      tipo: 'Suite Ocean Front',
 
-        children: Number(params['children'] ?? 0),
+      capacidad: 3,
 
-        rooms: Number(params['rooms'] ?? 1),
+      camas: 2,
 
-        withPets: Number(params['withPets'] ?? 0)
-      };
+      precioNoche: 145,
 
-      // =================================================
-      // SUMMARY
-      // =================================================
+      tarifa: 145,
 
-      this.checkIn = params['checkIn'] || '';
+      rating: 9.2,
 
-      this.checkOut = params['checkOut'] || '';
+      totalReviews: 421,
 
-      this.adults =
-        Number(params['adults'] ?? 2);
+      /*
+      ===================================================
+      🔥 CAMBIAR IMAGEN AQUÍ
+      ===================================================
+      */
 
-      this.children =
-        Number(params['children'] ?? 0);
+      imagenUrl:
+        'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1400&auto=format&fit=crop',
 
-      this.rooms =
-        Number(params['rooms'] ?? 1);
+      descripcion:
+        'Suite premium frente al mar con balcón privado y acceso exclusivo a piscina.',
 
-      this.calculateNights();
+      amenities: [
 
-      // =================================================
-      // RESET PAGE
-      // =================================================
+        'WiFi gratis',
+        'Vista al mar',
+        'Piscina',
+        'Aire acondicionado'
 
-      this.page = 1;
+      ]
 
-      this.loadHabitaciones();
+    },
+
+    {
+
+      id: 2,
+
+      tipo: 'Habitación Doble Deluxe',
+
+      capacidad: 2,
+
+      camas: 2,
+
+      precioNoche: 95,
+
+      tarifa: 95,
+
+      rating: 8.8,
+
+      totalReviews: 287,
+
+      imagenUrl:
+        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1400&auto=format&fit=crop',
+
+      descripcion:
+        'Habitación elegante con desayuno incluido y excelente ubicación.',
+
+      amenities: [
+
+        'WiFi gratis',
+        'TV Smart',
+        'Desayuno incluido'
+
+      ]
+
+    },
+
+    {
+
+      id: 3,
+
+      tipo: 'Habitación Simple',
+
+      capacidad: 1,
+
+      camas: 1,
+
+      precioNoche: 65,
+
+      tarifa: 65,
+
+      rating: 8.4,
+
+      totalReviews: 143,
+
+      imagenUrl:
+        'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1400&auto=format&fit=crop',
+
+      descripcion:
+        'Ideal para viajes rápidos y cómodos cerca de la playa.',
+
+      amenities: [
+
+        'WiFi gratis',
+        'Aire acondicionado'
+
+      ]
+
+    },
+
+    /* ==================================================
+       PALMERAS
+       🔥 DESCOMENTA CUANDO QUIERAS USARLAS
+    =================================================== */
+
+    /*
+    {
+
+      id: 4,
+
+      tipo: 'Suite Ejecutiva',
+
+      capacidad: 2,
+
+      camas: 1,
+
+      precioNoche: 120,
+
+      tarifa: 120,
+
+      rating: 9.0,
+
+      totalReviews: 312,
+
+      imagenUrl:
+        'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?q=80&w=1400&auto=format&fit=crop',
+
+      descripcion:
+        'Suite moderna en zona urbana premium.',
+
+      amenities: [
+
+        'WiFi gratis',
+        'Smart TV',
+        'Rooftop'
+
+      ]
+
+    },
+    */
+
+    /* ==================================================
+       BALLENITA
+       🔥 DESCOMENTA CUANDO QUIERAS USARLAS
+    =================================================== */
+
+    /*
+    {
+
+      id: 5,
+
+      tipo: 'Suite Sunset',
+
+      capacidad: 4,
+
+      camas: 2,
+
+      precioNoche: 180,
+
+      tarifa: 180,
+
+      rating: 9.5,
+
+      totalReviews: 501,
+
+      imagenUrl:
+        'https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=1400&auto=format&fit=crop',
+
+      descripcion:
+        'Suite de lujo con vista panorámica al océano.',
+
+      amenities: [
+
+        'Jacuzzi',
+        'Vista panorámica',
+        'Piscina infinita'
+
+      ]
+
+    },
+    */
+
+  ]);
+
+  /* ======================================================
+     FILTERED
+  ====================================================== */
+
+  filtradas = computed(() => {
+
+    let rooms = this.habitaciones()
+
+      .filter(h =>
+
+        h.precioNoche <= this.precioMax &&
+
+        h.capacidad >= this.capacidad
+
+      );
+
+    /* ==================================================
+       SORT
+    =================================================== */
+
+    if (this.sort === 'precio_asc') {
+
+      rooms = [...rooms].sort(
+
+        (a, b) =>
+
+          a.precioNoche -
+          b.precioNoche
+
+      );
+
+    }
+
+    if (this.sort === 'precio_desc') {
+
+      rooms = [...rooms].sort(
+
+        (a, b) =>
+
+          b.precioNoche -
+          a.precioNoche
+
+      );
+
+    }
+
+    if (this.sort === 'recomendado') {
+
+      rooms = [...rooms].sort(
+
+        (a, b) =>
+
+          b.rating -
+          a.rating
+
+      );
+
+    }
+
+    return rooms;
+
+  });
+
+  /* ======================================================
+     TOTAL
+  ====================================================== */
+
+  total = computed(() =>
+
+    this.filtradas().length
+
+  );
+
+  /* ======================================================
+     CONSTRUCTOR
+  ====================================================== */
+
+  constructor() {
+
+    addIcons({
+
+      peopleOutline,
+      bedOutline,
+      wifiOutline,
+      waterOutline,
+      snowOutline,
+      starOutline,
+      searchOutline,
+      businessOutline,
+      calendarOutline,
+      heartOutline,
+      checkmarkOutline,
+      locationOutline,
+      checkmarkCircleOutline,
+      sparklesOutline
+
     });
+
   }
 
-  // =====================================================
-  // LOAD
-  // =====================================================
+  /* ======================================================
+     LOAD
+  ====================================================== */
 
   loadHabitaciones(): void {
 
     this.loading = true;
 
-    const finalFilters = {
+    setTimeout(() => {
 
-      ...this.filters,
+      this.loading = false;
 
-      precioMin: this.precioMin,
+    }, 250);
 
-      precioMax: this.precioMax,
-
-      capacidad: this.capacidad,
-
-      sort: this.sort,
-
-      page: this.page,
-
-      limit: this.limit
-    };
-
-    this.habitacionesService
-      .getDisponiblesByHotel(
-        this.slug,
-        finalFilters
-      )
-      .subscribe({
-
-        next: (res) => {
-
-          // =============================================
-          // DATA
-          // =============================================
-
-          const data = res?.data || [];
-
-          this.habitaciones = data.map((h: any) => ({
-
-            ...h,
-
-            rating:
-              h.rating ||
-              this.randomRating(),
-
-            reviews:
-              h.reviews ||
-              this.randomReviews(),
-
-            camas:
-              h.camas || 1,
-
-            score:
-              h.score || 950,
-
-            imagenUrl:
-              h.imagenUrl ||
-              'assets/img/default-room.jpg',
-
-            descripcion:
-              h.descripcion ||
-              'Habitación moderna y confortable ideal para disfrutar tu estadía frente al mar.',
-
-            precioNoche:
-              h.precioNoche ||
-              h.precio ||
-              55
-          }));
-
-          // =============================================
-          // META
-          // =============================================
-
-          this.total =
-            res?.meta?.total || 0;
-
-          this.pages =
-            res?.meta?.pages || 0;
-
-          this.loading = false;
-        },
-
-        error: (err) => {
-
-          console.error(
-            'ERROR CARGANDO HABITACIONES:',
-            err
-          );
-
-          this.loading = false;
-        }
-      });
   }
 
-  // =====================================================
-  // HOTEL INFO
-  // =====================================================
+  /* ======================================================
+     IMAGE FALLBACK
+  ====================================================== */
 
-  resolveHotelInfo(): void {
+  onImageError(event: any): void {
 
-    switch (this.slug) {
+    /*
+    =====================================================
+    🔥 IMAGEN FALLBACK
+    =====================================================
+    */
 
-      case 'palmeras':
+    event.target.src =
+      'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1400&auto=format&fit=crop';
 
-        this.hotelName =
-          'Casa Blanca Palmeras';
-
-        this.hotelLocation =
-          'Salinas Centro';
-
-        break;
-
-      case 'chipipe':
-
-        this.hotelName =
-          'Casa Blanca Chipipe';
-
-        this.hotelLocation =
-          'Chipipe, Salinas';
-
-        break;
-
-      case 'ballenita':
-
-        this.hotelName =
-          'Casa Blanca Ballenita';
-
-        this.hotelLocation =
-          'Santa Elena, Ballenita';
-
-        break;
-
-      default:
-
-        this.hotelName =
-          'Casa Blanca';
-
-        this.hotelLocation =
-          'Salinas, Ecuador';
-    }
   }
 
-  // =====================================================
-  // NIGHTS
-  // =====================================================
-
-  calculateNights(): void {
-
-    if (!this.checkIn || !this.checkOut) {
-
-      this.nights = 1;
-
-      return;
-    }
-
-    const start =
-      new Date(this.checkIn);
-
-    const end =
-      new Date(this.checkOut);
-
-    const diff =
-      end.getTime() - start.getTime();
-
-    const total =
-      Math.ceil(
-        diff / (1000 * 60 * 60 * 24)
-      );
-
-    this.nights =
-      total > 0 ? total : 1;
-  }
-
-  // =====================================================
-  // FILTERS
-  // =====================================================
-
-  applyFilters(): void {
-
-    this.page = 1;
-
-    this.loadHabitaciones();
-  }
-
-  clearFilters(): void {
-
-    this.precioMin = 0;
-
-    this.precioMax = 500;
-
-    this.capacidad = 1;
-
-    this.cancelacionGratis = false;
-
-    this.desayunoIncluido = false;
-
-    this.sort = 'recomendado';
-
-    this.applyFilters();
-  }
-
-  // =====================================================
-  // PAGINATION
-  // =====================================================
-
-  nextPage(): void {
-
-    if (this.page < this.pages) {
-
-      this.page++;
-
-      this.loadHabitaciones();
-    }
-  }
-
-  prevPage(): void {
-
-    if (this.page > 1) {
-
-      this.page--;
-
-      this.loadHabitaciones();
-    }
-  }
-
-  // =====================================================
-  // NAVIGATION
-  // =====================================================
-
-  goToDetalle(h: any): void {
-
-    this.router.navigate(
-      ['/habitacion-detalle', h.id],
-      {
-        queryParams: this.filters
-      }
-    );
-  }
-
-  editSearch(): void {
-
-    this.router.navigate(
-      ['/hotel', this.slug]
-    );
-  }
-
-  // =====================================================
-  // HELPERS
-  // =====================================================
-
-  guestsText(): string {
-
-    const totalGuests =
-      this.adults + this.children;
-
-    return `${totalGuests} huésped(es), ${this.rooms} habitación(es)`;
-  }
-
-  randomRating(): number {
-
-    return Number(
-      (8 + Math.random() * 1.8).toFixed(1)
-    );
-  }
-
-  randomReviews(): number {
-
-    return Math.floor(
-      120 + Math.random() * 1500
-    );
-  }
-
-  getRatingText(rating: number): string {
-
-    if (rating >= 9) {
-      return 'Fantástico';
-    }
-
-    if (rating >= 8.5) {
-      return 'Muy bien';
-    }
-
-    if (rating >= 8) {
-      return 'Excelente';
-    }
-
-    return 'Bueno';
-  }
-
-  // =====================================================
-  // TRACK
-  // =====================================================
+  /* ======================================================
+     TRACKBY
+  ====================================================== */
 
   trackById(
     index: number,
-    item: any
+    item: Habitacion
   ): number {
 
     return item.id;
+
+  }
+
+  /* ======================================================
+     DETAIL
+  ====================================================== */
+
+  goToDetalle(h: Habitacion): void {
+
+    /*
+    =====================================================
+     AQUÍ LUEGO IRÁ:
+    this.router.navigate(...)
+    =====================================================
+    */
+
+    console.log(
+
+      'Abrir detalle:',
+
+      h
+
+    );
+
   }
 
 }

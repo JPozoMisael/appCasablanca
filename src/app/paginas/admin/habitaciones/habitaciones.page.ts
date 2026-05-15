@@ -29,6 +29,15 @@ interface Habitacion {
   tarifa: number;     // por noche
   estado: EstadoHab;
   notas?: string;
+  imagen?: string;
+  imagenUrl?: string;
+  descripcion?: string;
+  size?: number;
+  amenities?: string[];
+  camas?: number;
+  rating?: number;
+  totalReviews?: number;
+  precioNoche?: number;
 }
 
 type ModalMode = 'create' | 'edit';

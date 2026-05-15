@@ -6,41 +6,90 @@
 
   <div class="search-summary">
 
-    <div class="summary-item">
+    <div class="summary-left">
 
-      <ion-icon name="business-outline"></ion-icon>
+      <div class="summary-item">
 
-      <div>
-        <strong>Casa Blanca Palmeras</strong>
-        <span>Salinas, Ecuador</span>
+        <div class="summary-icon">
+          <ion-icon name="business-outline"></ion-icon>
+        </div>
+
+        <div class="summary-content">
+
+          <strong>
+            {{ hotelName || 'Casa Blanca Palmeras' }}
+          </strong>
+
+          <span>
+            Salinas, Ecuador
+          </span>
+
+        </div>
+
       </div>
 
-    </div>
+      <div class="summary-divider"></div>
 
-    <div class="summary-item">
+      <div class="summary-item">
 
-      <ion-icon name="calendar-outline"></ion-icon>
+        <div class="summary-icon">
+          <ion-icon name="calendar-outline"></ion-icon>
+        </div>
 
-      <div>
-        <strong>{{ checkIn }} - {{ checkOut }}</strong>
-        <span>2 noches</span>
+        <div class="summary-content">
+
+          <strong>
+
+            {{ checkIn || 'Seleccionar' }}
+            —
+            {{ checkOut || 'Seleccionar' }}
+
+          </strong>
+
+          <span>
+
+            {{ nights || 0 }} noches
+
+          </span>
+
+        </div>
+
       </div>
 
-    </div>
+      <div class="summary-divider"></div>
 
-    <div class="summary-item">
+      <div class="summary-item">
 
-      <ion-icon name="people-outline"></ion-icon>
+        <div class="summary-icon">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
 
-      <div>
-        <strong>{{ adults }} adultos</strong>
-        <span>{{ rooms }} habitación</span>
+        <div class="summary-content">
+
+          <strong>
+
+            {{ adults || 2 }} adultos
+
+          </strong>
+
+          <span>
+
+            {{ rooms || 1 }} habitación
+
+          </span>
+
+        </div>
+
       </div>
 
     </div>
 
     <button class="edit-search">
+
+      <ion-icon name="search-outline"></ion-icon>
+
       Modificar búsqueda
+
     </button>
 
   </div>
@@ -51,35 +100,72 @@
 
   <div class="header">
 
-    <div class="header-text">
+    <div class="header-left">
 
       <h1>
+
         Habitaciones disponibles
+
       </h1>
 
       <p>
-        {{ total }} opciones encontradas para tus fechas
+
+        {{ habitaciones().length }}
+
+        opciones encontradas para tus fechas
+
       </p>
+
+    </div>
+
+    <div class="header-right">
+
+      <div class="mini-score">
+
+        <div class="mini-score-text">
+
+          <strong>
+            Fantástico
+          </strong>
+
+          <span>
+            321 comentarios
+          </span>
+
+        </div>
+
+        <div class="mini-score-box">
+
+          8.9
+
+        </div>
+
+      </div>
 
     </div>
 
   </div>
 
   <!-- =========================================================
-       SORT
+       SORT BAR
   ========================================================== -->
 
   <div class="sort-bar">
 
     <div class="sort-left">
 
-      <span>Ordenar por:</span>
+      <span>
+
+        Ordenar por:
+
+      </span>
 
       <button
         [class.active]="sort === 'recomendado'"
         (click)="sort='recomendado'; loadHabitaciones()">
 
         Recomendado
+
       </button>
 
       <button
@@ -87,6 +173,7 @@
         (click)="sort='precio_asc'; loadHabitaciones()">
 
         Precio menor
+
       </button>
 
       <button
@@ -94,6 +181,7 @@
         (click)="sort='precio_desc'; loadHabitaciones()">
 
         Precio mayor
+
       </button>
 
     </div>
@@ -112,76 +200,119 @@
 
     <aside class="filters">
 
-      <h3>Filtrar por</h3>
+      <div class="filters-card">
 
-      <!-- PRICE -->
+        <h3>
 
-      <div class="filter">
+          Filtrar por
 
-        <label>
-          Precio máximo
-        </label>
+        </h3>
 
-        <input
-          type="range"
-          [(ngModel)]="precioMax"
-          (change)="loadHabitaciones()"
-          min="20"
-          max="500"
-        />
+        <!-- PRICE -->
 
-        <div class="price-value">
-          Hasta ${{ precioMax }}
-        </div>
+        <div class="filter">
 
-      </div>
+          <label>
 
-      <!-- CAPACITY -->
+            Precio máximo
 
-      <div class="filter">
+          </label>
 
-        <label>Capacidad</label>
+          <input
+            type="range"
+            [(ngModel)]="precioMax"
+            (change)="loadHabitaciones()"
+            min="20"
+            max="500"
+          />
 
-        <select
-          [(ngModel)]="capacidad"
-          (change)="loadHabitaciones()">
+          <div class="price-value">
 
-          <option [value]="1">1+ personas</option>
-          <option [value]="2">2+ personas</option>
-          <option [value]="3">3+ personas</option>
-          <option [value]="4">4+ personas</option>
+            Hasta ${{ precioMax }}
 
-        </select>
-
-      </div>
-
-      <!-- BENEFITS -->
-
-      <div class="filter">
-
-        <label>Beneficios</label>
-
-        <div class="check">
-
-          <input type="checkbox">
-
-          <span>Cancelación gratis</span>
+          </div>
 
         </div>
 
-        <div class="check">
+        <!-- CAPACITY -->
 
-          <input type="checkbox">
+        <div class="filter">
 
-          <span>Desayuno incluido</span>
+          <label>
+
+            Capacidad
+
+          </label>
+
+          <select
+            [(ngModel)]="capacidad"
+            (change)="loadHabitaciones()">
+
+            <option [value]="1">
+              1+ personas
+            </option>
+
+            <option [value]="2">
+              2+ personas
+            </option>
+
+            <option [value]="3">
+              3+ personas
+            </option>
+
+            <option [value]="4">
+              4+ personas
+            </option>
+
+          </select>
 
         </div>
 
-        <div class="check">
+        <!-- BENEFITS -->
 
-          <input type="checkbox">
+        <div class="filter">
 
-          <span>Piscina</span>
+          <label>
+
+            Beneficios
+
+          </label>
+
+          <div class="check">
+
+            <input type="checkbox">
+
+            <span>
+
+              Cancelación gratis
+
+            </span>
+
+          </div>
+
+          <div class="check">
+
+            <input type="checkbox">
+
+            <span>
+
+              Desayuno incluido
+
+            </span>
+
+          </div>
+
+          <div class="check">
+
+            <input type="checkbox">
+
+            <span>
+
+              Piscina
+
+            </span>
+
+          </div>
 
         </div>
 
@@ -205,65 +336,123 @@
 
       </div>
 
-      <!-- =========================================================
-           CARDS
-      ========================================================== -->
+      <!-- EMPTY -->
 
       <div
-        *ngFor="let h of habitaciones; trackBy: trackById"
-        class="card">
+        *ngIf="!loading && habitaciones().length === 0"
+        class="empty-state">
 
-        <!-- IMAGE -->
+        <ion-icon name="bed-outline"></ion-icon>
 
-        <div class="img">
+        <h3>
+
+          No encontramos habitaciones
+
+        </h3>
+
+        <p>
+
+          Prueba cambiando fechas o filtros.
+
+        </p>
+
+      </div>
+
+      <!-- =====================================================
+           BOOKING CARDS
+      ====================================================== -->
+
+      <div
+        *ngFor="let h of habitaciones(); trackBy: trackById"
+        class="booking-card">
+
+        <!-- =====================================================
+             IMAGE
+        ====================================================== -->
+
+        <div class="booking-image">
 
           <img
-            [src]="h.imagenUrl"
+
+            [src]="
+              h.imagenUrl ||
+              h.imagen ||
+              'assets/img/default-room.jpg'
+            "
+
             [alt]="h.tipo"
+
+            (error)="onImageError($event)"
+
           />
 
-          <div class="favorite">
+          <div class="image-badge">
 
-            <ion-icon name="heart-outline"></ion-icon>
+            Oferta Genius
 
           </div>
 
+          <button class="favorite-btn">
+
+            <ion-icon name="heart-outline"></ion-icon>
+
+          </button>
+
         </div>
 
-        <!-- INFO -->
+        <!-- =====================================================
+             CENTER
+        ====================================================== -->
 
-        <div class="info">
+        <div class="booking-center">
 
-          <div class="top">
+          <!-- TITLE -->
 
-            <div>
+          <div class="booking-title-row">
+
+            <div class="title-content">
 
               <h2>
+
                 {{ h.tipo }}
+
               </h2>
 
-              <p class="location">
-                Salinas · Frente al mar
-              </p>
+              <div class="hotel-location">
+
+                <ion-icon name="location-outline"></ion-icon>
+
+                Frente al mar · Salinas
+
+              </div>
 
             </div>
 
             <!-- RATING -->
 
-            <div class="rating">
+            <div class="booking-rating">
 
-              <div class="rating-text">
+              <div class="booking-rating-text">
 
-                <strong>Fantástico</strong>
+                <strong>
+
+                  Fantástico
+
+                </strong>
 
                 <span>
-                  321 comentarios
+
+                  {{ h.totalReviews || 321 }}
+                  comentarios
+
                 </span>
 
               </div>
 
-              <div class="pill">
+              <div class="booking-score">
+
                 {{ h.rating || 8.5 }}
+
               </div>
 
             </div>
@@ -272,95 +461,131 @@
 
           <!-- FEATURES -->
 
-          <div class="features">
+          <div class="booking-features">
 
-            <div class="feature">
+            <span>
+
               <ion-icon name="people-outline"></ion-icon>
-              {{ h.capacidad }} huéspedes
-            </div>
 
-            <div class="feature">
+              {{ h.capacidad || 2 }}
+              huéspedes
+
+            </span>
+
+            <span>
+
               <ion-icon name="bed-outline"></ion-icon>
-              {{ h.camas }} cama(s)
-            </div>
 
-            <div class="feature">
+              {{ h.camas || 1 }}
+              cama(s)
+
+            </span>
+
+            <span>
+
               <ion-icon name="wifi-outline"></ion-icon>
-              Wi-Fi gratis
-            </div>
+
+              WiFi gratis
+
+            </span>
+
+            <span>
+
+              <ion-icon name="snow-outline"></ion-icon>
+
+              Aire acondicionado
+
+            </span>
+
+          </div>
+
+          <!-- DESCRIPTION -->
+
+          <div class="booking-description">
+
+            {{
+
+              h.descripcion ||
+
+              'Habitación premium frente al mar con excelente ubicación y acceso a piscina.'
+
+            }}
 
           </div>
 
           <!-- BENEFITS -->
 
-          <div class="benefits">
+          <div class="benefits-list">
 
-            <span>
-              <ion-icon name="checkmark-outline"></ion-icon>
-              Cancelación gratis
-            </span>
+            <div class="benefit success">
 
-            <span>
-              <ion-icon name="checkmark-outline"></ion-icon>
-              Reserva flexible
-            </span>
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
 
-            <span>
-              <ion-icon name="checkmark-outline"></ion-icon>
-              Confirmación inmediata
-            </span>
+              Cancelación GRATIS
 
-          </div>
-
-          <!-- TRUST -->
-
-          <div class="trust">
-
-            <div class="trust-item green">
-              Alta demanda para estas fechas
             </div>
 
-            <div class="trust-item blue">
-              Última reserva hace 2 horas
+            <div class="benefit success">
+
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+
+              Sin pago por adelantado
+
+            </div>
+
+            <div class="benefit blue">
+
+              <ion-icon name="sparkles-outline"></ion-icon>
+
+              Oferta exclusiva online
+
             </div>
 
           </div>
 
         </div>
 
-        <!-- PRICE -->
+        <!-- =====================================================
+             RIGHT
+        ====================================================== -->
 
-        <div class="price">
+        <div class="booking-right">
 
-          <div class="price-top">
+          <div class="right-top">
 
-            <span class="from">
-              Desde
-            </span>
+            <div class="price-label">
 
-            <div class="amount">
-
-              ${{ h.precioNoche }}
+              Precio por noche
 
             </div>
 
-            <span class="night">
-              por noche
-            </span>
+            <div class="booking-price">
 
-            <small>
-              impuestos incluidos
-            </small>
+              ${{ h.precioNoche || h.tarifa }}
+
+            </div>
+
+            <div class="price-tax">
+
+              Incluye impuestos y cargos
+
+            </div>
 
           </div>
 
-          <ion-button
-            class="btn"
+          <button
+            class="booking-btn"
             (click)="goToDetalle(h)">
 
             Ver disponibilidad
 
-          </ion-button>
+          </button>
+
+          <div class="last-room">
+
+            ¡Queda 1 habitación a este precio!
+
+          </div>
 
         </div>
 
