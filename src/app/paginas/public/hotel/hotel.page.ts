@@ -20,6 +20,7 @@ import {
 import { addIcons } from 'ionicons';
 
 import {
+
   locationOutline,
   searchOutline,
   calendarOutline,
@@ -35,11 +36,127 @@ import {
   closeCircleOutline,
   walkOutline,
   cafeOutline,
-  carOutline
+  carOutline,
+  businessOutline,
+  tvOutline,
+ snowOutline,
+  starOutline,
+  heartOutline,
+  timeOutline,
+  mapOutline,
+  heart,
+  imagesOutline,
+  chevronForwardOutline,
+  navigateOutline
+
 } from 'ionicons/icons';
 
 import { HabitacionesService } from '@app/core/services/habitaciones.service';
 import { HotelesService } from '@app/core/services/hotel.service';
+
+/* ======================================================
+   INTERFACES
+====================================================== */
+
+interface HotelServiceItem {
+
+  name: string;
+
+  icon: string;
+
+}
+
+interface NearbyPlace {
+
+  name: string;
+
+  distance: string;
+
+  icon: string;
+
+}
+
+interface HotelReview {
+
+  name: string;
+
+  country: string;
+
+  text: string;
+
+  score: number;
+
+}
+
+interface HotelData {
+
+  slug: string;
+
+  name: string;
+
+  location: string;
+
+  address: string;
+
+  description: string;
+
+  heroImage: string;
+
+  gallery: string[];
+
+  lat: number;
+
+  lng: number;
+
+  score: number;
+
+  reviews: number;
+
+  price: number;
+
+  oldPrice?: number;
+
+  stars?: number;
+
+  features: string[];
+
+  services: HotelServiceItem[];
+
+  nearbyPlaces: NearbyPlace[];
+
+}
+
+interface RoomData {
+
+  id: number;
+
+  numero: number;
+
+  name: string;
+
+  desc: string;
+
+  price: number;
+
+  oldPrice?: number;
+
+  discount?: number;
+
+  image: string;
+
+  available: boolean;
+
+  capacity?: number;
+
+  size?: number;
+
+  benefits?: string[];
+
+}
+
+/* ======================================================
+   COMPONENT
+====================================================== */
 
 @Component({
   selector: 'app-hotel',
@@ -53,26 +170,117 @@ import { HotelesService } from '@app/core/services/hotel.service';
     IonIcon
   ]
 })
+
 export class HotelPage implements OnInit {
 
   /* ======================================================
      STATE
   ====================================================== */
 
-  slug: string = '';
+  slug = '';
 
-  hotel: any = null;
+  hotel: HotelData | null = null;
 
-  featuredRooms: any[] = [];
+  featuredRooms: RoomData[] = [];
 
   loading = true;
 
-  showAll = false;
-
   mapUrl!: SafeResourceUrl;
 
+  roomsPreviewCount = 3;
+
+  isFavorite = false;
+
+  galleryOpen = false;
+
+  selectedImageIndex = 0;
+
   /* ======================================================
-     HOTEL SWITCH
+     SEARCH
+  ====================================================== */
+
+  checkIn = '';
+
+  checkOut = '';
+
+  adults = 2;
+
+  children = 0;
+
+  rooms = 1;
+
+  /* ======================================================
+     REVIEWS
+  ====================================================== */
+
+  reviewCategories = [
+
+    {
+      name: 'Ubicación',
+      value: 9.4
+    },
+
+    {
+      name: 'Limpieza',
+      value: 9.0
+    },
+
+    {
+      name: 'Confort',
+      value: 8.9
+    },
+
+    {
+      name: 'Servicio',
+      value: 9.2
+    },
+
+    {
+      name: 'Relación calidad-precio',
+      value: 8.8
+    }
+
+  ];
+
+  hotelReviews: HotelReview[] = [
+
+    {
+
+      name: 'Carlos',
+      country: 'Ecuador',
+      text:
+        'Excelente ubicación y habitaciones muy cómodas frente al mar.',
+
+      score: 9
+
+    },
+
+    {
+
+      name: 'Andrea',
+      country: 'Colombia',
+      text:
+        'Muy buena atención y piscina espectacular.',
+
+      score: 10
+
+    },
+
+    {
+
+      name: 'John',
+      country: 'Estados Unidos',
+      text:
+        'Muy limpio y tranquilo. Perfecto para descansar.',
+
+      score: 9
+
+    }
+
+  ];
+
+  /* ======================================================
+     HOTELS
   ====================================================== */
 
   hotelList = [
@@ -99,11 +307,17 @@ export class HotelPage implements OnInit {
   ====================================================== */
 
   constructor(
+
     private route: ActivatedRoute,
+
     private router: Router,
+
     private habitacionesService: HabitacionesService,
+
     private hotelesService: HotelesService,
+
     private sanitizer: DomSanitizer
+
   ) {
 
     addIcons({
@@ -123,7 +337,18 @@ export class HotelPage implements OnInit {
       wifiOutline,
       walkOutline,
       cafeOutline,
-      carOutline
+      carOutline,
+      businessOutline,
+      tvOutline,
+      snowOutline,
+      starOutline,
+      heartOutline,
+      timeOutline,
+      mapOutline,
+      heart,
+      imagesOutline,
+      chevronForwardOutline,
+      navigateOutline
 
     });
 
@@ -135,6 +360,25 @@ export class HotelPage implements OnInit {
 
   ngOnInit(): void {
 
+    this.route.queryParamMap.subscribe(query => {
+
+      this.checkIn =
+        query.get('checkIn') || '';
+
+      this.checkOut =
+        query.get('checkOut') || '';
+
+      this.adults =
+        Number(query.get('adults')) || 2;
+
+      this.children =
+        Number(query.get('children')) || 0;
+
+      this.rooms =
+        Number(query.get('rooms')) || 1;
+
+    });
+
     this.route.paramMap.subscribe(params => {
 
       this.slug =
@@ -142,18 +386,75 @@ export class HotelPage implements OnInit {
 
       if (!this.slug) {
 
-        console.error(
-          'Slug vacío'
-        );
+        console.error('Slug vacío');
 
         return;
+
       }
 
       this.loadHotel();
 
-      this.loadRooms();
-
     });
+
+  }
+
+  /* ======================================================
+     IMAGE FALLBACK
+  ====================================================== */
+
+  onImageError(event: any): void {
+
+    event.target.src =
+      'assets/img/default-room.jpg';
+
+  }
+
+  /* ======================================================
+     GALLERY HELPERS
+  ====================================================== */
+
+  get validGallery(): string[] {
+
+    if (
+      !this.hotel?.gallery ||
+      !this.hotel.gallery.length
+    ) {
+
+      return [
+
+        'assets/img/1.PNG',
+        'assets/img/2.PNG',
+        'assets/img/3.PNG',
+        'assets/img/4.PNG',
+        'assets/img/5.PNG'
+
+      ];
+
+    }
+
+    return this.hotel.gallery.filter(
+
+      (img: string) =>
+
+        !!img &&
+        img !== 'null' &&
+        img !== 'undefined'
+
+    );
+
+  }
+
+  get coverImage(): string {
+
+    return (
+
+      this.validGallery[0] ||
+
+      this.hotel?.heroImage ||
+
+      'assets/img/default-room.jpg'
+
+    );
 
   }
 
@@ -178,8 +479,8 @@ export class HotelPage implements OnInit {
               h.slug === this.slug ||
 
               h.nombre
-                .toLowerCase()
-                .includes(this.slug)
+                ?.toLowerCase()
+                ?.includes(this.slug)
 
             );
 
@@ -187,24 +488,71 @@ export class HotelPage implements OnInit {
 
             this.hotel = {
 
+              slug:
+                found.slug,
+
               name:
                 found.nombre,
 
               location:
-                `${found.ciudad}`,
+                found.ciudad || 'Salinas',
+
+              address:
+                found.direccion ||
+                'Salinas, Santa Elena',
 
               description:
                 found.descripcion,
 
               heroImage:
                 found.imagen ||
-                'assets/img/default.jpg',
+                'assets/img/1.PNG',
+
+              gallery:
+
+                Array.isArray(found.galeria) &&
+                found.galeria.length
+
+                  ? found.galeria
+
+                  : [
+
+                    found.imagen ||
+                    'assets/img/1.PNG',
+
+                    'assets/img/2.PNG',
+                    'assets/img/3.PNG',
+                    'assets/img/4.PNG',
+                    'assets/img/5.PNG'
+
+                  ],
+
+              lat:
+                found.lat || -2.2147,
+
+              lng:
+                found.lng || -80.9515,
+
+              score:
+                found.rating || 9.1,
+
+              reviews:
+                found.totalReviews || 324,
+
+              price:
+                found.precio_desde || 85,
+
+              oldPrice:
+                (found.precio_desde || 85) + 20,
+
+              stars:
+                4,
 
               features: [
 
-                'Ubicación privilegiada',
-                'Alta valoración',
-                'Confort garantizado'
+                'Excelente ubicación',
+                'Frente al mar',
+                'Alta valoración'
 
               ],
 
@@ -228,17 +576,39 @@ export class HotelPage implements OnInit {
                 {
                   name: 'Parqueadero',
                   icon: 'car-outline'
+                },
+
+                {
+                  name: 'TV Smart',
+                  icon: 'tv-outline'
+                },
+
+                {
+                  name: 'Aire acondicionado',
+                  icon: 'snow-outline'
                 }
 
               ],
 
-              gallery: [
+              nearbyPlaces: [
 
-                found.imagen || 'assets/img/default.jpg',
-                found.imagen || 'assets/img/default.jpg',
-                found.imagen || 'assets/img/default.jpg',
-                found.imagen || 'assets/img/default.jpg',
-                found.imagen || 'assets/img/default.jpg'
+                {
+                  name: 'Playa principal',
+                  distance: '120 m',
+                  icon: 'walk-outline'
+                },
+
+                {
+                  name: 'Malecón Salinas',
+                  distance: '450 m',
+                  icon: 'navigate-outline'
+                },
+
+                {
+                  name: 'Zona gastronómica',
+                  distance: '300 m',
+                  icon: 'restaurant-outline'
+                }
 
               ]
 
@@ -246,7 +616,11 @@ export class HotelPage implements OnInit {
 
             this.buildMap();
 
-          } else {
+            this.loadRooms();
+
+          }
+
+          else {
 
             this.loadHotelFallback();
 
@@ -255,10 +629,6 @@ export class HotelPage implements OnInit {
         },
 
         error: () => {
-
-          console.warn(
-            'Backend no disponible, usando fallback'
-          );
 
           this.loadHotelFallback();
 
@@ -274,178 +644,93 @@ export class HotelPage implements OnInit {
 
   loadHotelFallback(): void {
 
-    const hotelesMock: any = {
+    this.hotel = {
 
-      chipipe: {
+      slug: this.slug,
 
-        name:
-          'Casa Blanca Chipipe',
+      name:
+        `Casa Blanca ${this.slug}`,
 
-        location:
-          'Chipipe, Salinas',
+      location:
+        'Salinas',
 
-        description:
-          'Frente a la playa más tranquila de Salinas.',
+      address:
+        'Salinas, Ecuador',
 
-        heroImage:
-          'assets/img/26.jpeg',
+      description:
+        'Disfruta una experiencia premium frente al mar.',
 
-        features: [
+      heroImage:
+        'assets/img/1.PNG',
 
-          'Ambiente familiar',
-          'Playa tranquila',
-          'Ideal para descanso'
+      gallery: [
 
-        ],
+        'assets/img/1.PNG',
+        'assets/img/2.PNG',
+        'assets/img/3.PNG',
+        'assets/img/4.PNG',
+        'assets/img/5.PNG'
 
-        services: [
+      ],
 
-          {
-            name: 'Piscina',
-            icon: 'water-outline'
-          },
+      lat:
+        -2.2147,
 
-          {
-            name: 'WiFi',
-            icon: 'wifi-outline'
-          },
+      lng:
+        -80.9515,
 
-          {
-            name: 'Aire acondicionado',
-            icon: 'thermometer-outline'
-          },
+      score:
+        9.1,
 
-          {
-            name: 'Frente al mar',
-            icon: 'sunny-outline'
-          }
+      reviews:
+        324,
 
-        ],
+      price:
+        85,
 
-        gallery: [
+      oldPrice:
+        105,
 
-          'assets/img/26.jpeg',
-          'assets/img/26.jpeg',
-          'assets/img/26.jpeg',
-          'assets/img/26.jpeg',
-          'assets/img/26.jpeg'
+      stars:
+        4,
 
-        ]
+      features: [
 
-      },
+        'Frente al mar',
+        'Piscina',
+        'Ideal para familias'
 
-      palmeras: {
+      ],
 
-        name:
-          'Casa Blanca Palmeras',
+      services: [
 
-        location:
-          'Centro, Salinas',
+        {
+          name: 'WiFi',
+          icon: 'wifi-outline'
+        },
 
-        description:
-          'Zona céntrica, restaurantes y vida nocturna.',
+        {
+          name: 'Piscina',
+          icon: 'water-outline'
+        }
 
-        heroImage:
-          'assets/img/25.jpeg',
+      ],
 
-        features: [
+      nearbyPlaces: [
 
-          'Zona céntrica',
-          'Cerca de bares',
-          'Ambiente activo'
+        {
+          name: 'Playa',
+          distance: '120 m',
+          icon: 'walk-outline'
+        }
 
-        ],
-
-        services: [
-
-          {
-            name: 'Restaurante',
-            icon: 'restaurant-outline'
-          },
-
-          {
-            name: 'WiFi',
-            icon: 'wifi-outline'
-          },
-
-          {
-            name: 'Frente al mar',
-            icon: 'sunny-outline'
-          }
-
-        ],
-
-        gallery: [
-
-          'assets/img/25.jpeg',
-          'assets/img/25.jpeg',
-          'assets/img/25.jpeg',
-          'assets/img/25.jpeg',
-          'assets/img/25.jpeg'
-
-        ]
-
-      },
-
-      ballenita: {
-
-        name:
-          'Casa Blanca Ballenita',
-
-        location:
-          'Ballenita, Santa Elena',
-
-        description:
-          'Vista panorámica y máxima tranquilidad.',
-
-        heroImage:
-          'assets/img/27.jpeg',
-
-        features: [
-
-          'Vista al mar',
-          'Zona tranquila',
-          'Atardeceres únicos'
-
-        ],
-
-        services: [
-
-          {
-            name: 'Piscina',
-            icon: 'water-outline'
-          },
-
-          {
-            name: 'Vista al mar',
-            icon: 'sunny-outline'
-          },
-
-          {
-            name: 'WiFi',
-            icon: 'wifi-outline'
-          }
-
-        ],
-
-        gallery: [
-
-          'assets/img/27.jpeg',
-          'assets/img/27.jpeg',
-          'assets/img/27.jpeg',
-          'assets/img/27.jpeg',
-          'assets/img/27.jpeg'
-
-        ]
-
-      }
+      ]
 
     };
 
-    this.hotel =
-      hotelesMock[this.slug] || null;
-
     this.buildMap();
+
+    this.loadRooms();
 
   }
 
@@ -455,21 +740,39 @@ export class HotelPage implements OnInit {
 
   buildMap(): void {
 
-    const query =
-      encodeURIComponent(
-
-        this.hotel?.location ||
-        'Salinas Ecuador'
-
-      );
+    if (
+      !this.hotel?.lat ||
+      !this.hotel?.lng
+    ) {
+      return;
+    }
 
     this.mapUrl =
       this.sanitizer
         .bypassSecurityTrustResourceUrl(
 
-          `https://www.google.com/maps?q=${query}&output=embed`
+          `https://www.google.com/maps?q=${this.hotel.lat},${this.hotel.lng}&z=15&output=embed`
 
         );
+
+  }
+
+  openGoogleMaps(): void {
+
+    if (
+      !this.hotel?.lat ||
+      !this.hotel?.lng
+    ) {
+      return;
+    }
+
+    window.open(
+
+      `https://www.google.com/maps?q=${this.hotel.lat},${this.hotel.lng}`,
+
+      '_blank'
+
+    );
 
   }
 
@@ -482,18 +785,45 @@ export class HotelPage implements OnInit {
     this.loading = true;
 
     this.habitacionesService
-      .getByHotel(this.slug)
+
+      .getDisponiblesByHotel(
+
+        this.slug,
+
+        {
+
+          checkIn:
+            this.checkIn,
+
+          checkOut:
+            this.checkOut,
+
+          adults:
+            this.adults,
+
+          children:
+            this.children,
+
+          rooms:
+            this.rooms,
+
+          limit:
+            this.roomsPreviewCount
+
+        }
+
+      )
+
       .subscribe({
 
-        next: (rooms) => {
+        next: (res: any) => {
 
-          console.log(
-            'Rooms raw:',
-            rooms
-          );
+          const rooms =
+            res?.data || [];
 
           this.featuredRooms =
-            (rooms || [])
+
+            rooms
 
             .map((r: any) => ({
 
@@ -504,27 +834,57 @@ export class HotelPage implements OnInit {
                 Number(r.numero),
 
               name:
+
+                r.tipo ||
+
                 `Habitación ${r.numero}`,
 
               desc:
+
                 r.descripcion ||
-                `Piso ${r.piso}`,
+
+                'Habitación premium',
 
               price:
-                r.precioNoche,
+                r.precioNoche || 85,
+
+              oldPrice:
+                (r.precioNoche || 85) + 20,
+
+              discount:
+                20,
 
               image:
+
                 r.imagenUrl ||
+
+                this.coverImage ||
+
                 'assets/img/default-room.jpg',
 
               available:
-                r.disponible ?? true
+                r.estado === 'disponible',
+
+              capacity:
+                r.capacidad || 2,
+
+              size:
+                32,
+
+              benefits: [
+
+                'Cancelación flexible',
+                'WiFi gratis',
+                'Aire acondicionado'
+
+              ]
 
             }))
 
             .sort(
 
-              (a: any, b: any) =>
+              (a: RoomData, b: RoomData) =>
+
                 a.numero - b.numero
 
             );
@@ -536,7 +896,7 @@ export class HotelPage implements OnInit {
         error: (err: any) => {
 
           console.error(
-            'Error cargando habitaciones:',
+            'Error habitaciones:',
             err
           );
 
@@ -545,6 +905,84 @@ export class HotelPage implements OnInit {
         }
 
       });
+
+  }
+
+  /* ======================================================
+     GALLERY
+  ====================================================== */
+
+  openGallery(index = 0): void {
+
+    this.selectedImageIndex =
+      index;
+
+    this.galleryOpen = true;
+
+  }
+
+  closeGallery(): void {
+
+    this.galleryOpen = false;
+
+  }
+
+  nextImage(): void {
+
+    if (!this.hotel) {
+      return;
+    }
+
+    this.selectedImageIndex =
+
+      (this.selectedImageIndex + 1) %
+
+      this.hotel.gallery.length;
+
+  }
+
+  prevImage(): void {
+
+    if (!this.hotel) {
+      return;
+    }
+
+    this.selectedImageIndex =
+
+      (
+        this.selectedImageIndex - 1 +
+        this.hotel.gallery.length
+      ) %
+
+      this.hotel.gallery.length;
+
+  }
+
+  /* ======================================================
+     FAVORITES
+  ====================================================== */
+
+  toggleFavorite(): void {
+
+    this.isFavorite =
+      !this.isFavorite;
+
+  }
+
+  /* ======================================================
+     SCROLL
+  ====================================================== */
+
+  scrollToRooms(): void {
+
+    const el =
+      document.getElementById('rooms-section');
+
+    el?.scrollIntoView({
+
+      behavior: 'smooth'
+
+    });
 
   }
 
@@ -560,7 +998,34 @@ export class HotelPage implements OnInit {
       this.slug,
       'habitaciones'
 
-    ]);
+    ], {
+
+      queryParams: {
+
+        checkIn:
+          this.checkIn,
+
+        checkOut:
+          this.checkOut,
+
+        adults:
+          this.adults,
+
+        children:
+          this.children,
+
+        rooms:
+          this.rooms
+
+      }
+
+    });
+
+  }
+
+  showAllRooms(): void {
+
+    this.goToAvailability();
 
   }
 
@@ -577,27 +1042,35 @@ export class HotelPage implements OnInit {
 
     ], {
 
-      queryParamsHandling: 'merge'
+      queryParamsHandling:
+        'merge'
 
     });
 
   }
 
   /* ======================================================
-     ROOMS GETTERS
+     GETTERS
   ====================================================== */
 
-  get availableRooms() {
+  get availableRooms(): RoomData[] {
 
     return this.featuredRooms
       .filter(r => r.available);
 
   }
 
-  get unavailableRooms() {
+  get previewRooms(): RoomData[] {
 
-    return this.featuredRooms
-      .filter(r => !r.available);
+    return this.availableRooms
+      .slice(0, this.roomsPreviewCount);
+
+  }
+
+  get hasMoreRooms(): boolean {
+
+    return this.availableRooms.length >
+      this.roomsPreviewCount;
 
   }
 

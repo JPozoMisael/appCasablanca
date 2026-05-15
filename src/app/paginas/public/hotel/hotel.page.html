@@ -1,16 +1,16 @@
 <div class="hotel-page" *ngIf="hotel">
 
   <!-- ======================================================
-       HERO / HEADER
+       HERO
   ======================================================= -->
 
   <section class="hotel-hero">
 
     <div class="page-shell">
 
-      <!-- TOP -->
-
       <div class="hotel-top">
+
+        <!-- LEFT -->
 
         <div class="hotel-main-info">
 
@@ -22,6 +22,8 @@
             {{ hotel.name }}
           </h1>
 
+          <!-- META -->
+
           <div class="hotel-meta">
 
             <div class="hotel-location">
@@ -29,36 +31,90 @@
               <ion-icon name="location-outline"></ion-icon>
 
               <span>
-                {{ hotel.location }}
+                {{ hotel.address }}
               </span>
 
             </div>
 
-            <button class="map-link">
+            <button
+              class="map-link"
+              (click)="openGoogleMaps()">
+
+              <ion-icon name="map-outline"></ion-icon>
+
               Ver mapa
+
             </button>
+
+          </div>
+
+          <!-- PROPERTY HIGHLIGHTS -->
+
+          <div class="property-highlights">
+
+            <div class="property-pill blue">
+
+              <ion-icon name="wifi-outline"></ion-icon>
+
+              Wifi gratis
+
+            </div>
+
+            <div class="property-pill green">
+
+              <ion-icon name="sunny-outline"></ion-icon>
+
+              Frente al mar
+
+            </div>
+
+            <div class="property-pill dark">
+
+              <ion-icon name="water-outline"></ion-icon>
+
+              Piscina
+
+            </div>
+
+            <div class="property-pill success">
+
+              <ion-icon name="people-outline"></ion-icon>
+
+              Ideal para familias
+
+            </div>
+
+            <div class="property-pill orange">
+
+              <ion-icon name="restaurant-outline"></ion-icon>
+
+              Desayuno incluido
+
+            </div>
 
           </div>
 
         </div>
 
-        <!-- RATING -->
+        <!-- RIGHT -->
 
         <div class="hotel-rating-box">
 
-          <div class="rating-score">
-            9.1
-          </div>
-
-          <div class="rating-info">
+          <div class="rating-text">
 
             <strong>
               Fantástico
             </strong>
 
             <span>
-              +324 comentarios
+              {{ hotel.reviews }} comentarios
             </span>
+
+          </div>
+
+          <div class="rating-score">
+
+            {{ hotel.score }}
 
           </div>
 
@@ -66,82 +122,101 @@
 
       </div>
 
-      <!-- QUICK FEATURES -->
+    </div>
 
-      <div class="hotel-features-bar">
+  </section>
 
-        <div class="feature-pill">
-          <ion-icon name="wifi-outline"></ion-icon>
-          Wifi gratis
+  <!-- ======================================================
+     GALLERY
+======================================================= -->
+
+<section class="gallery-section" *ngIf="hotel">
+
+  <div class="page-shell">
+
+    <div class="gallery-layout">
+
+      <!-- MAIN IMAGE -->
+
+      <div
+        class="gallery-main"
+        (click)="openGallery(0)">
+
+        <img
+
+          [src]="
+            hotel.gallery?.[0] ||
+            hotel.heroImage ||
+            'assets/img/default.jpg'
+          "
+
+          [alt]="hotel.name"
+
+          (error)="onImageError($event)"
+
+        />
+
+        <div class="gallery-overlay">
+
+          <button class="gallery-all-btn">
+
+            <ion-icon
+              name="images-outline">
+            </ion-icon>
+
+            <span>
+              Ver todas las fotos
+            </span>
+
+          </button>
+
         </div>
 
-        <div class="feature-pill">
-          <ion-icon name="water-outline"></ion-icon>
-          Piscina
-        </div>
+      </div>
 
-        <div class="feature-pill">
-          <ion-icon name="restaurant-outline"></ion-icon>
-          Desayuno incluido
-        </div>
+      <!-- SIDE GRID -->
 
-        <div class="feature-pill">
-          <ion-icon name="car-outline"></ion-icon>
-          Parqueadero
-        </div>
+      <div class="gallery-side">
 
-        <div class="feature-pill">
-          <ion-icon name="sunny-outline"></ion-icon>
-          Frente al mar
+        <div
+
+          class="gallery-side-item"
+
+          *ngFor="
+            let img of hotel.gallery | slice:1:5;
+            let i = index
+          "
+
+          (click)="openGallery(i + 1)"
+
+        >
+
+          <img
+
+            [src]="
+              img ||
+              hotel.heroImage ||
+              'assets/img/default.jpg'
+            "
+
+            [alt]="hotel.name"
+
+            (error)="onImageError($event)"
+
+          />
+
         </div>
 
       </div>
 
     </div>
 
-  </section>
+  </div>
+
+</section>
 
   <!-- ======================================================
-       GALLERY
-  ======================================================= -->
-
-  <section class="gallery-section">
-
-    <div class="page-shell">
-
-      <div class="gallery-layout">
-
-        <!-- MAIN -->
-
-        <div class="gallery-main">
-
-          <img
-            [src]="hotel.heroImage"
-            [alt]="hotel.name"
-          />
-
-        </div>
-
-        <!-- SIDE -->
-
-        <div class="gallery-side">
-
-          <img
-            *ngFor="let img of hotel.gallery | slice:0:4"
-            [src]="img"
-            [alt]="hotel.name"
-          />
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- ======================================================
-       HOTEL CONTENT
+       CONTENT
   ======================================================= -->
 
   <section class="hotel-content">
@@ -151,12 +226,12 @@
       <div class="content-layout">
 
         <!-- ======================================================
-             LEFT
+             MAIN
         ======================================================= -->
 
         <div class="content-main">
 
-          <!-- DESCRIPTION -->
+          <!-- ABOUT -->
 
           <div class="content-card">
 
@@ -182,7 +257,9 @@
 
               <div class="highlight-item">
 
-                <ion-icon name="walk-outline"></ion-icon>
+                <div class="highlight-icon">
+                  <ion-icon name="walk-outline"></ion-icon>
+                </div>
 
                 <div>
 
@@ -191,7 +268,7 @@
                   </strong>
 
                   <span>
-                    Cerca del mar y del malecón
+                    Cerca del mar y restaurantes
                   </span>
 
                 </div>
@@ -200,7 +277,9 @@
 
               <div class="highlight-item">
 
-                <ion-icon name="shield-checkmark-outline"></ion-icon>
+                <div class="highlight-icon">
+                  <ion-icon name="shield-checkmark-outline"></ion-icon>
+                </div>
 
                 <div>
 
@@ -218,7 +297,9 @@
 
               <div class="highlight-item">
 
-                <ion-icon name="bed-outline"></ion-icon>
+                <div class="highlight-icon">
+                  <ion-icon name="bed-outline"></ion-icon>
+                </div>
 
                 <div>
 
@@ -227,7 +308,7 @@
                   </strong>
 
                   <span>
-                    Cómodas y modernas
+                    Modernas y cómodas
                   </span>
 
                 </div>
@@ -236,7 +317,9 @@
 
               <div class="highlight-item">
 
-                <ion-icon name="cafe-outline"></ion-icon>
+                <div class="highlight-icon">
+                  <ion-icon name="cafe-outline"></ion-icon>
+                </div>
 
                 <div>
 
@@ -269,14 +352,14 @@
                 </h2>
 
                 <p>
-                  Selecciona la opción ideal para tu estadía.
+                  Las mejores opciones disponibles para tu estadía.
                 </p>
 
               </div>
 
               <button
                 class="see-all-btn"
-                [routerLink]="['/hotel', slug, 'habitaciones']">
+                (click)="showAllRooms()">
 
                 Ver todas
 
@@ -288,7 +371,7 @@
 
             <div
               class="booking-room"
-              *ngFor="let r of featuredRooms">
+              *ngFor="let r of previewRooms">
 
               <!-- IMAGE -->
 
@@ -326,6 +409,14 @@
                   <span>
                     Cancelación flexible
                   </span>
+
+                </div>
+
+                <div class="availability-warning">
+
+                  <ion-icon name="flash-outline"></ion-icon>
+
+                  Última habitación disponible
 
                 </div>
 
@@ -390,13 +481,101 @@
 
           <div class="content-card">
 
-            <h2>
-              Ubicación
-            </h2>
+            <div class="map-head">
 
-            <div class="map-box">
+              <div>
 
-              <iframe [src]="mapUrl"></iframe>
+                <h2>
+                  Ubicación
+                </h2>
+
+                <p>
+                  Excelente zona cerca del mar y puntos turísticos.
+                </p>
+
+              </div>
+
+              <button
+                class="map-google-btn"
+                (click)="openGoogleMaps()">
+
+                <ion-icon name="map-outline"></ion-icon>
+
+                Google Maps
+
+              </button>
+
+            </div>
+
+            <div class="map-layout">
+
+              <!-- MAP -->
+
+              <div class="map-box">
+
+                <iframe [src]="mapUrl"></iframe>
+
+              </div>
+
+              <!-- INFO -->
+
+              <div class="map-info">
+
+                <div class="map-info-card">
+
+                  <ion-icon name="sunny-outline"></ion-icon>
+
+                  <div>
+
+                    <strong>
+                      Frente al mar
+                    </strong>
+
+                    <span>
+                      Acceso rápido a la playa
+                    </span>
+
+                  </div>
+
+                </div>
+
+                <div class="map-info-card">
+
+                  <ion-icon name="walk-outline"></ion-icon>
+
+                  <div>
+
+                    <strong>
+                      Excelente ubicación
+                    </strong>
+
+                    <span>
+                      Cerca de restaurantes y malecón
+                    </span>
+
+                  </div>
+
+                </div>
+
+                <div class="map-info-card">
+
+                  <ion-icon name="business-outline"></ion-icon>
+
+                  <div>
+
+                    <strong>
+                      Zona turística
+                    </strong>
+
+                    <span>
+                      Ideal para entretenimiento
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
 
             </div>
 
@@ -410,6 +589,8 @@
 
         <aside class="content-sidebar">
 
+          <!-- BOOKING -->
+
           <div class="booking-box">
 
             <div class="booking-price">
@@ -419,7 +600,7 @@
               </small>
 
               <strong>
-                $85
+                ${{ hotel.price }}
               </strong>
 
               <span>
@@ -431,15 +612,27 @@
             <div class="booking-benefits">
 
               <div>
-                ✓ Mejor tarifa disponible
+
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+
+                Mejor tarifa disponible
+
               </div>
 
               <div>
-                ✓ Confirmación inmediata
+
+                <ion-icon name="shield-checkmark-outline"></ion-icon>
+
+                Reserva segura
+
               </div>
 
               <div>
-                ✓ Reserva segura
+
+                <ion-icon name="time-outline"></ion-icon>
+
+                Confirmación inmediata
+
               </div>
 
             </div>
@@ -451,6 +644,184 @@
               Ver disponibilidad
 
             </button>
+
+          </div>
+
+          <!-- REVIEW CARD -->
+
+          <div class="sidebar-card">
+
+            <div class="sidebar-title">
+
+              <h3>
+                Valoración
+              </h3>
+
+            </div>
+
+            <div class="sidebar-score">
+
+              <div class="score-box">
+                {{ hotel.score }}
+              </div>
+
+              <div>
+
+                <strong>
+                  Fantástico
+                </strong>
+
+                <span>
+                  {{ hotel.reviews }} comentarios
+                </span>
+
+              </div>
+
+            </div>
+
+            <div class="review-mini-list">
+
+              <div
+                class="review-mini"
+                *ngFor="let r of hotelReviews | slice:0:2">
+
+                <strong>
+                  {{ r.name }}
+                </strong>
+
+                <p>
+                  {{ r.text }}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- FACILITIES -->
+
+          <div class="sidebar-card">
+
+            <div class="sidebar-title">
+
+              <h3>
+                Servicios populares
+              </h3>
+
+            </div>
+
+            <div class="sidebar-services">
+
+              <div
+                class="sidebar-service"
+                *ngFor="let s of hotel.services | slice:0:6">
+
+                <ion-icon [name]="s.icon"></ion-icon>
+
+                <span>
+                  {{ s.name }}
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- LOCATION -->
+
+          <div class="sidebar-card">
+
+            <div class="sidebar-title">
+
+              <h3>
+                Ubicación
+              </h3>
+
+            </div>
+
+            <div class="location-points">
+
+              <div class="location-point">
+
+                <ion-icon name="sunny-outline"></ion-icon>
+
+                <span>
+                  Frente al mar
+                </span>
+
+              </div>
+
+              <div class="location-point">
+
+                <ion-icon name="walk-outline"></ion-icon>
+
+                <span>
+                  Cerca del malecón
+                </span>
+
+              </div>
+
+              <div class="location-point">
+
+                <ion-icon name="restaurant-outline"></ion-icon>
+
+                <span>
+                  Restaurantes cercanos
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- RULES -->
+
+          <div class="sidebar-card">
+
+            <div class="sidebar-title">
+
+              <h3>
+                Información importante
+              </h3>
+
+            </div>
+
+            <div class="rules-list">
+
+              <div class="rule-item">
+
+                <ion-icon name="calendar-outline"></ion-icon>
+
+                <span>
+                  Check-in: 14:00
+                </span>
+
+              </div>
+
+              <div class="rule-item">
+
+                <ion-icon name="calendar-outline"></ion-icon>
+
+                <span>
+                  Check-out: 12:00
+                </span>
+
+              </div>
+
+              <div class="rule-item">
+
+                <ion-icon name="shield-checkmark-outline"></ion-icon>
+
+                <span>
+                  Cancelación flexible
+                </span>
+
+              </div>
+
+            </div>
 
           </div>
 
