@@ -1,10 +1,41 @@
-export type Role = 'ADMIN' | 'RECEPCION' | 'GERENCIA' | 'CLIENTE';
+export type Role =
+
+  | 'super_admin'
+
+  | 'admin'
+
+  | 'recepcion'
+
+  | 'cliente';
+
+
+// =========================================
+// ROLES
+// =========================================
 
 export const ROLES = {
-  ADMIN: 'ADMIN' as Role,
-  RECEPCION: 'RECEPCION' as Role,
-  GERENCIA: 'GERENCIA' as Role,
-  CLIENTE: 'CLIENTE' as Role,
+
+  SUPER_ADMIN:
+    'super_admin' as Role,
+
+  ADMIN:
+    'admin' as Role,
+
+  RECEPCION:
+    'recepcion' as Role,
+
+  CLIENTE:
+    'cliente' as Role,
 };
 
-export const ADMIN_ROLES: Role[] = [ROLES.ADMIN, ROLES.GERENCIA];
+
+// =========================================
+// ROLES ADMINISTRATIVOS
+// =========================================
+
+export const ADMIN_ROLES: Role[] = [
+
+  ROLES.SUPER_ADMIN,
+
+  ROLES.ADMIN
+];
