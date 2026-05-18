@@ -90,23 +90,78 @@ export class DashboardPage implements OnInit {
 
   ngOnInit(): void {
 
-    // Obtener estadísticas del hotel
-    this.dashboardService.getStats().subscribe((data: any) => {
+  // =====================================
+  // STATS
+  // =====================================
 
-      this.totalHabitaciones.set(data.totalHabitaciones ?? 0);
-      this.habitacionesOcupadas.set(data.habitacionesOcupadas ?? 0);
-      this.ingresosMes.set(data.ingresosMes ?? 0);
+  this.dashboardService
+    .getStats()
 
+    .subscribe({
+
+      next: (response: any) => {
+
+        const data =
+          response?.data || {};
+
+
+        this.totalHabitaciones.set(
+          data?.habitaciones?.total ?? 0
+        );
+
+
+        this.habitacionesOcupadas.set(
+
+          (data?.habitaciones?.total ?? 0)
+
+          -
+
+          (data?.habitaciones?.disponibles ?? 0)
+        );
+
+
+        this.ingresosMes.set(
+          data?.ingresosTotales ?? 0
+        );
+      },
+
+
+      error: (err) => {
+
+        console.error(
+          'Error dashboard stats:',
+          err
+        );
+      }
     });
 
-    // Obtener reservas del día
-    this.dashboardService.getReservasHoy().subscribe((data: ReservaHoy[]) => {
 
-      this.reservasHoy.set(data ?? []);
+  // =====================================
+  // RESERVAS HOY
+  // =====================================
 
+  this.dashboardService
+    .getReservasHoy()
+
+    .subscribe({
+
+      next: (response: any) => {
+
+        this.reservasHoy.set(
+          response?.data ?? []
+        );
+      },
+
+
+      error: (err) => {
+
+        console.error(
+          'Error reservas hoy:',
+          err
+        );
+      }
     });
-
-  }
+}
 
   colorEstado(estado: string): string {
 
