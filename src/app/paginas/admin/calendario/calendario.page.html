@@ -65,7 +65,7 @@
           <!-- bars -->
           <div
             class="bar"
-            *ngFor="let b of barsForRoom(room.id)"
+            *ngFor="let b of barsMap().get(room.id) || []"
             [style.gridColumn]="(b.colStart + 1) + ' / ' + (b.colEnd + 1)"
             [class.selected]="isSelected(b.reserva.id)"
             [class.clipL]="b.clippedLeft"
