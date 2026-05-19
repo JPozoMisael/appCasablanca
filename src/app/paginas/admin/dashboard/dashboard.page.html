@@ -1,5 +1,8 @@
 <div class="db">
-  <!-- Top -->
+
+  <!-- ======================================
+       TOP — título + acciones
+  ======================================= -->
   <div class="db-top">
     <div class="title">
       <h2>Dashboard</h2>
@@ -19,89 +22,192 @@
     </div>
   </div>
 
-  <!-- KPIs -->
+
+  <!-- ======================================
+       KPIs
+  ======================================= -->
   <div class="kpis">
+
+    <!-- Ocupación -->
     <div class="kpi">
       <div class="kpi-head">
-        <span class="label">Ocupación hoy</span>
-        <ion-icon name="bedOutline"></ion-icon>
+        <span class="kpi-label">Ocupación hoy</span>
+        <div class="kpi-icon kpi-icon--blue">
+          <ion-icon name="bedOutline"></ion-icon>
+        </div>
       </div>
+
       <div class="kpi-value">{{ ocupacionPorcentaje() }}%</div>
       <div class="kpi-sub">
         {{ habitacionesOcupadas() }} ocupadas / {{ totalHabitaciones() }} total
       </div>
+
+      <!-- Barra de progreso -->
+      <div class="kpi-bar" aria-hidden="true">
+        <div
+          class="kpi-bar-fill"
+          [style.width]="ocupacionPorcentaje() + '%'"
+        ></div>
+      </div>
     </div>
 
+    <!-- Reservas hoy -->
     <div class="kpi">
       <div class="kpi-head">
-        <span class="label">Reservas hoy</span>
-        <ion-icon name="clipboardOutline"></ion-icon>
+        <span class="kpi-label">Reservas hoy</span>
+        <div class="kpi-icon kpi-icon--purple">
+          <ion-icon name="clipboardOutline"></ion-icon>
+        </div>
       </div>
+
       <div class="kpi-value">{{ reservasHoyCount() }}</div>
-      <div class="kpi-sub">Entradas y salidas programadas</div>
+      <div class="kpi-sub">
+        {{ checkins().length }} check-ins · {{ checkouts().length }} check-outs
+      </div>
+
+      <div
+        *ngIf="tendenciaReservas() !== null"
+        class="kpi-trend"
+        [class.kpi-trend--up]="tendenciaReservas()! >= 0"
+        [class.kpi-trend--down]="tendenciaReservas()! < 0"
+      >
+        <ion-icon
+          [name]="tendenciaReservas()! >= 0 ? 'trendingUpOutline' : 'trendingDownOutline'"
+        ></ion-icon>
+        {{ labelTendencia(tendenciaReservas(), ' vs ayer') }}
+      </div>
     </div>
 
+    <!-- Disponibles -->
     <div class="kpi">
       <div class="kpi-head">
-        <span class="label">Disponibles</span>
-        <ion-icon name="peopleOutline"></ion-icon>
+        <span class="kpi-label">Disponibles</span>
+        <div class="kpi-icon kpi-icon--green">
+          <ion-icon name="peopleOutline"></ion-icon>
+        </div>
       </div>
+
       <div class="kpi-value">{{ habitacionesDisponibles() }}</div>
       <div class="kpi-sub">Habitaciones libres hoy</div>
+
+      <div
+        *ngIf="tendenciaDisponibles() !== null"
+        class="kpi-trend"
+        [class.kpi-trend--up]="tendenciaDisponibles()! >= 0"
+        [class.kpi-trend--down]="tendenciaDisponibles()! < 0"
+      >
+        <ion-icon
+          [name]="tendenciaDisponibles()! >= 0 ? 'trendingUpOutline' : 'trendingDownOutline'"
+        ></ion-icon>
+        {{ labelTendencia(tendenciaDisponibles(), ' vs ayer') }}
+      </div>
     </div>
 
+    <!-- Ingresos -->
     <div class="kpi">
       <div class="kpi-head">
-        <span class="label">Ingresos (mes)</span>
-        <ion-icon name="cashOutline"></ion-icon>
+        <span class="kpi-label">Ingresos (mes)</span>
+        <div class="kpi-icon kpi-icon--amber">
+          <ion-icon name="cashOutline"></ion-icon>
+        </div>
       </div>
-      <div class="kpi-value">\${{ ingresosMes() }}</div>
+
+      <div class="kpi-value">${{ ingresosMesFormateado() }}</div>
       <div class="kpi-sub">Facturación acumulada del mes</div>
+
+      <div
+        *ngIf="tendenciaIngresos() !== null"
+        class="kpi-trend"
+        [class.kpi-trend--up]="tendenciaIngresos()! >= 0"
+        [class.kpi-trend--down]="tendenciaIngresos()! < 0"
+      >
+        <ion-icon
+          [name]="tendenciaIngresos()! >= 0 ? 'trendingUpOutline' : 'trendingDownOutline'"
+        ></ion-icon>
+        {{ labelTendencia(tendenciaIngresos(), '% vs mes ant.') }}
+      </div>
     </div>
+
   </div>
 
-  <!-- Quick cards -->
+
+  <!-- ======================================
+       QUICK CARDS
+  ======================================= -->
   <div class="quick">
+
     <a class="qcard" routerLink="/admin/habitaciones">
-      <div class="qleft">
-        <strong>Gestionar habitaciones</strong>
-        <span>Estados, tarifas y mantenimiento</span>
+      <div class="qcard-left">
+        <div class="qcard-icon qcard-icon--blue">
+          <ion-icon name="bedOutline"></ion-icon>
+        </div>
+        <div>
+          <strong>Gestionar habitaciones</strong>
+          <span>Estados, tarifas y mantenimiento</span>
+        </div>
       </div>
       <ion-icon class="go" name="chevronForwardOutline"></ion-icon>
     </a>
 
     <a class="qcard" routerLink="/admin/huespedes">
-      <div class="qleft">
-        <strong>Huéspedes</strong>
-        <span>Registro e historial de estadías</span>
+      <div class="qcard-left">
+        <div class="qcard-icon qcard-icon--purple">
+          <ion-icon name="peopleOutline"></ion-icon>
+        </div>
+        <div>
+          <strong>Huéspedes</strong>
+          <span>Registro e historial de estadías</span>
+        </div>
       </div>
       <ion-icon class="go" name="chevronForwardOutline"></ion-icon>
     </a>
 
     <a class="qcard" routerLink="/admin/reportes">
-      <div class="qleft">
-        <strong>Reportes</strong>
-        <span>Ocupación, ingresos, exportaciones</span>
+      <div class="qcard-left">
+        <div class="qcard-icon qcard-icon--amber">
+          <ion-icon name="cashOutline"></ion-icon>
+        </div>
+        <div>
+          <strong>Reportes</strong>
+          <span>Ocupación, ingresos, exportaciones</span>
+        </div>
       </div>
       <ion-icon class="go" name="chevronForwardOutline"></ion-icon>
     </a>
+
   </div>
 
-  <!-- Reservas de hoy -->
+
+  <!-- ======================================
+       RESERVAS DE HOY
+  ======================================= -->
   <div class="card">
+
     <div class="card-head">
       <div>
         <h3>Reservas de hoy</h3>
         <p>Últimos movimientos del día</p>
       </div>
-
       <a class="link" routerLink="/admin/reservas">
         Ver todas
         <ion-icon name="chevronForwardOutline"></ion-icon>
       </a>
     </div>
 
-    <div class="table">
+    <!-- Estado de carga -->
+    <div *ngIf="loadingReservas()" class="table-empty">
+      <p>Cargando reservas...</p>
+    </div>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!loadingReservas() && !hayReservas()" class="table-empty">
+      <ion-icon name="clipboardOutline"></ion-icon>
+      <p>No hay movimientos registrados para hoy.</p>
+    </div>
+
+    <!-- Tabla con datos -->
+    <div *ngIf="!loadingReservas() && hayReservas()" class="table">
+
       <div class="thead">
         <div>ID</div>
         <div>Huésped</div>
@@ -111,19 +217,78 @@
         <div>Estado</div>
       </div>
 
-      <div class="trow" *ngFor="let r of reservasHoy()">
-        <div class="mono">#{{ r.id }}</div>
-        <div class="strong">{{ r.huesped }}</div>
-        <div>{{ r.habitacion }}</div>
-        <div class="dates">
+      <!-- Grupo: Check-ins -->
+      <ng-container *ngIf="checkins().length > 0">
+        <div class="group-divider">
+          <ion-icon name="logInOutline"></ion-icon>
+          <span>Check-ins ({{ checkins().length }})</span>
+        </div>
+        <div class="trow" *ngFor="let r of checkins()">
+          <ng-container *ngTemplateOutlet="filaReserva; context: { r: r }"></ng-container>
+        </div>
+      </ng-container>
+
+      <!-- Grupo: Check-outs -->
+      <ng-container *ngIf="checkouts().length > 0">
+        <div class="group-divider">
+          <ion-icon name="logOutOutline"></ion-icon>
+          <span>Check-outs ({{ checkouts().length }})</span>
+        </div>
+        <div class="trow" *ngFor="let r of checkouts()">
+          <ng-container *ngTemplateOutlet="filaReserva; context: { r: r }"></ng-container>
+        </div>
+      </ng-container>
+
+      <!-- Grupo: Pendientes / Confirmadas -->
+      <ng-container *ngIf="pendientes().length > 0">
+        <div class="group-divider">
           <ion-icon name="timeOutline"></ion-icon>
-          <span>{{ formatoFechaCorta(r.entrada) }} → {{ formatoFechaCorta(r.salida) }}</span>
+          <span>Pendientes ({{ pendientes().length }})</span>
         </div>
-        <div class="money">\${{ r.total }}</div>
-        <div>
-          <ion-chip [color]="colorEstado(r.estado)">{{ r.estado }}</ion-chip>
+        <div class="trow" *ngFor="let r of pendientes()">
+          <ng-container *ngTemplateOutlet="filaReserva; context: { r: r }"></ng-container>
         </div>
-      </div>
+      </ng-container>
+
+      <!-- Grupo: Canceladas -->
+      <ng-container *ngIf="canceladas().length > 0">
+        <div class="group-divider group-divider--danger">
+          <ion-icon name="alertCircleOutline"></ion-icon>
+          <span>Canceladas ({{ canceladas().length }})</span>
+        </div>
+        <div class="trow" *ngFor="let r of canceladas()">
+          <ng-container *ngTemplateOutlet="filaReserva; context: { r: r }"></ng-container>
+        </div>
+      </ng-container>
+
     </div>
   </div>
+
 </div>
+
+
+<!-- ==========================================
+     TEMPLATE REUTILIZABLE — fila de reserva
+=========================================== -->
+<ng-template #filaReserva let-r="r">
+  <div class="mono">#{{ r.id }}</div>
+
+  <!-- Avatar + nombre -->
+  <div class="guest">
+    <div class="avatar">{{ iniciales(r.huesped) }}</div>
+    <span class="guest-name">{{ r.huesped }}</span>
+  </div>
+
+  <div>{{ r.habitacion }}</div>
+
+  <div class="dates">
+    <ion-icon name="timeOutline"></ion-icon>
+    <span>{{ formatoFechaCorta(r.entrada) }} → {{ formatoFechaCorta(r.salida) }}</span>
+  </div>
+
+  <div class="money">${{ r.total }}</div>
+
+  <div>
+    <ion-chip [color]="colorEstado(r.estado)">{{ r.estado }}</ion-chip>
+  </div>
+</ng-template>
