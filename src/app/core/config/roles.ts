@@ -1,11 +1,8 @@
 export type Role =
 
   | 'super_admin'
-
   | 'admin'
-
   | 'recepcion'
-
   | 'cliente';
 
 
@@ -30,12 +27,12 @@ export const ROLES = {
 
 
 // =========================================
-// ROLES ADMINISTRATIVOS
+// ADMIN ROLES
 // =========================================
 
 export const ADMIN_ROLES: Role[] = [
 
   ROLES.SUPER_ADMIN,
 
-  ROLES.ADMIN
+  ROLES.ADMIN,
 ];

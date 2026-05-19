@@ -162,7 +162,7 @@ export const routes: Routes = [
         path: 'usuarios',
         canActivate: [roleGuard],
         data: {
-          roles: ['ADMIN', 'GERENCIA']
+          roles: ['super_admin', 'admin']
         },
 
         loadComponent: () =>
