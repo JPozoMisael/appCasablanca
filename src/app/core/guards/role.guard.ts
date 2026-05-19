@@ -1,33 +1,122 @@
-import { CanActivateFn, ActivatedRouteSnapshot, Router } from '@angular/router';
-import { inject } from '@angular/core';
-import { StorageService } from '../services/storage.service';
-import { Role } from '../config/roles';
+import {
+  CanActivateFn,
+  ActivatedRouteSnapshot,
+  Router
+} from '@angular/router';
 
-export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+import { inject }
+  from '@angular/core';
 
-  const router = inject(Router);
-  const storage = inject(StorageService);
+import { StorageService }
+  from '../services/storage.service';
 
-  const token = storage.getToken();
+import { Role }
+  from '../config/roles';
+
+export const roleGuard: CanActivateFn = (
+
+  route: ActivatedRouteSnapshot
+
+) => {
+
+  console.log(
+    '[ROLE GUARD] Ejecutando...'
+  );
+
+  const router =
+    inject(Router);
+
+  const storage =
+    inject(StorageService);
+
+
+  // =====================================
+  // TOKEN
+  // =====================================
+
+  const token =
+    storage.getToken();
+
+  console.log(
+    '[ROLE GUARD] Token:',
+    token ? 'EXISTE' : 'NO EXISTE'
+  );
+
 
   if (!token) {
-    router.navigate(['/login']);
+
+    console.warn(
+      '[ROLE GUARD] Sin token. Redirigiendo a /login'
+    );
+
+    router.navigate([
+      '/login'
+    ]);
+
     return false;
   }
 
-  const allowed = (route.data['roles'] ?? []) as Role[];
+
+  // =====================================
+  // ROLES PERMITIDOS
+  // =====================================
+
+  const allowed =
+    (route.data['roles'] ?? []) as Role[];
+
+  console.log(
+    '[ROLE GUARD] Allowed:',
+    allowed
+  );
+
 
   if (!allowed.length) {
+
+    console.log(
+      '[ROLE GUARD] Ruta libre'
+    );
+
     return true;
   }
 
-  const role = storage.getRole();
 
-  if (role && allowed.includes(role)) {
+  // =====================================
+  // ROLE USUARIO
+  // =====================================
+
+  const role =
+    storage.getRole();
+
+  console.log(
+    '[ROLE GUARD] User role:',
+    role
+  );
+
+
+  // =====================================
+  // VALIDACIÓN
+  // =====================================
+
+  if (
+    role &&
+    allowed.includes(role)
+  ) {
+
+    console.log(
+      '[ROLE GUARD] Acceso permitido'
+    );
+
     return true;
   }
 
-  router.navigate(['/inicio']);
+
+  console.warn(
+    '[ROLE GUARD] Acceso denegado. Redirigiendo a /inicio'
+  );
+
+  router.navigate([
+    '/inicio'
+  ]);
+
   return false;
-
 };

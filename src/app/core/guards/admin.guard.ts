@@ -1,26 +1,94 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { ADMIN_ROLES } from '../config/roles';
-import { StorageService } from '../services/storage.service';
+
+import { ADMIN_ROLES }
+  from '../config/roles';
+
+import { StorageService }
+  from '../services/storage.service';
 
 export const adminGuard: CanActivateFn = () => {
 
-  const router = inject(Router);
-  const storage = inject(StorageService);
+  console.log(
+    '[ADMIN GUARD] Ejecutando...'
+  );
 
-  const token = storage.getToken();
+  const router =
+    inject(Router);
+
+  const storage =
+    inject(StorageService);
+
+
+  // =====================================
+  // TOKEN
+  // =====================================
+
+  const token =
+    storage.getToken();
+
+  console.log(
+    '[ADMIN GUARD] Token:',
+    token ? 'EXISTE' : 'NO EXISTE'
+  );
+
+
   if (!token) {
-    router.navigate(['/login']);
+
+    console.warn(
+      '[ADMIN GUARD] Sin token. Redirigiendo a /login'
+    );
+
+    router.navigate([
+      '/login'
+    ]);
+
     return false;
   }
 
-  const role = storage.getRole();
 
-  if (role && ADMIN_ROLES.includes(role)) {
+  // =====================================
+  // ROLE
+  // =====================================
+
+  const role =
+    storage.getRole();
+
+  console.log(
+    '[ADMIN GUARD] Role:',
+    role
+  );
+
+  console.log(
+    '[ADMIN GUARD] ADMIN_ROLES:',
+    ADMIN_ROLES
+  );
+
+
+  // =====================================
+  // VALIDACIÓN
+  // =====================================
+
+  if (
+    role &&
+    ADMIN_ROLES.includes(role)
+  ) {
+
+    console.log(
+      '[ADMIN GUARD] Acceso permitido'
+    );
+
     return true;
   }
 
-  router.navigate(['/inicio']);
-  return false;
 
+  console.warn(
+    '[ADMIN GUARD] Acceso denegado. Redirigiendo a /inicio'
+  );
+
+  router.navigate([
+    '/inicio'
+  ]);
+
+  return false;
 };
