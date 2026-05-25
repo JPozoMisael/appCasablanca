@@ -1,0 +1,93 @@
+<ion-content class="ion-padding">
+  <div class="checkin-header">
+    <h1>Check-in / Check-out</h1>
+    <p>Gestión de llegadas y salidas de huéspedes</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <ion-icon name="log-in-outline"></ion-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ checkinsCount() }}</span>
+        <span class="stat-label">Check-ins hoy</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ checkoutsCount() }}</span>
+        <span class="stat-label">Check-outs hoy</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange">
+        <ion-icon name="time-outline"></ion-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ pendientesCount() }}</span>
+        <span class="stat-label">Pendientes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <ion-icon name="search-outline"></ion-icon>
+    <input 
+      type="text" 
+      placeholder="Buscar por nombre, documento o habitación..." 
+      [(ngModel)]="searchTerm"
+      (input)="filtrarReservas()"
+    >
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'checkin'" (click)="activeTab = 'checkin'">
+      <ion-icon name="log-in-outline"></ion-icon>
+      Check-in
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'checkout'" (click)="activeTab = 'checkout'">
+      <ion-icon name="log-out-outline"></ion-icon>
+      Check-out
+    </button>
+  </div>
+
+  <!-- Lista de reservas -->
+  <div class="reservas-list">
+    <div class="reserva-card" *ngFor="let r of reservasFiltradas()">
+      <div class="reserva-info">
+        <div class="guest-avatar">{{ getInitials(r.huesped) }}</div>
+        <div class="guest-details">
+          <strong>{{ r.huesped }}</strong>
+          <span>{{ r.habitacion }}</span>
+          <span class="guest-dates">{{ r.fechaEntrada }} → {{ r.fechaSalida }}</span>
+          <div class="guest-contact" *ngIf="r.documento">
+            <span><ion-icon name="person-outline"></ion-icon> {{ r.documento }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="reserva-actions">
+        <button 
+          class="btn-action" 
+          [class.btn-checkin]="r.tipo === 'checkin'"
+          [class.btn-checkout]="r.tipo === 'checkout'"
+          (click)="procesar(r)">
+          <ion-icon [name]="r.tipo === 'checkin' ? 'log-in-outline' : 'log-out-outline'"></ion-icon>
+          {{ r.tipo === 'checkin' ? 'Registrar entrada' : 'Registrar salida' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="reservasFiltradas().length === 0" class="empty-state">
+      <ion-icon name="people-outline"></ion-icon>
+      <p>No hay {{ activeTab === 'checkin' ? 'check-ins' : 'check-outs' }} pendientes</p>
+    </div>
+  </div>
+</ion-content>

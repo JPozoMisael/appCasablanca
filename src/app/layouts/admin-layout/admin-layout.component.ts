@@ -19,7 +19,8 @@ import {
   restaurantOutline,
   cardOutline,
   settingsOutline,
-  swapHorizontalOutline
+  swapHorizontalOutline,
+  closeOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -39,6 +40,7 @@ import {
 })
 export class AdminLayoutComponent implements OnInit {
   sidebarCollapsed = false;
+  mobileMenuOpen = false;
   userName = 'Administrador';
   userEmail = 'admin@hotel.com';
   userRole = 'Super Administrador';
@@ -65,12 +67,14 @@ export class AdminLayoutComponent implements OnInit {
       restaurantOutline,
       cardOutline,
       settingsOutline,
-      swapHorizontalOutline
+      swapHorizontalOutline,
+      closeOutline
     });
 
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.updatePageTitle(event.urlAfterRedirects);
+        this.closeMobileMenu();
       }
     });
   }
@@ -134,13 +138,27 @@ export class AdminLayoutComponent implements OnInit {
   }
 
   toggleSidebar() {
-    this.sidebarCollapsed = !this.sidebarCollapsed;
+    if (window.innerWidth <= 768) {
+      this.mobileMenuOpen = !this.mobileMenuOpen;
+    } else {
+      this.sidebarCollapsed = !this.sidebarCollapsed;
+    }
+  }
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.mobileMenuOpen = false;
   }
 
   checkScreenSize() {
-    if (window.innerWidth < 768) {
-      this.sidebarCollapsed = true;
+    if (window.innerWidth <= 768) {
+      this.sidebarCollapsed = false;
+      this.mobileMenuOpen = false;
     } else {
+      this.mobileMenuOpen = false;
       this.sidebarCollapsed = false;
     }
   }

@@ -1,0 +1,26 @@
+<ion-content class="ion-padding">
+  <div class="config-header">
+    <h1>Configuración del sistema</h1>
+    <p>Ajustes generales del hotel</p>
+  </div>
+
+  <div class="config-grid">
+    <div class="config-card" *ngFor="let config of configs()">
+      <div class="config-icon">
+        <ion-icon [name]="config.icon"></ion-icon>
+      </div>
+      <div class="config-content">
+        <h3>{{ config.title }}</h3>
+        <p>{{ config.description }}</p>
+      </div>
+      <button class="config-btn">Configurar</button>
+    </div>
+  </div>
+
+  <div class="save-bar">
+    <button class="btn-save">
+      <ion-icon name="save-outline"></ion-icon>
+      Guardar cambios
+    </button>
+  </div>
+</ion-content>

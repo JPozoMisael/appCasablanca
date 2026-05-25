@@ -2,11 +2,11 @@
   <div class="admin-shell">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <aside class="sidebar" [class.collapsed]="sidebarCollapsed" [class.mobile-open]="mobileMenuOpen">
 
-      <!-- Botón toggle para móvil (fuera del sidebar) -->
-      <button class="global-toggle" (click)="toggleSidebar()">
-        <ion-icon name="menu-outline"></ion-icon>
+      <!-- Botón toggle dentro del sidebar (visible en móvil) -->
+      <button class="sidebar-toggle" (click)="toggleSidebar()">
+        <ion-icon [name]="sidebarCollapsed ? 'menu-outline' : 'close-outline'"></ion-icon>
       </button>
 
       <!-- BRAND -->
@@ -20,90 +20,84 @@
         </div>
       </div>
 
-      <!-- NAVEGACIÓN PRINCIPAL -->
-      <nav class="sb-nav">
-        <a routerLink="/admin/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-          <ion-icon name="grid-outline"></ion-icon>
-          <span>Dashboard</span>
-        </a>
+      <!-- SCROLLABLE NAVIGATION -->
+      <div class="sb-nav-wrapper">
+        <nav class="sb-nav">
+          <a routerLink="/admin/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <ion-icon name="grid-outline"></ion-icon>
+            <span>Dashboard</span>
+          </a>
 
-        <a routerLink="/admin/calendario" routerLinkActive="active">
-          <ion-icon name="calendar-outline"></ion-icon>
-          <span>Calendario</span>
-        </a>
+          <a routerLink="/admin/calendario" routerLinkActive="active">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>Calendario</span>
+          </a>
 
-        <a routerLink="/admin/reservas" routerLinkActive="active">
-          <ion-icon name="clipboard-outline"></ion-icon>
-          <span>Reservas</span>
-        </a>
+          <a routerLink="/admin/reservas" routerLinkActive="active">
+            <ion-icon name="clipboard-outline"></ion-icon>
+            <span>Reservas</span>
+          </a>
 
-        <a routerLink="/admin/checkin-out" routerLinkActive="active">
-          <ion-icon name="swap-horizontal-outline"></ion-icon>
-          <span>Check-in/out</span>
-        </a>
-      </nav>
+          <a routerLink="/admin/checkin-out" routerLinkActive="active">
+            <ion-icon name="swap-horizontal-outline"></ion-icon>
+            <span>Check-in/out</span>
+          </a>
 
-      <!-- SEPARADOR -->
-      <div class="nav-divider" *ngIf="!sidebarCollapsed">
-        <span>Gestión hotelera</span>
+          <div class="nav-divider" *ngIf="!sidebarCollapsed">
+            <span>Gestión hotelera</span>
+          </div>
+          <div class="nav-divider-icon" *ngIf="sidebarCollapsed">
+            <ion-icon name="ellipse-outline"></ion-icon>
+          </div>
+
+          <a routerLink="/admin/habitaciones" routerLinkActive="active">
+            <ion-icon name="bed-outline"></ion-icon>
+            <span>Habitaciones</span>
+          </a>
+
+          <a routerLink="/admin/tarifas" routerLinkActive="active">
+            <ion-icon name="pricetag-outline"></ion-icon>
+            <span>Tarifas</span>
+          </a>
+
+          <a routerLink="/admin/servicios" routerLinkActive="active">
+            <ion-icon name="restaurant-outline"></ion-icon>
+            <span>Servicios</span>
+          </a>
+
+          <a routerLink="/admin/huespedes" routerLinkActive="active">
+            <ion-icon name="people-outline"></ion-icon>
+            <span>Huéspedes</span>
+          </a>
+
+          <div class="nav-divider" *ngIf="!sidebarCollapsed">
+            <span>Administración</span>
+          </div>
+          <div class="nav-divider-icon" *ngIf="sidebarCollapsed">
+            <ion-icon name="ellipse-outline"></ion-icon>
+          </div>
+
+          <a routerLink="/admin/pagos" routerLinkActive="active">
+            <ion-icon name="card-outline"></ion-icon>
+            <span>Pagos</span>
+          </a>
+
+          <a routerLink="/admin/reportes" routerLinkActive="active">
+            <ion-icon name="analytics-outline"></ion-icon>
+            <span>Reportes</span>
+          </a>
+
+          <a *ngIf="isSuperAdmin" routerLink="/admin/usuarios" routerLinkActive="active">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+            <span>Usuarios</span>
+          </a>
+
+          <a *ngIf="isSuperAdmin" routerLink="/admin/configuracion" routerLinkActive="active">
+            <ion-icon name="settings-outline"></ion-icon>
+            <span>Configuración</span>
+          </a>
+        </nav>
       </div>
-      <div class="nav-divider-icon" *ngIf="sidebarCollapsed">
-        <ion-icon name="ellipse-outline"></ion-icon>
-      </div>
-
-      <!-- NAVEGACIÓN SECUNDARIA -->
-      <nav class="sb-nav">
-        <a routerLink="/admin/habitaciones" routerLinkActive="active">
-          <ion-icon name="bed-outline"></ion-icon>
-          <span>Habitaciones</span>
-        </a>
-
-        <a routerLink="/admin/tarifas" routerLinkActive="active">
-          <ion-icon name="pricetag-outline"></ion-icon>
-          <span>Tarifas</span>
-        </a>
-
-        <a routerLink="/admin/servicios" routerLinkActive="active">
-          <ion-icon name="restaurant-outline"></ion-icon>
-          <span>Servicios</span>
-        </a>
-
-        <a routerLink="/admin/huespedes" routerLinkActive="active">
-          <ion-icon name="people-outline"></ion-icon>
-          <span>Huéspedes</span>
-        </a>
-      </nav>
-
-      <!-- SEPARADOR -->
-      <div class="nav-divider" *ngIf="!sidebarCollapsed">
-        <span>Administración</span>
-      </div>
-      <div class="nav-divider-icon" *ngIf="sidebarCollapsed">
-        <ion-icon name="ellipse-outline"></ion-icon>
-      </div>
-
-      <!-- NAVEGACIÓN TERCIARIA -->
-      <nav class="sb-nav">
-        <a routerLink="/admin/pagos" routerLinkActive="active">
-          <ion-icon name="card-outline"></ion-icon>
-          <span>Pagos</span>
-        </a>
-
-        <a routerLink="/admin/reportes" routerLinkActive="active">
-          <ion-icon name="analytics-outline"></ion-icon>
-          <span>Reportes</span>
-        </a>
-
-        <a *ngIf="isSuperAdmin" routerLink="/admin/usuarios" routerLinkActive="active">
-          <ion-icon name="shield-checkmark-outline"></ion-icon>
-          <span>Usuarios</span>
-        </a>
-
-        <a *ngIf="isSuperAdmin" routerLink="/admin/configuracion" routerLinkActive="active">
-          <ion-icon name="settings-outline"></ion-icon>
-          <span>Configuración</span>
-        </a>
-      </nav>
 
       <!-- FOOTER DEL SIDEBAR -->
       <div class="sb-foot">
@@ -118,21 +112,24 @@
           <div class="user-avatar small">{{ userInitials }}</div>
         </div>
 
-        <ion-button class="btn-logout" fill="clear" (click)="logout()">
-          <ion-icon slot="start" name="log-out-outline"></ion-icon>
+        <button class="logout-btn" (click)="logout()">
+          <ion-icon name="log-out-outline"></ion-icon>
           <span *ngIf="!sidebarCollapsed">Cerrar sesión</span>
-        </ion-button>
+        </button>
       </div>
 
     </aside>
 
+    <!-- OVERLAY para móvil -->
+    <div class="sidebar-overlay" *ngIf="mobileMenuOpen" (click)="closeMobileMenu()"></div>
+
     <!-- MAIN -->
-    <section class="main" [class.sidebar-collapsed]="sidebarCollapsed">
+    <section class="main">
 
       <!-- TOPBAR -->
       <header class="topbar">
         <div class="tb-left">
-          <button class="mobile-toggle" (click)="toggleSidebar()">
+          <button class="mobile-toggle" (click)="toggleMobileMenu()">
             <ion-icon name="menu-outline"></ion-icon>
           </button>
           <div class="page-info">

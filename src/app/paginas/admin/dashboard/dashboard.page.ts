@@ -69,6 +69,17 @@ type EstadoReserva =
 })
 export class DashboardPage implements OnInit {
 
+  // ======================================================
+  // NUEVAS PROPIEDADES PARA EL HEADER
+  // ======================================================
+  todayDate: string = '';
+  userName: string = 'Administrador';
+  userRole: string = 'Super Administrador';
+  userInitials: string = 'AD';
+
+  // ======================================================
+  // SIGNALS — estado principal
+  // ======================================================
   totalHabitaciones   = signal(0);
   habitacionesOcupadas = signal(0);
   ingresosMes          = signal(0);
@@ -81,11 +92,11 @@ export class DashboardPage implements OnInit {
   loadingStats    = signal(true);
   loadingReservas = signal(true);
 
+  // ======================================================
+  // COMPUTED — derivados automáticos
+  // ======================================================
   reservasHoyCount = computed(() => this.reservasHoy().length);
-
-  habitacionesDisponibles = computed(
-    () => this.totalHabitaciones() - this.habitacionesOcupadas()
-  );
+  habitacionesDisponibles = computed(() => this.totalHabitaciones() - this.habitacionesOcupadas());
 
   ocupacionPorcentaje = computed(() =>
     this.totalHabitaciones() === 0
@@ -170,21 +181,61 @@ export class DashboardPage implements OnInit {
   ngOnInit(): void {
     this.loadStats();
     this.loadReservasHoy();
+    this.setTodayDate();
+    this.loadUserData();
   }
 
+  // ======================================================
+  // HEADER METHODS
+  // ======================================================
+  setTodayDate() {
+    const today = new Date();
+    const options: Intl.DateTimeFormatOptions = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    this.todayDate = today.toLocaleDateString('es-EC', options);
+  }
+
+  loadUserData() {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        this.userName = (user.nombre + ' ' + user.apellido) || 'Administrador';
+        this.userRole = this.getRoleLabel(user.rol);
+        this.userInitials = (user.nombre?.charAt(0) || 'A') + (user.apellido?.charAt(0) || 'D');
+      } catch (e) {
+        console.error('Error parsing user', e);
+      }
+    }
+  }
+
+  getRoleLabel(rol: string): string {
+    const roles: Record<string, string> = {
+      super_admin: 'Super Administrador',
+      admin: 'Administrador',
+      recepcion: 'Recepcionista',
+      cliente: 'Cliente'
+    };
+    return roles[rol] || 'Usuario';
+  }
+
+  // ======================================================
+  // LOAD STATS & RESERVAS
+  // ======================================================
   loadStats(): void {
     this.loadingStats.set(true);
-
     this.dashboardService.getStats().subscribe({
       next: (data: DashboardStats) => {
         this.totalHabitaciones.set(data?.totalHabitaciones ?? 0);
         this.habitacionesOcupadas.set(data?.habitacionesOcupadas ?? 0);
         this.ingresosMes.set(Number(data?.ingresosMes ?? 0));
-
         this.ingresosMesAnterior.set(Number(data?.ingresosMesAnterior ?? 0));
         this.reservasAyer.set(Number(data?.reservasAyer ?? 0));
         this.disponiblesAyer.set(Number(data?.disponiblesAyer ?? 0));
-
         this.loadingStats.set(false);
       },
       error: (err) => {
@@ -199,7 +250,6 @@ export class DashboardPage implements OnInit {
 
   loadReservasHoy(): void {
     this.loadingReservas.set(true);
-
     this.dashboardService.getReservasHoy().subscribe({
       next: (reservas: ReservaHoy[]) => {
         this.reservasHoy.set(Array.isArray(reservas) ? reservas : []);
@@ -213,6 +263,9 @@ export class DashboardPage implements OnInit {
     });
   }
 
+  // ======================================================
+  // HELPERS
+  // ======================================================
   colorEstado(estado: string): string {
     const colores: Record<string, string> = {
       CHECKIN:    'success',

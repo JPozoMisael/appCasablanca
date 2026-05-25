@@ -1,0 +1,100 @@
+.config-header {
+  margin-bottom: 32px;
+}
+
+.config-header h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.config-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.config-card {
+  background: white;
+  border: 1px solid #e6e6e6;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.2s;
+}
+
+.config-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.config-icon {
+  width: 56px;
+  height: 56px;
+  background: #dbeafe;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.config-icon ion-icon {
+  font-size: 28px;
+  color: #1d4ed8;
+}
+
+.config-content {
+  flex: 1;
+}
+
+.config-content h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.config-content p {
+  margin: 0;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.config-btn {
+  padding: 8px 20px;
+  background: #f8fafc;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-bar {
+  position: sticky;
+  bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-save {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: #003580;
+  color: white;
+  border: none;
+  border-radius: 40px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}

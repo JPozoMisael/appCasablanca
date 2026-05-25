@@ -1,0 +1,75 @@
+<ion-content class="ion-padding">
+  <div class="servicios-header">
+    <div>
+      <h1>Servicios adicionales</h1>
+      <p>Desayuno, spa, traslados, etc.</p>
+    </div>
+    <button class="btn-primary" (click)="abrirModal()">
+      <ion-icon name="add-circle-outline"></ion-icon>
+      Nuevo servicio
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="search-box">
+    <ion-icon name="search-outline"></ion-icon>
+    <input type="text" placeholder="Buscar servicio..." [(ngModel)]="searchTerm">
+  </div>
+
+  <!-- Grid de servicios -->
+  <div class="servicios-grid">
+    <div class="servicio-card" *ngFor="let s of serviciosFiltrados()">
+      <div class="servicio-icon">
+        <ion-icon [name]="s.icono"></ion-icon>
+      </div>
+      <div class="servicio-info">
+        <h3>{{ s.nombre }}</h3>
+        <p>{{ s.descripcion }}</p>
+        <span class="precio">${{ s.precio }}</span>
+      </div>
+      <div class="servicio-actions">
+        <button class="icon-btn" (click)="editar(s)"><ion-icon name="create-outline"></ion-icon></button>
+        <button class="icon-btn danger" (click)="eliminar(s)"><ion-icon name="trash-outline"></ion-icon></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" *ngIf="modalAbierto" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editando ? 'Editar servicio' : 'Nuevo servicio' }}</h3>
+        <button class="close-btn" (click)="cerrarModal()"><ion-icon name="close-outline"></ion-icon></button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>Nombre</label>
+          <input type="text" [(ngModel)]="formData.nombre">
+        </div>
+        <div class="field">
+          <label>Descripción</label>
+          <textarea rows="2" [(ngModel)]="formData.descripcion"></textarea>
+        </div>
+        <div class="field">
+          <label>Precio ($)</label>
+          <input type="number" [(ngModel)]="formData.precio">
+        </div>
+        <div class="field">
+          <label>Icono</label>
+          <select [(ngModel)]="formData.icono">
+            <option value="restaurant-outline">🍽️ Restaurante</option>
+            <option value="wifi-outline">📡 WiFi</option>
+            <option value="water-outline">🏊 Piscina</option>
+            <option value="car-outline">🚗 Transporte</option>
+            <option value="snow-outline">❄️ Aire acondicionado</option>
+            <option value="beer-outline">🍺 Bar</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-save" (click)="guardar()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</ion-content>

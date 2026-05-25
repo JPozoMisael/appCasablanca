@@ -1,30 +1,38 @@
 <div class="db">
 
-  <!-- ======================================
-       TOP — título + acciones
-  ======================================= -->
-  <div class="db-top">
-    <div class="title">
-      <h2>Dashboard</h2>
-      <p>Resumen del día y accesos rápidos a la operación del hotel.</p>
+  <!-- ======================================================
+       HEADER PROFESIONAL
+  ======================================================= -->
+  <div class="db-header">
+    <div class="db-header-left">
+      <div class="db-breadcrumb">
+        <span class="breadcrumb-item">Panel de Control</span>
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+        <span class="breadcrumb-item active">Dashboard</span>
+      </div>
+      <h1 class="db-title">Dashboard</h1>
+      <p class="db-description">Resumen ejecutivo de la operación del hotel</p>
     </div>
 
-    <div class="actions">
-      <ion-button class="btn" routerLink="/admin/reservas">
-        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
-        Nueva reserva
-      </ion-button>
-
-      <ion-button class="btn soft" fill="outline" routerLink="/admin/calendario">
-        <ion-icon slot="start" name="calendar-outline"></ion-icon>
-        Ver calendario
-      </ion-button>
+    <div class="db-header-right">
+      <div class="date-badge">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>{{ todayDate }}</span>
+      </div>
+      <div class="user-welcome">
+        <div class="user-avatar">{{ userInitials }}</div>
+        <div class="user-greeting">
+          <span class="greeting">Bienvenido,</span>
+          <strong class="user-name">{{ userName }}</strong>
+          <span class="user-role">{{ userRole }}</span>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ======================================
+  <!-- ======================================================
        KPIs
-  ======================================= -->
+  ======================================================= -->
   <div class="kpis">
 
     <!-- Ocupación -->
@@ -110,9 +118,9 @@
 
   </div>
 
-  <!-- ======================================
+  <!-- ======================================================
        QUICK CARDS
-  ======================================= -->
+  ======================================================= -->
   <div class="quick">
 
     <a class="qcard" routerLink="/admin/habitaciones">
@@ -195,9 +203,9 @@
 
   </div>
 
-  <!-- ======================================
+  <!-- ======================================================
        RESERVAS DE HOY
-  ======================================= -->
+  ======================================================= -->
   <div class="card">
 
     <div class="card-head">

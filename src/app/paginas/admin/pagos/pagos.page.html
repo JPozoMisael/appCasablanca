@@ -1,0 +1,48 @@
+<ion-content class="ion-padding">
+  <div class="pagos-header">
+    <div>
+      <h1>Pagos y facturación</h1>
+      <p>Historial de pagos y facturas</p>
+    </div>
+    <button class="btn-primary">
+      <ion-icon name="download-outline"></ion-icon>
+      Exportar reporte
+    </button>
+  </div>
+
+  <!-- Search -->
+  <div class="search-box">
+    <ion-icon name="search-outline"></ion-icon>
+    <input type="text" placeholder="Buscar por reserva o huésped..." [(ngModel)]="searchTerm">
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-container">
+    <table class="pagos-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Reserva</th>
+          <th>Huésped</th>
+          <th>Monto</th>
+          <th>Fecha</th>
+          <th>Método</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of pagosFiltrados()">
+          <td>#{{ p.id }}</td>
+          <td>{{ p.reserva }}</td>
+          <td>{{ p.huesped }}</td>
+          <td class="price">${{ p.monto }}</td>
+          <td>{{ p.fecha }}</td>
+          <td><span class="method-badge">{{ p.metodo }}</span></td>
+          <td><span class="status-badge" [class.pagado]="p.estado === 'pagado'" [class.pendiente]="p.estado === 'pendiente'">{{ p.estado === 'pagado' ? 'Pagado' : 'Pendiente' }}</span></td>
+          <td><button class="icon-btn"><ion-icon name="eye-outline"></ion-icon></button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ion-content>

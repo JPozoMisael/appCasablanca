@@ -331,6 +331,50 @@ export const routes: Routes = [
 
 
       // ===============================================
+      // RESERVAS ADMIN
+      // ===============================================
+
+      {
+        path: 'reservas',
+
+        loadComponent: async () => {
+
+          console.log(
+            '[ROUTE] Reservas Admin'
+          );
+
+          return import(
+            './paginas/admin/reservas/reservas.page'
+          ).then(
+            m => m.AdminReservasPage
+          );
+        },
+      },
+
+
+      // ===============================================
+      // CHECK-IN / CHECK-OUT (NUEVO)
+      // ===============================================
+
+      {
+        path: 'checkin-out',
+
+        loadComponent: async () => {
+
+          console.log(
+            '[ROUTE] Check-in / Check-out'
+          );
+
+          return import(
+            './paginas/admin/checkin-out/checkin-out.page'
+          ).then(
+            m => m.CheckinOutPage
+          );
+        },
+      },
+
+
+      // ===============================================
       // HABITACIONES ADMIN
       // ===============================================
 
@@ -347,6 +391,72 @@ export const routes: Routes = [
             './paginas/admin/habitaciones/habitaciones.page'
           ).then(
             m => m.AdminHabitacionesPage
+          );
+        },
+      },
+
+
+      // ===============================================
+      // TARIFAS (NUEVO)
+      // ===============================================
+
+      {
+        path: 'tarifas',
+
+        canActivate: [
+          roleGuard
+        ],
+
+        data: {
+          roles: [
+            'super_admin',
+            'admin'
+          ]
+        },
+
+        loadComponent: async () => {
+
+          console.log(
+            '[ROUTE] Tarifas'
+          );
+
+          return import(
+            './paginas/admin/tarifas/tarifas.page'
+          ).then(
+            m => m.TarifasPage
+          );
+        },
+      },
+
+
+      // ===============================================
+      // SERVICIOS (NUEVO)
+      // ===============================================
+
+      {
+        path: 'servicios',
+
+        canActivate: [
+          roleGuard
+        ],
+
+        data: {
+          roles: [
+            'super_admin',
+            'admin'
+          ]
+        },
+
+        loadComponent: async () => {
+
+          console.log(
+            '[ROUTE] Servicios'
+          );
+
+          return import(
+            './paginas/admin/servicios/servicios.page'
+          ).then(
+            m => m.ServiciosPage
           );
         },
       },
@@ -375,22 +485,55 @@ export const routes: Routes = [
 
 
       // ===============================================
-      // RESERVAS ADMIN
+      // PAGOS (NUEVO)
       // ===============================================
 
       {
-        path: 'reservas',
+        path: 'pagos',
+
+        canActivate: [
+          roleGuard
+        ],
+
+        data: {
+          roles: [
+            'super_admin',
+            'admin'
+          ]
+        },
 
         loadComponent: async () => {
 
           console.log(
-            '[ROUTE] Reservas Admin'
+            '[ROUTE] Pagos'
           );
 
           return import(
-            './paginas/admin/reservas/reservas.page'
+            './paginas/admin/pagos/pagos.page'
           ).then(
-            m => m.AdminReservasPage
+            m => m.PagosPage
+          );
+        },
+      },
+
+
+      // ===============================================
+      // REPORTES
+      // ===============================================
+
+      {
+        path: 'reportes',
+
+        loadComponent: async () => {
+
+          console.log(
+            '[ROUTE] Reportes'
+          );
+
+          return import(
+            './paginas/admin/reportes/reportes.page'
+          ).then(
+            m => m.ReportesPage
           );
         },
       },
@@ -430,22 +573,32 @@ export const routes: Routes = [
 
 
       // ===============================================
-      // REPORTES
+      // CONFIGURACIÓN (NUEVO - solo super_admin)
       // ===============================================
 
       {
-        path: 'reportes',
+        path: 'configuracion',
+
+        canActivate: [
+          roleGuard
+        ],
+
+        data: {
+          roles: [
+            'super_admin'
+          ]
+        },
 
         loadComponent: async () => {
 
           console.log(
-            '[ROUTE] Reportes'
+            '[ROUTE] Configuración'
           );
 
           return import(
-            './paginas/admin/reportes/reportes.page'
+            './paginas/admin/configuracion/configuracion.page'
           ).then(
-            m => m.ReportesPage
+            m => m.ConfiguracionPage
           );
         },
       },
