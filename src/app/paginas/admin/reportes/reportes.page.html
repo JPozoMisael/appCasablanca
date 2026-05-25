@@ -1,34 +1,38 @@
 <div class="rp">
-  <!-- Top -->
+
+  <!-- =====================================================
+       TOP BAR
+  ====================================================== -->
   <div class="rp-top">
     <div class="title">
-      <h2>Reportes</h2>
+      <span class="eyebrow">HOTEL CASA BLANCA</span>
+      <h2>Reportes y estadísticas</h2>
       <p>Resumen operativo y financiero con exportación rápida.</p>
     </div>
 
     <div class="actions">
-      <ion-button class="btn soft" fill="outline" (click)="exportResumenCSV()">
-        <ion-icon slot="start" name="downloadOutline"></ion-icon>
+      <button class="ghost-btn" (click)="exportResumenCSV()">
+        <ion-icon name="download-outline"></ion-icon>
         Exportar resumen
-      </ion-button>
-
-      <ion-button class="btn" (click)="exportTopCSV()">
-        <ion-icon slot="start" name="downloadOutline"></ion-icon>
+      </button>
+      <button class="primary-btn" (click)="exportTopCSV()">
+        <ion-icon name="download-outline"></ion-icon>
         Exportar top
-      </ion-button>
+      </button>
     </div>
   </div>
 
-  <!-- Period chips -->
-  <div class="period">
-    <div class="p-title">
-      <ion-icon name="calendarOutline"></ion-icon>
+  <!-- =====================================================
+       PERIOD SELECTOR
+  ====================================================== -->
+  <div class="period-card">
+    <div class="period-title">
+      <ion-icon name="calendar-outline"></ion-icon>
       <span>Período</span>
     </div>
-
-    <div class="p-chips">
+    <div class="period-chips">
       <button class="chip" [class.active]="periodo() === 'hoy'" (click)="setPeriodo('hoy')">
-        <ion-icon name="timeOutline"></ion-icon> Hoy
+        <ion-icon name="today-outline"></ion-icon> Hoy
       </button>
       <button class="chip" [class.active]="periodo() === '7d'" (click)="setPeriodo('7d')">
         7 días
@@ -37,166 +41,186 @@
         30 días
       </button>
       <button class="chip" [class.active]="periodo() === 'mes'" (click)="setPeriodo('mes')">
-        Mes
+        Este mes
       </button>
     </div>
   </div>
 
-  <!-- KPIs -->
+  <!-- =====================================================
+       KPIs
+  ====================================================== -->
   <div class="kpis">
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Ingresos</span>
-        <ion-icon name="cashOutline"></ion-icon>
+    <div class="kpi-card revenue">
+      <div class="kpi-icon">
+        <ion-icon name="cash-outline"></ion-icon>
       </div>
-      <div class="kpi-value">\${{ kpi().ingresos }}</div>
-      <div class="kpi-sub">Total período</div>
+      <div class="kpi-info">
+        <span>Ingresos</span>
+        <strong>${{ kpi().ingresos | number }}</strong>
+        <small>Total período</small>
+      </div>
     </div>
 
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Ocupación</span>
-        <ion-icon name="bedOutline"></ion-icon>
+    <div class="kpi-card occupancy">
+      <div class="kpi-icon">
+        <ion-icon name="bed-outline"></ion-icon>
       </div>
-      <div class="kpi-value">{{ kpi().ocupacion }}%</div>
-      <div class="kpi-sub">Promedio período</div>
+      <div class="kpi-info">
+        <span>Ocupación</span>
+        <strong>{{ kpi().ocupacion }}%</strong>
+        <small>Promedio período</small>
+      </div>
     </div>
 
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Reservas</span>
-        <ion-icon name="clipboardOutline"></ion-icon>
+    <div class="kpi-card bookings">
+      <div class="kpi-icon">
+        <ion-icon name="clipboard-outline"></ion-icon>
       </div>
-      <div class="kpi-value">{{ kpi().reservas }}</div>
-      <div class="kpi-sub">Cantidad</div>
+      <div class="kpi-info">
+        <span>Reservas</span>
+        <strong>{{ kpi().reservas }}</strong>
+        <small>Cantidad</small>
+      </div>
     </div>
 
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Ticket prom.</span>
-        <ion-icon name="trendingUpOutline"></ion-icon>
+    <div class="kpi-card ticket">
+      <div class="kpi-icon">
+        <ion-icon name="trending-up-outline"></ion-icon>
       </div>
-      <div class="kpi-value">\${{ kpi().ticket }}</div>
-      <div class="kpi-sub">Ingresos / reservas</div>
+      <div class="kpi-info">
+        <span>Ticket promedio</span>
+        <strong>${{ kpi().ticket | number }}</strong>
+        <small>Ingresos / reservas</small>
+      </div>
     </div>
   </div>
 
-  <!-- Tabs -->
-  <div class="tabs">
-    <ion-segment [value]="tab()" (ionChange)="setTab($event.detail.value)">
-      <ion-segment-button value="general">
-        <ion-label>General</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="ingresos">
-        <ion-label>Ingresos</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="ocupacion">
-        <ion-label>Ocupación</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+  <!-- =====================================================
+       TABS
+  ====================================================== -->
+  <div class="tabs-card">
+    <div class="tabs-buttons">
+      <button class="tab-btn" [class.active]="tab() === 'general'" (click)="setTab('general')">
+        <ion-icon name="stats-chart-outline"></ion-icon>
+        General
+      </button>
+      <button class="tab-btn" [class.active]="tab() === 'ingresos'" (click)="setTab('ingresos')">
+        <ion-icon name="cash-outline"></ion-icon>
+        Ingresos
+      </button>
+      <button class="tab-btn" [class.active]="tab() === 'ocupacion'" (click)="setTab('ocupacion')">
+        <ion-icon name="bed-outline"></ion-icon>
+        Ocupación
+      </button>
+      <button class="tab-btn" [class.active]="tab() === 'habitaciones'" (click)="setTab('habitaciones')">
+        <ion-icon name="business-outline"></ion-icon>
+        Top habitaciones
+      </button>
+    </div>
   </div>
 
-  <!-- Content -->
+  <!-- =====================================================
+       CONTENT GRID
+  ====================================================== -->
   <div class="grid">
-    <!-- Left card -->
-    <div class="card">
+
+    <!-- TAB: GENERAL -->
+    <div class="card full" *ngIf="tab() === 'general'">
       <div class="card-head">
         <div>
-          <h3>{{ tab() === 'general' ? 'Resumen' : (tab() === 'ingresos' ? 'Ingresos' : 'Ocupación') }}</h3>
+          <h3>Resumen ejecutivo</h3>
           <p>Vista rápida para decisiones operativas</p>
         </div>
       </div>
-
-      <!-- GENERAL -->
-      <div class="body" *ngIf="tab() === 'general'">
-        <div class="summary">
-          <div class="srow" *ngFor="let r of resumen()">
-            <span class="k">{{ r.label }}</span>
-            <span class="v">{{ r.value }}</span>
+      <div class="card-body">
+        <div class="summary-grid">
+          <div class="summary-item" *ngFor="let r of resumen()">
+            <span class="summary-label">{{ r.label }}</span>
+            <span class="summary-value">{{ r.value }}</span>
           </div>
         </div>
-
-        <div class="note">
-          <ion-icon name="analyticsOutline"></ion-icon>
-          <span>Este módulo está listo para conectar a tu API (reservas/ingresos/ocupación).</span>
-        </div>
-      </div>
-
-      <!-- INGRESOS -->
-      <div class="body" *ngIf="tab() === 'ingresos'">
-        <div class="mini">
-          <div class="mini-head">
-            <strong>Ingresos por período</strong>
-            <span>barritas (mock)</span>
-          </div>
-
-          <div class="bars">
-            <div
-              class="bar"
-              *ngFor="let p of ingresosSerie()"
-              [style.height.%]="pct(p.value, maxSerie(ingresosSerie()))"
-              title="{{ p.label }}: ${{ p.value }}"
-            ></div>
-          </div>
-
-          <div class="labels">
-            <span *ngFor="let p of ingresosSerie()">{{ p.label }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- OCUPACION -->
-      <div class="body" *ngIf="tab() === 'ocupacion'">
-        <div class="mini">
-          <div class="mini-head">
-            <strong>Ocupación (%)</strong>
-            <span>barritas (mock)</span>
-          </div>
-
-          <div class="bars">
-            <div
-              class="bar"
-              *ngFor="let p of ocupacionSerie()"
-              [style.height.%]="pct(p.value, maxSerie(ocupacionSerie()))"
-              title="{{ p.label }}: {{ p.value }}%"
-            ></div>
-          </div>
-
-          <div class="labels">
-            <span *ngFor="let p of ocupacionSerie()">{{ p.label }}</span>
-          </div>
+        <div class="info-note">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span>Los datos se actualizan automáticamente según el período seleccionado</span>
         </div>
       </div>
     </div>
 
-    <!-- Right card -->
-    <div class="card">
+    <!-- TAB: INGRESOS -->
+    <div class="card full" *ngIf="tab() === 'ingresos'">
+      <div class="card-head">
+        <div>
+          <h3>Ingresos por período</h3>
+          <p>Evolución diaria de ingresos</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="chart-container">
+          <div class="bars-container">
+            <div class="bar-wrapper" *ngFor="let p of ingresosSerie()">
+              <div class="bar" [style.height.%]="pct(p.value, maxIngresos())"></div>
+              <span class="bar-label">{{ p.label }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="chart-legend">
+          <span class="legend-dot revenue"></span>
+          <span>Ingresos en dólares ($)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: OCUPACIÓN -->
+    <div class="card full" *ngIf="tab() === 'ocupacion'">
+      <div class="card-head">
+        <div>
+          <h3>Ocupación por período</h3>
+          <p>Porcentaje de ocupación diaria</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="chart-container">
+          <div class="bars-container">
+            <div class="bar-wrapper" *ngFor="let p of ocupacionSerie()">
+              <div class="bar occupancy-bar" [style.height.%]="pct(p.value, maxOcupacion())"></div>
+              <span class="bar-label">{{ p.label }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="chart-legend">
+          <span class="legend-dot occupancy"></span>
+          <span>Porcentaje de ocupación (%)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: TOP HABITACIONES -->
+    <div class="card full" *ngIf="tab() === 'habitaciones'">
       <div class="card-head">
         <div>
           <h3>Top habitaciones</h3>
           <p>Mejores ingresos en el período</p>
         </div>
-
-        <ion-button class="btn-sm" fill="outline" (click)="exportTopCSV()">
-          <ion-icon slot="start" name="downloadOutline"></ion-icon>
-          CSV
-        </ion-button>
+        <button class="mini-btn" (click)="exportTopCSV()">
+          <ion-icon name="download-outline"></ion-icon>
+          Exportar CSV
+        </button>
       </div>
-
-      <div class="body">
-        <div class="top">
-          <div class="trow" *ngFor="let t of topHabitaciones()">
-            <div class="left">
+      <div class="card-body">
+        <div class="top-list">
+          <div class="top-item" *ngFor="let t of topHabitaciones(); let i = index">
+            <div class="top-rank">{{ i + 1 }}</div>
+            <div class="top-info">
               <strong>{{ t.name }}</strong>
-              <span>Ingresos estimados</span>
+              <span>{{ t.category || 'Habitación' }}</span>
             </div>
-            <div class="right">
-              <span class="money">\${{ t.value }}</span>
-              <ion-chip color="primary">TOP</ion-chip>
-            </div>
+            <div class="top-value">${{ t.value | number }}</div>
+            <div class="top-badge">TOP</div>
           </div>
         </div>
       </div>
     </div>
+
   </div>
+
 </div>

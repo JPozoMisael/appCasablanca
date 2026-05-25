@@ -3,216 +3,128 @@
   <!-- =====================================================
        TOP BAR
   ====================================================== -->
-
   <div class="hb-top">
-
     <div class="title">
-      <span class="eyebrow">
-        HOTEL CASA BLANCA
-      </span>
-
-      <h2>
-        Gestión de habitaciones
-      </h2>
-
-      <p>
-        Controla disponibilidad, tarifas, ocupación,
-        mantenimiento y estado operativo del hotel.
-      </p>
+      <span class="eyebrow">HOTEL CASA BLANCA</span>
+      <h2>Gestión de habitaciones</h2>
+      <p>Controla disponibilidad, tarifas, ocupación, mantenimiento y estado operativo del hotel.</p>
     </div>
 
     <div class="actions">
-
-      <button
-        class="ghost-btn"
-        type="button"
-      >
-        <ion-icon name="downloadOutline"></ion-icon>
+      <button class="ghost-btn" type="button" (click)="exportData()">
+        <ion-icon name="download-outline"></ion-icon>
         Exportar
       </button>
-
-      <button
-        class="primary-btn"
-        type="button"
-        (click)="openCreate()"
-      >
-        <ion-icon name="addCircleOutline"></ion-icon>
+      <button class="primary-btn" type="button" (click)="openCreate()">
+        <ion-icon name="add-circle-outline"></ion-icon>
         Nueva habitación
       </button>
-
     </div>
-
   </div>
 
   <!-- =====================================================
-       KPI
+       KPIs
   ====================================================== -->
-
   <div class="kpis">
-
     <div class="kpi-card total">
-
       <div class="kpi-icon">
-        <ion-icon name="bedOutline"></ion-icon>
+        <ion-icon name="bed-outline"></ion-icon>
       </div>
-
       <div class="kpi-info">
         <span>Total habitaciones</span>
         <strong>{{ total() }}</strong>
         <small>Registradas en el sistema</small>
       </div>
-
     </div>
 
     <div class="kpi-card available">
-
       <div class="kpi-icon">
-        <ion-icon name="checkmarkCircleOutline"></ion-icon>
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
       </div>
-
       <div class="kpi-info">
         <span>Disponibles</span>
         <strong>{{ disponibles() }}</strong>
         <small>Listas para reservar</small>
       </div>
-
     </div>
 
     <div class="kpi-card occupied">
-
       <div class="kpi-icon">
-        <ion-icon name="pauseCircleOutline"></ion-icon>
+        <ion-icon name="pause-circle-outline"></ion-icon>
       </div>
-
       <div class="kpi-info">
         <span>Ocupadas</span>
         <strong>{{ ocupadas() }}</strong>
         <small>Actualmente en uso</small>
       </div>
-
     </div>
 
     <div class="kpi-card maintenance">
-
       <div class="kpi-icon">
-        <ion-icon name="constructOutline"></ion-icon>
+        <ion-icon name="construct-outline"></ion-icon>
       </div>
-
       <div class="kpi-info">
         <span>Mantenimiento</span>
         <strong>{{ mantenimiento() }}</strong>
         <small>Limpieza / revisión</small>
       </div>
-
     </div>
-
   </div>
 
   <!-- =====================================================
        FILTERS
   ====================================================== -->
-
   <div class="filters-card">
-
     <div class="search-box">
-
-      <ion-icon name="searchOutline"></ion-icon>
-
-      <input
-        type="text"
-        placeholder="Buscar habitación, código, tipo o piso..."
-        [value]="q()"
-        (input)="q.set(($any($event.target).value || ''))"
-      />
-
+      <ion-icon name="search-outline"></ion-icon>
+      <input type="text" placeholder="Buscar habitación, código, tipo o piso..."
+             [value]="q()" (input)="q.set(($any($event.target).value || ''))">
     </div>
 
     <div class="filter-group">
-
       <div class="select-box">
-
         <label>Estado</label>
-
-        <select
-          [value]="fEstado()"
-          (change)="setEstadoFilter(($any($event.target).value))"
-        >
+        <select [value]="fEstado()" (change)="setEstadoFilter(($any($event.target).value))">
           <option value="TODOS">Todos</option>
           <option value="DISPONIBLE">Disponible</option>
           <option value="OCUPADA">Ocupada</option>
           <option value="LIMPIEZA">Limpieza</option>
           <option value="MANTENIMIENTO">Mantenimiento</option>
         </select>
-
       </div>
 
       <div class="select-box">
-
         <label>Tipo</label>
-
-        <select
-          [value]="fTipo()"
-          (change)="setTipoFilter(($any($event.target).value))"
-        >
+        <select [value]="fTipo()" (change)="setTipoFilter(($any($event.target).value))">
           <option value="TODOS">Todos</option>
           <option value="SIMPLE">Simple</option>
           <option value="DOBLE">Doble</option>
           <option value="TRIPLE">Triple</option>
           <option value="SUITE">Suite</option>
         </select>
-
       </div>
-
     </div>
-
   </div>
 
   <!-- =====================================================
        TABLE CARD
   ====================================================== -->
-
   <div class="table-card">
-
     <div class="table-head">
-
       <div>
-        <h3>
-          Habitaciones registradas
-        </h3>
-
-        <p>
-          {{ filtradas().length }} resultado(s)
-        </p>
+        <h3>Habitaciones registradas</h3>
+        <p>{{ filtradas().length }} resultado(s)</p>
       </div>
-
       <div class="table-head-actions">
-
-        <button class="mini-btn active">
-          Todas
-        </button>
-
-        <button class="mini-btn">
-          Disponibles
-        </button>
-
-        <button class="mini-btn">
-          Ocupadas
-        </button>
-
+        <button class="mini-btn" [class.active]="quickFilter() === 'TODAS'" (click)="setQuickFilter('TODAS')">Todas</button>
+        <button class="mini-btn" [class.active]="quickFilter() === 'DISPONIBLE'" (click)="setQuickFilter('DISPONIBLE')">Disponibles</button>
+        <button class="mini-btn" [class.active]="quickFilter() === 'OCUPADA'" (click)="setQuickFilter('OCUPADA')">Ocupadas</button>
       </div>
-
     </div>
 
-    <!-- =====================================================
-         TABLE
-    ====================================================== -->
-
     <div class="table-wrapper">
-
-      <table>
-
+      <table class="room-table">
         <thead>
-
           <tr>
             <th>Habitación</th>
             <th>Tipo</th>
@@ -222,339 +134,71 @@
             <th>Estado</th>
             <th class="actions-col">Acciones</th>
           </tr>
-
         </thead>
-
         <tbody>
-
           <tr *ngFor="let h of filtradas()">
-
-            <!-- ROOM -->
-
             <td>
-
               <div class="room-cell">
-
                 <div class="room-image">
-
-                  <img
-                    src="assets/img/default-room.jpg"
-                    alt="room"
-                  />
-
+                  <img [src]="h.imagenUrl || 'assets/img/default-room.jpg'" [alt]="'Habitación ' + h.codigo">
                 </div>
-
                 <div class="room-meta">
-
-                  <strong>
-                    Habitación {{ h.codigo }}
-                  </strong>
-
-                  <span>
-                    Vista premium · Aire acondicionado
-                  </span>
-
+                  <strong>Habitación {{ h.codigo }}</strong>
+                  <span>{{ getAmenitiesPreview(h) }}</span>
                 </div>
-
               </div>
-
             </td>
-
-            <!-- TYPE -->
-
-            <td>
-
-              <span class="type-pill">
-                {{ h.tipo }}
-              </span>
-
-            </td>
-
-            <!-- FLOOR -->
-
-            <td>
-              Piso {{ h.piso }}
-            </td>
-
-            <!-- CAPACITY -->
-
-            <td>
-
-              <div class="capacity">
-
-                <ion-icon name="peopleOutline"></ion-icon>
-
-                {{ h.capacidad }}
-
-              </div>
-
-            </td>
-
-            <!-- PRICE -->
-
-            <td>
-
-              <div class="price">
-
-                <strong>
-                  ${{ h.tarifa }}
-                </strong>
-
-                <small>/ noche</small>
-
-              </div>
-
-            </td>
-
-            <!-- STATUS -->
-
-            <td>
-
-              <div
-                class="status"
-                [ngClass]="h.estado.toLowerCase()"
-              >
-                {{ h.estado }}
-              </div>
-
-            </td>
-
-            <!-- ACTIONS -->
-
+            <td><span class="type-pill">{{ formatTipo(h.tipo) }}</span></td>
+            <td>Piso {{ h.piso }}</td>
+            <td><div class="capacity"><ion-icon name="people-outline"></ion-icon>{{ h.capacidad }}</div></td>
+            <td><div class="price"><strong>${{ h.tarifa }}</strong><small>/ noche</small></div></td>
+            <td><div class="status" [class]="getEstadoClass(h.estado)">{{ formatEstado(h.estado) }}</div></td>
             <td class="actions-col">
-
               <div class="table-actions">
-
-                <button
-                  class="icon-btn"
-                  type="button"
-                  title="Ver"
-                >
-                  <ion-icon name="eyeOutline"></ion-icon>
-                </button>
-
-                <button
-                  class="icon-btn"
-                  type="button"
-                  title="Editar"
-                  (click)="openEdit(h)"
-                >
-                  <ion-icon name="createOutline"></ion-icon>
-                </button>
-
-                <button
-                  class="icon-btn"
-                  type="button"
-                  title="Estado"
-                  (click)="cycleEstado(h)"
-                >
-                  <ion-icon name="optionsOutline"></ion-icon>
-                </button>
-
+                <button class="icon-btn" type="button" title="Ver" (click)="openDetail(h)"><ion-icon name="eye-outline"></ion-icon></button>
+                <button class="icon-btn" type="button" title="Editar" (click)="openEdit(h)"><ion-icon name="create-outline"></ion-icon></button>
+                <button class="icon-btn" type="button" title="Cambiar estado" (click)="cycleEstado(h)"><ion-icon name="sync-outline"></ion-icon></button>
+                <button class="icon-btn danger" type="button" title="Eliminar" (click)="confirmDelete(h)"><ion-icon name="trash-outline"></ion-icon></button>
               </div>
-
             </td>
-
           </tr>
-
         </tbody>
-
       </table>
-
     </div>
-
   </div>
 
   <!-- =====================================================
        MODAL
   ====================================================== -->
-
-  <div
-    class="modal-backdrop"
-    *ngIf="modalOpen()"
-    (click)="closeModal()"
-  ></div>
-
-  <div
-    class="modal"
-    *ngIf="modalOpen()"
-  >
-
-    <div
-      class="modal-card"
-      (click)="$event.stopPropagation()"
-    >
-
-      <!-- HEAD -->
-
+  <div class="modal-backdrop" *ngIf="modalOpen()" (click)="closeModal()"></div>
+  <div class="modal" *ngIf="modalOpen()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-head">
-
         <div>
-
-          <span class="modal-tag">
-            HOTEL CASA BLANCA
-          </span>
-
-          <h3>
-            {{
-              modalMode() === 'create'
-              ? 'Nueva habitación'
-              : 'Editar habitación'
-            }}
-          </h3>
-
-          <p>
-            Configura información principal,
-            capacidad, tarifa y estado operativo.
-          </p>
-
+          <span class="modal-tag">HOTEL CASA BLANCA</span>
+          <h3>{{ modalMode() === 'create' ? 'Nueva habitación' : 'Editar habitación' }}</h3>
+          <p>Configura información principal, capacidad, tarifa y estado operativo.</p>
         </div>
-
-        <button
-          class="close-btn"
-          type="button"
-          (click)="closeModal()"
-        >
-          <ion-icon name="closeOutline"></ion-icon>
-        </button>
-
+        <button class="close-btn" type="button" (click)="closeModal()"><ion-icon name="close-outline"></ion-icon></button>
       </div>
-
-      <!-- BODY -->
 
       <div class="modal-body">
-
         <div class="form-grid">
-
-          <div class="field">
-
-            <label>Código</label>
-
-            <input
-              type="text"
-              placeholder="Ej: 204"
-              [value]="form().codigo"
-              (input)="patch('codigo', ($any($event.target).value || ''))"
-            />
-
-          </div>
-
-          <div class="field">
-
-            <label>Piso</label>
-
-            <input
-              type="number"
-              min="1"
-              [value]="form().piso"
-              (input)="patch('piso', +($any($event.target).value || 1))"
-            />
-
-          </div>
-
-          <div class="field">
-
-            <label>Tipo</label>
-
-            <select
-              [value]="form().tipo"
-              (change)="patch('tipo', $any($event.target).value)"
-            >
-              <option value="SIMPLE">Simple</option>
-              <option value="DOBLE">Doble</option>
-              <option value="TRIPLE">Triple</option>
-              <option value="SUITE">Suite</option>
-            </select>
-
-          </div>
-
-          <div class="field">
-
-            <label>Capacidad</label>
-
-            <input
-              type="number"
-              min="1"
-              [value]="form().capacidad"
-              (input)="patch('capacidad', +($any($event.target).value || 1))"
-            />
-
-          </div>
-
-          <div class="field">
-
-            <label>Tarifa</label>
-
-            <input
-              type="number"
-              min="0"
-              [value]="form().tarifa"
-              (input)="patch('tarifa', +($any($event.target).value || 0))"
-            />
-
-          </div>
-
-          <div class="field">
-
-            <label>Estado</label>
-
-            <select
-              [value]="form().estado"
-              (change)="patch('estado', $any($event.target).value)"
-            >
-              <option value="DISPONIBLE">Disponible</option>
-              <option value="OCUPADA">Ocupada</option>
-              <option value="LIMPIEZA">Limpieza</option>
-              <option value="MANTENIMIENTO">Mantenimiento</option>
-            </select>
-
-          </div>
-
-          <div class="field full">
-
-            <label>Notas</label>
-
-            <textarea
-              rows="4"
-              placeholder="Ej: Habitación en limpieza profunda..."
-              [value]="form().notas || ''"
-              (input)="patch('notas', ($any($event.target).value || ''))"
-            ></textarea>
-
-          </div>
-
+          <div class="field"><label>Código *</label><input type="text" placeholder="Ej: 204" [value]="form().codigo" (input)="patch('codigo', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Piso</label><input type="number" min="1" [value]="form().piso" (input)="patch('piso', +($any($event.target).value || 1))"></div>
+          <div class="field"><label>Tipo</label><select [value]="form().tipo" (change)="patch('tipo', $any($event.target).value)"><option value="SIMPLE">Simple</option><option value="DOBLE">Doble</option><option value="TRIPLE">Triple</option><option value="SUITE">Suite</option></select></div>
+          <div class="field"><label>Capacidad</label><input type="number" min="1" [value]="form().capacidad" (input)="patch('capacidad', +($any($event.target).value || 1))"></div>
+          <div class="field"><label>Tarifa por noche ($)</label><input type="number" min="0" step="0.01" [value]="form().tarifa" (input)="patch('tarifa', +($any($event.target).value || 0))"></div>
+          <div class="field"><label>Estado</label><select [value]="form().estado" (change)="patch('estado', $any($event.target).value)"><option value="DISPONIBLE">Disponible</option><option value="OCUPADA">Ocupada</option><option value="LIMPIEZA">Limpieza</option><option value="MANTENIMIENTO">Mantenimiento</option></select></div>
+          <div class="field full"><label>Notas / Servicios</label><textarea rows="4" placeholder="Ej: Habitación con vista al mar, WiFi incluido..." [value]="form().notas || ''" (input)="patch('notas', ($any($event.target).value || ''))"></textarea></div>
         </div>
-
       </div>
-
-      <!-- FOOT -->
 
       <div class="modal-foot">
-
-        <button
-          class="cancel-btn"
-          type="button"
-          (click)="closeModal()"
-        >
-          Cancelar
-        </button>
-
-        <button
-          class="save-btn"
-          type="button"
-          (click)="save()"
-        >
-          {{
-            modalMode() === 'create'
-            ? 'Crear habitación'
-            : 'Guardar cambios'
-          }}
-        </button>
-
+        <button class="cancel-btn" type="button" (click)="closeModal()">Cancelar</button>
+        <button class="save-btn" type="button" (click)="save()">{{ modalMode() === 'create' ? 'Crear habitación' : 'Guardar cambios' }}</button>
       </div>
-
     </div>
-
   </div>
 
 </div>

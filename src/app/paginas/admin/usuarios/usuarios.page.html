@@ -1,231 +1,98 @@
 <div class="us">
-  <!-- Top -->
+
+  <!-- =====================================================
+       TOP BAR
+  ====================================================== -->
   <div class="us-top">
     <div class="title">
-      <h2>Usuarios</h2>
+      <span class="eyebrow">HOTEL CASA BLANCA</span>
+      <h2>Gestión de usuarios</h2>
       <p>Gestión de accesos, roles y estado de cuenta.</p>
     </div>
 
     <div class="actions">
-      <ion-button class="btn" (click)="openCreate()">
-        <ion-icon slot="start" name="addCircleOutline"></ion-icon>
+      <button class="primary-btn" (click)="openCreate()">
+        <ion-icon name="add-circle-outline"></ion-icon>
         Nuevo usuario
-      </ion-button>
+      </button>
     </div>
   </div>
 
-  <!-- KPIs -->
+  <!-- =====================================================
+       KPIs
+  ====================================================== -->
   <div class="kpis">
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Total</span>
-        <ion-icon name="peopleOutline"></ion-icon>
-      </div>
-      <div class="kpi-value">{{ total() }}</div>
-      <div class="kpi-sub">Cuentas registradas</div>
+    <div class="kpi-card total">
+      <div class="kpi-icon"><ion-icon name="people-outline"></ion-icon></div>
+      <div class="kpi-info"><span>Total usuarios</span><strong>{{ total() }}</strong><small>Cuentas registradas</small></div>
     </div>
-
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Activos</span>
-        <ion-icon name="checkmarkCircleOutline"></ion-icon>
-      </div>
-      <div class="kpi-value">{{ activos() }}</div>
-      <div class="kpi-sub">Con acceso habilitado</div>
+    <div class="kpi-card active">
+      <div class="kpi-icon"><ion-icon name="checkmark-circle-outline"></ion-icon></div>
+      <div class="kpi-info"><span>Activos</span><strong>{{ activos() }}</strong><small>Con acceso habilitado</small></div>
     </div>
-
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Admin/Gerencia</span>
-        <ion-icon name="shieldOutline"></ion-icon>
-      </div>
-      <div class="kpi-value">{{ admins() }}</div>
-      <div class="kpi-sub">Roles críticos</div>
+    <div class="kpi-card admin">
+      <div class="kpi-icon"><ion-icon name="shield-outline"></ion-icon></div>
+      <div class="kpi-info"><span>Admin/Gerencia</span><strong>{{ admins() }}</strong><small>Roles críticos</small></div>
     </div>
-
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Bloqueados</span>
-        <ion-icon name="lockClosedOutline"></ion-icon>
-      </div>
-      <div class="kpi-value">{{ bloqueados() }}</div>
-      <div class="kpi-sub">Acceso restringido</div>
+    <div class="kpi-card blocked">
+      <div class="kpi-icon"><ion-icon name="lock-closed-outline"></ion-icon></div>
+      <div class="kpi-info"><span>Bloqueados</span><strong>{{ bloqueados() }}</strong><small>Acceso restringido</small></div>
     </div>
   </div>
 
-  <!-- Filters -->
-  <div class="filters">
-    <div class="search">
-      <ion-icon name="searchOutline"></ion-icon>
-      <input
-        type="text"
-        placeholder="Buscar: nombre, email, rol, estado…"
-        [value]="q()"
-        (input)="q.set(($any($event.target).value || ''))"
-      />
+  <!-- =====================================================
+       FILTERS
+  ====================================================== -->
+  <div class="filters-card">
+    <div class="search-box">
+      <ion-icon name="search-outline"></ion-icon>
+      <input type="text" placeholder="Buscar: nombre, email, rol, estado…"
+             [value]="q()" (input)="q.set(($any($event.target).value || ''))">
     </div>
-
-    <div class="select">
-      <label>Rol</label>
-      <select [value]="fRol()" (change)="setRolFilter(($any($event.target).value))">
-        <option value="TODOS">Todos</option>
-        <option value="ADMIN">ADMIN</option>
-        <option value="GERENCIA">GERENCIA</option>
-        <option value="RECEPCION">RECEPCION</option>
-        <option value="LIMPIEZA">LIMPIEZA</option>
-      </select>
-    </div>
-
-    <div class="select">
-      <label>Estado</label>
-      <select [value]="fEstado()" (change)="setEstadoFilter(($any($event.target).value))">
-        <option value="TODOS">Todos</option>
-        <option value="ACTIVO">ACTIVO</option>
-        <option value="BLOQUEADO">BLOQUEADO</option>
-      </select>
+    <div class="filter-group">
+      <div class="select-box"><label>Rol</label><select [value]="fRol()" (change)="setRolFilter(($any($event.target).value))"><option value="TODOS">Todos</option><option value="ADMIN">ADMIN</option><option value="GERENCIA">GERENCIA</option><option value="RECEPCION">RECEPCION</option><option value="LIMPIEZA">LIMPIEZA</option></select></div>
+      <div class="select-box"><label>Estado</label><select [value]="fEstado()" (change)="setEstadoFilter(($any($event.target).value))"><option value="TODOS">Todos</option><option value="ACTIVO">ACTIVO</option><option value="BLOQUEADO">BLOQUEADO</option></select></div>
     </div>
   </div>
 
-  <!-- Table -->
-  <div class="card">
-    <div class="card-head">
-      <div>
-        <h3>Listado</h3>
-        <p>{{ filtrados().length }} resultado(s)</p>
-      </div>
-    </div>
-
-    <div class="table">
-      <div class="thead">
-        <div>Usuario</div>
-        <div>Email</div>
-        <div>Rol</div>
-        <div>Estado</div>
-        <div>Último acceso</div>
-        <div class="end">Acciones</div>
-      </div>
-
-      <div class="trow" *ngFor="let u of filtrados()">
-        <div class="strong">
-          <div class="name">
-            <ion-icon name="personOutline"></ion-icon>
-            <span>{{ u.nombres }}</span>
-          </div>
-          <div class="sub">ID #{{ u.id }}</div>
-        </div>
-
-        <div class="mail">
-          <ion-icon name="mailOutline"></ion-icon>
-          <span>{{ u.email }}</span>
-        </div>
-
-        <div>
-          <ion-chip [color]="rolColor(u.rol)">{{ u.rol }}</ion-chip>
-        </div>
-
-        <div>
-          <ion-chip [color]="estadoColor(u.estado)">{{ u.estado }}</ion-chip>
-        </div>
-
-        <div class="sub">{{ u.ultimoAcceso || '—' }}</div>
-
-        <div class="end actions">
-          <button class="icon" type="button" title="Ver">
-            <ion-icon name="eyeOutline"></ion-icon>
-          </button>
-
-          <button class="icon" type="button" title="Editar" (click)="openEdit(u)">
-            <ion-icon name="createOutline"></ion-icon>
-          </button>
-
-          <button class="icon" type="button" title="Bloquear / Activar" (click)="toggleEstado(u)">
-            <ion-icon name="optionsOutline"></ion-icon>
-          </button>
-        </div>
-      </div>
+  <!-- =====================================================
+       TABLE CARD
+  ====================================================== -->
+  <div class="table-card">
+    <div class="table-head"><div><h3>Listado de usuarios</h3><p>{{ filtrados().length }} resultado(s)</p></div></div>
+    <div class="table-wrapper">
+      <table class="usuarios-table">
+        <thead><tr><th>Usuario</th><th>Email</th><th>Rol</th><th>Estado</th><th>Último acceso</th><th class="actions-col">Acciones</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let u of filtrados()">
+            <td class="user-cell"><div class="user-avatar">{{ getInitials(u.nombres) }}</div><div class="user-info"><strong>{{ u.nombres }}</strong><span>ID #{{ u.id }}</span></div></td>
+            <td class="email-cell"><ion-icon name="mail-outline"></ion-icon><span>{{ u.email }}</span></td>
+            <td><div class="role-badge" [class]="getRolClass(u.rol)">{{ formatRol(u.rol) }}</div></td>
+            <td><div class="status-badge" [class]="getEstadoClass(u.estado)">{{ formatEstado(u.estado) }}</div></td>
+            <td class="date-cell">{{ u.ultimoAcceso || '—' }}</td>
+            <td class="actions-col"><div class="table-actions"><button class="icon-btn" title="Ver detalles" (click)="openDetail(u)"><ion-icon name="eye-outline"></ion-icon></button><button class="icon-btn" title="Editar" (click)="openEdit(u)"><ion-icon name="create-outline"></ion-icon></button><button class="icon-btn" title="Bloquear / Activar" (click)="toggleEstado(u)"><ion-icon name="refresh-outline"></ion-icon></button><button class="icon-btn danger" title="Eliminar" (click)="confirmDelete(u)"><ion-icon name="trash-outline"></ion-icon></button></div></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <!-- MODAL -->
   <div class="modal-backdrop" *ngIf="modalOpen()" (click)="closeModal()"></div>
-
   <div class="modal" *ngIf="modalOpen()">
     <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="m-head">
-        <div>
-          <h3>{{ modalMode() === 'create' ? 'Nuevo usuario' : 'Editar usuario' }}</h3>
-          <p>Roles y estado de acceso</p>
-        </div>
-
-        <button class="close" type="button" (click)="closeModal()">
-          <ion-icon name="closeOutline"></ion-icon>
-        </button>
-      </div>
-
-      <div class="m-body">
-        <div class="grid">
-          <div class="field">
-            <label>Nombres</label>
-            <input
-              type="text"
-              placeholder="Nombre completo"
-              [value]="form().nombres"
-              (input)="patch('nombres', ($any($event.target).value || ''))"
-            />
-          </div>
-
-          <div class="field">
-            <label>Email</label>
-            <input
-              type="email"
-              placeholder="correo@hotel.com"
-              [value]="form().email"
-              (input)="patch('email', ($any($event.target).value || ''))"
-            />
-          </div>
-
-          <div class="field">
-            <label>Rol</label>
-            <select [value]="form().rol" (change)="patch('rol', $any($event.target).value)">
-              <option value="ADMIN">ADMIN</option>
-              <option value="GERENCIA">GERENCIA</option>
-              <option value="RECEPCION">RECEPCION</option>
-              <option value="LIMPIEZA">LIMPIEZA</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>Estado</label>
-            <select [value]="form().estado" (change)="patch('estado', $any($event.target).value)">
-              <option value="ACTIVO">ACTIVO</option>
-              <option value="BLOQUEADO">BLOQUEADO</option>
-            </select>
-          </div>
-
-          <div class="field full">
-            <label>
-              Contraseña
-              <span class="hint">(opcional: solo si vas a cambiarla)</span>
-            </label>
-            <div class="pass">
-              <ion-icon name="keyOutline"></ion-icon>
-              <input
-                type="password"
-                placeholder="••••••••"
-                [value]="form().password || ''"
-                (input)="patch('password', ($any($event.target).value || ''))"
-              />
-            </div>
-          </div>
+      <div class="modal-head"><div><span class="modal-tag">HOTEL CASA BLANCA</span><h3>{{ modalMode() === 'create' ? 'Nuevo usuario' : 'Editar usuario' }}</h3><p>Roles y estado de acceso</p></div><button class="close-btn" (click)="closeModal()"><ion-icon name="close-outline"></ion-icon></button></div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="field"><label>Nombres *</label><input type="text" placeholder="Nombre completo" [value]="form().nombres" (input)="patch('nombres', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Email *</label><input type="email" placeholder="correo@hotel.com" [value]="form().email" (input)="patch('email', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Rol</label><select [value]="form().rol" (change)="patch('rol', $any($event.target).value)"><option value="ADMIN">ADMIN</option><option value="GERENCIA">GERENCIA</option><option value="RECEPCION">RECEPCION</option><option value="LIMPIEZA">LIMPIEZA</option></select></div>
+          <div class="field"><label>Estado</label><select [value]="form().estado" (change)="patch('estado', $any($event.target).value)"><option value="ACTIVO">ACTIVO</option><option value="BLOQUEADO">BLOQUEADO</option></select></div>
+          <div class="field full"><label>Contraseña <span class="hint">(opcional: solo si vas a cambiarla)</span></label><div class="password-input"><ion-icon name="key-outline"></ion-icon><input type="password" placeholder="••••••••" [value]="form().password || ''" (input)="patch('password', ($any($event.target).value || ''))"></div></div>
         </div>
       </div>
-
-      <div class="m-foot">
-        <ion-button class="btn" fill="outline" (click)="closeModal()">Cancelar</ion-button>
-        <ion-button class="btn" (click)="save()">
-          {{ modalMode() === 'create' ? 'Crear' : 'Guardar cambios' }}
-        </ion-button>
-      </div>
+      <div class="modal-foot"><button class="cancel-btn" (click)="closeModal()">Cancelar</button><button class="save-btn" (click)="save()">{{ modalMode() === 'create' ? 'Crear usuario' : 'Guardar cambios' }}</button></div>
     </div>
   </div>
+
 </div>

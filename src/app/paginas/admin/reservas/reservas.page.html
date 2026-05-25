@@ -1,275 +1,221 @@
 <div class="rv">
-  <!-- Top -->
+
+  <!-- =====================================================
+       TOP BAR
+  ====================================================== -->
   <div class="rv-top">
     <div class="title">
-      <h2>Reservas</h2>
+      <span class="eyebrow">HOTEL CASA BLANCA</span>
+      <h2>Gestión de reservas</h2>
       <p>Crear, editar y controlar estados (pendiente, confirmada, check-in, check-out).</p>
     </div>
 
     <div class="actions">
-      <ion-button class="btn" (click)="openCreate()">
-        <ion-icon slot="start" name="addCircleOutline"></ion-icon>
+      <button class="primary-btn" (click)="openCreate()">
+        <ion-icon name="add-circle-outline"></ion-icon>
         Nueva reserva
-      </ion-button>
+      </button>
     </div>
   </div>
 
-  <!-- KPIs -->
+  <!-- =====================================================
+       KPIs
+  ====================================================== -->
   <div class="kpis">
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Hoy</span>
-        <ion-icon name="calendarOutline"></ion-icon>
+    <div class="kpi-card today">
+      <div class="kpi-icon">
+        <ion-icon name="calendar-outline"></ion-icon>
       </div>
-      <div class="kpi-value">{{ reservasHoy() }}</div>
-      <div class="kpi-sub">Movimientos de hoy</div>
+      <div class="kpi-info">
+        <span>Movimientos hoy</span>
+        <strong>{{ reservasHoy() }}</strong>
+        <small>Entradas y salidas</small>
+      </div>
     </div>
 
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Check-in</span>
-        <ion-icon name="logInOutline"></ion-icon>
+    <div class="kpi-card checkin">
+      <div class="kpi-icon">
+        <ion-icon name="log-in-outline"></ion-icon>
       </div>
-      <div class="kpi-value">{{ checkinHoy() }}</div>
-      <div class="kpi-sub">Entradas hoy</div>
+      <div class="kpi-info">
+        <span>Check-in</span>
+        <strong>{{ checkinHoy() }}</strong>
+        <small>Entradas hoy</small>
+      </div>
     </div>
 
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Check-out</span>
-        <ion-icon name="logOutOutline"></ion-icon>
+    <div class="kpi-card checkout">
+      <div class="kpi-icon">
+        <ion-icon name="log-out-outline"></ion-icon>
       </div>
-      <div class="kpi-value">{{ checkoutHoy() }}</div>
-      <div class="kpi-sub">Salidas hoy</div>
+      <div class="kpi-info">
+        <span>Check-out</span>
+        <strong>{{ checkoutHoy() }}</strong>
+        <small>Salidas hoy</small>
+      </div>
     </div>
 
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="label">Próximas</span>
-        <ion-icon name="timeOutline"></ion-icon>
+    <div class="kpi-card upcoming">
+      <div class="kpi-icon">
+        <ion-icon name="time-outline"></ion-icon>
       </div>
-      <div class="kpi-value">{{ proximas() }}</div>
-      <div class="kpi-sub">Entradas futuras</div>
+      <div class="kpi-info">
+        <span>Próximas</span>
+        <strong>{{ proximas() }}</strong>
+        <small>Entradas futuras</small>
+      </div>
     </div>
   </div>
 
-  <!-- Filters -->
-  <div class="filters">
-    <div class="search">
-      <ion-icon name="searchOutline"></ion-icon>
-      <input
-        type="text"
-        placeholder="Buscar: código, huésped, documento, habitación…"
-        [value]="q()"
-        (input)="q.set(($any($event.target).value || ''))"
-      />
+  <!-- =====================================================
+       FILTERS
+  ====================================================== -->
+  <div class="filters-card">
+    <div class="search-box">
+      <ion-icon name="search-outline"></ion-icon>
+      <input type="text" placeholder="Buscar: código, huésped, documento, habitación…"
+             [value]="q()" (input)="q.set(($any($event.target).value || ''))">
     </div>
 
-    <div class="select">
-      <label>Estado</label>
-      <select [value]="fEstado()" (change)="setEstadoFilter(($any($event.target).value))">
-        <option value="TODOS">Todos</option>
-        <option value="PENDIENTE">Pendiente</option>
-        <option value="CONFIRMADA">Confirmada</option>
-        <option value="CHECKIN">Check-in</option>
-        <option value="CHECKOUT">Check-out</option>
-        <option value="CANCELADA">Cancelada</option>
-      </select>
-    </div>
+    <div class="filter-group">
+      <div class="select-box">
+        <label>Estado</label>
+        <select [value]="fEstado()" (change)="setEstadoFilter(($any($event.target).value))">
+          <option value="TODOS">Todos</option>
+          <option value="PENDIENTE">Pendiente</option>
+          <option value="CONFIRMADA">Confirmada</option>
+          <option value="CHECKIN">Check-in</option>
+          <option value="CHECKOUT">Check-out</option>
+          <option value="CANCELADA">Cancelada</option>
+        </select>
+      </div>
 
-    <div class="date">
-      <label>Desde</label>
-      <input type="date" [value]="fDesde()" (input)="fDesde.set(($any($event.target).value || ''))" />
-    </div>
+      <div class="date-box">
+        <label>Desde</label>
+        <input type="date" [value]="fDesde()" (input)="fDesde.set(($any($event.target).value || ''))">
+      </div>
 
-    <div class="date">
-      <label>Hasta</label>
-      <input type="date" [value]="fHasta()" (input)="fHasta.set(($any($event.target).value || ''))" />
+      <div class="date-box">
+        <label>Hasta</label>
+        <input type="date" [value]="fHasta()" (input)="fHasta.set(($any($event.target).value || ''))">
+      </div>
     </div>
   </div>
 
-  <!-- Table -->
-  <div class="card">
-    <div class="card-head">
+  <!-- =====================================================
+       TABLE CARD
+  ====================================================== -->
+  <div class="table-card">
+    <div class="table-head">
       <div>
-        <h3>Listado</h3>
+        <h3>Listado de reservas</h3>
         <p>{{ filtradas().length }} resultado(s)</p>
       </div>
+      <div class="table-head-actions">
+        <button class="mini-btn" (click)="exportData()">
+          <ion-icon name="download-outline"></ion-icon>
+          Exportar CSV
+        </button>
+      </div>
     </div>
 
-    <div class="table">
-      <div class="thead">
-        <div>Código</div>
-        <div>Huésped</div>
-        <div>Habitación</div>
-        <div>Fechas</div>
-        <div>Total</div>
-        <div>Estado</div>
-        <div class="end">Acciones</div>
-      </div>
-
-      <div class="trow" *ngFor="let r of filtradas()">
-        <div class="mono">{{ r.codigo || ('#' + r.id) }}</div>
-
-        <div class="strong">
-          <div class="name">
-            <ion-icon name="personOutline"></ion-icon>
-            <span>{{ r.huesped }}</span>
-          </div>
-          <div class="sub" *ngIf="r.documento">{{ r.documento }}</div>
-        </div>
-
-        <div class="room">
-          <ion-icon name="bedOutline"></ion-icon>
-          <span>{{ r.habitacion }}</span>
-        </div>
-
-        <div class="dates">
-          <ion-icon name="calendarOutline"></ion-icon>
-          <span>{{ short(r.fechaEntrada) }} → {{ short(r.fechaSalida) }}</span>
-        </div>
-
-        <div class="money">\${{ r.total }}</div>
-
-        <div>
-          <ion-chip [color]="estadoColor(r.estado)">{{ r.estado }}</ion-chip>
-        </div>
-
-        <div class="end actions">
-          <button class="icon" type="button" title="Ver">
-            <ion-icon name="eyeOutline"></ion-icon>
-          </button>
-
-          <button class="icon" type="button" title="Editar" (click)="openEdit(r)">
-            <ion-icon name="createOutline"></ion-icon>
-          </button>
-
-          <button class="icon" type="button" title="Cambiar estado" (click)="cycleEstado(r)">
-            <ion-icon name="optionsOutline"></ion-icon>
-          </button>
-        </div>
-      </div>
+    <div class="table-wrapper">
+      <table class="reservas-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Huésped</th>
+            <th>Habitación</th>
+            <th>Fechas</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th class="actions-col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filtradas()">
+            <td class="mono">{{ r.codigo || ('#' + r.id) }}</td>
+            <td class="guest-cell">
+              <div class="guest-info">
+                <div class="guest-avatar">{{ getInitials(r.huesped) }}</div>
+                <div class="guest-details">
+                  <strong>{{ r.huesped }}</strong>
+                  <span>{{ r.documento || 'Sin documento' }}</span>
+                </div>
+              </div>
+            </td>
+            <td class="room-cell">
+              <ion-icon name="bed-outline"></ion-icon>
+              <span>{{ r.habitacion }}</span>
+            </td>
+            <td class="dates-cell">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>{{ formatDate(r.fechaEntrada) }} → {{ formatDate(r.fechaSalida) }}</span>
+            </td>
+            <td class="money">${{ r.total | number }}</td>
+            <td>
+              <div class="status-badge" [class]="getEstadoClass(r.estado)">
+                {{ formatEstado(r.estado) }}
+              </div>
+            </td>
+            <td class="actions-col">
+              <div class="table-actions">
+                <button class="icon-btn" title="Ver detalles" (click)="openDetail(r)">
+                  <ion-icon name="eye-outline"></ion-icon>
+                </button>
+                <button class="icon-btn" title="Editar" (click)="openEdit(r)">
+                  <ion-icon name="create-outline"></ion-icon>
+                </button>
+                <button class="icon-btn" title="Cambiar estado" (click)="cycleEstado(r)">
+                  <ion-icon name="sync-outline"></ion-icon>
+                </button>
+                <button class="icon-btn danger" title="Cancelar reserva" (click)="confirmCancel(r)">
+                  <ion-icon name="close-circle-outline"></ion-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <!-- MODAL -->
+  <!-- =====================================================
+       MODAL
+  ====================================================== -->
   <div class="modal-backdrop" *ngIf="modalOpen()" (click)="closeModal()"></div>
-
   <div class="modal" *ngIf="modalOpen()">
     <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="m-head">
+      <div class="modal-head">
         <div>
+          <span class="modal-tag">HOTEL CASA BLANCA</span>
           <h3>{{ modalMode() === 'create' ? 'Nueva reserva' : 'Editar reserva' }}</h3>
           <p>Datos principales de la reserva</p>
         </div>
-
-        <button class="close" type="button" (click)="closeModal()">
-          <ion-icon name="closeOutline"></ion-icon>
+        <button class="close-btn" (click)="closeModal()">
+          <ion-icon name="close-outline"></ion-icon>
         </button>
       </div>
 
-      <div class="m-body">
-        <div class="grid">
-          <div class="field">
-            <label>Huésped</label>
-            <input
-              type="text"
-              placeholder="Nombre completo"
-              [value]="form().huesped"
-              (input)="patch('huesped', ($any($event.target).value || ''))"
-            />
-          </div>
-
-          <div class="field">
-            <label>Documento</label>
-            <input
-              type="text"
-              placeholder="Cédula / pasaporte"
-              [value]="form().documento || ''"
-              (input)="patch('documento', ($any($event.target).value || ''))"
-            />
-          </div>
-
-          <div class="field">
-            <label>Habitación</label>
-            <select
-              [value]="form().habitacion"
-              (change)="patch('habitacion', $any($event.target).value)"
-            >
-              <option *ngFor="let h of habitaciones()" [value]="h">{{ h }}</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>Estado</label>
-            <select
-              [value]="form().estado"
-              (change)="patch('estado', $any($event.target).value)"
-            >
-              <option value="PENDIENTE">Pendiente</option>
-              <option value="CONFIRMADA">Confirmada</option>
-              <option value="CHECKIN">Check-in</option>
-              <option value="CHECKOUT">Check-out</option>
-              <option value="CANCELADA">Cancelada</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>Entrada</label>
-            <input
-              type="date"
-              [value]="form().fechaEntrada"
-              (input)="patch('fechaEntrada', ($any($event.target).value || ''))"
-            />
-          </div>
-
-          <div class="field">
-            <label>Salida</label>
-            <input
-              type="date"
-              [value]="form().fechaSalida"
-              (input)="patch('fechaSalida', ($any($event.target).value || ''))"
-            />
-          </div>
-
-          <div class="field">
-            <label>Total</label>
-            <input
-              type="number"
-              min="0"
-              [value]="form().total"
-              (input)="patch('total', +($any($event.target).value || 0))"
-            />
-          </div>
-
-          <div class="field">
-            <label>Anticipo</label>
-            <input
-              type="number"
-              min="0"
-              [value]="form().anticipo || 0"
-              (input)="patch('anticipo', +($any($event.target).value || 0))"
-            />
-          </div>
-
-          <div class="field full">
-            <label>Notas</label>
-            <textarea
-              rows="3"
-              placeholder="Observaciones..."
-              [value]="form().notas || ''"
-              (input)="patch('notas', ($any($event.target).value || ''))"
-            ></textarea>
-          </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="field"><label>Huésped *</label><input type="text" placeholder="Nombre completo" [value]="form().huesped" (input)="patch('huesped', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Documento</label><input type="text" placeholder="Cédula / pasaporte" [value]="form().documento || ''" (input)="patch('documento', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Habitación *</label><select [value]="form().habitacion" (change)="patch('habitacion', $any($event.target).value)"><option *ngFor="let h of habitaciones()" [value]="h">{{ h }}</option></select></div>
+          <div class="field"><label>Estado</label><select [value]="form().estado" (change)="patch('estado', $any($event.target).value)"><option value="PENDIENTE">Pendiente</option><option value="CONFIRMADA">Confirmada</option><option value="CHECKIN">Check-in</option><option value="CHECKOUT">Check-out</option><option value="CANCELADA">Cancelada</option></select></div>
+          <div class="field"><label>Fecha entrada *</label><input type="date" [value]="form().fechaEntrada" (input)="patch('fechaEntrada', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Fecha salida *</label><input type="date" [value]="form().fechaSalida" (input)="patch('fechaSalida', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Total ($)</label><input type="number" min="0" step="0.01" [value]="form().total" (input)="patch('total', +($any($event.target).value || 0))"></div>
+          <div class="field"><label>Anticipo ($)</label><input type="number" min="0" step="0.01" [value]="form().anticipo || 0" (input)="patch('anticipo', +($any($event.target).value || 0))"></div>
+          <div class="field full"><label>Notas</label><textarea rows="3" placeholder="Observaciones..." [value]="form().notas || ''" (input)="patch('notas', ($any($event.target).value || ''))"></textarea></div>
         </div>
       </div>
 
-      <div class="m-foot">
-        <ion-button class="btn" fill="outline" (click)="closeModal()">Cancelar</ion-button>
-        <ion-button class="btn" (click)="save()">
-          {{ modalMode() === 'create' ? 'Crear' : 'Guardar cambios' }}
-        </ion-button>
+      <div class="modal-foot">
+        <button class="cancel-btn" (click)="closeModal()">Cancelar</button>
+        <button class="save-btn" (click)="save()">{{ modalMode() === 'create' ? 'Crear reserva' : 'Guardar cambios' }}</button>
       </div>
     </div>
   </div>
+
 </div>

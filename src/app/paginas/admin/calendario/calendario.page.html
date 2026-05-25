@@ -1,4 +1,8 @@
 <div class="cal">
+
+  <!-- ======================================================
+       HEADER
+  ======================================================= -->
   <div class="cal-top">
     <div class="title">
       <h2>Calendario</h2>
@@ -7,87 +11,148 @@
 
     <div class="controls">
       <ion-button class="btn" fill="outline" (click)="prevMonth()">
-        <ion-icon slot="icon-only" name="chevronBackOutline"></ion-icon>
+        <ion-icon slot="icon-only" name="chevron-back-outline"></ion-icon>
       </ion-button>
 
       <div class="month">
-        <ion-icon name="calendarOutline"></ion-icon>
+        <ion-icon name="calendar-outline"></ion-icon>
         <span>{{ monthLabel() }}</span>
       </div>
 
       <ion-button class="btn" fill="outline" (click)="nextMonth()">
-        <ion-icon slot="icon-only" name="chevronForwardOutline"></ion-icon>
+        <ion-icon slot="icon-only" name="chevron-forward-outline"></ion-icon>
       </ion-button>
 
       <ion-button class="btn today" (click)="goToday()">
-        <ion-icon slot="start" name="todayOutline"></ion-icon>
+        <ion-icon slot="start" name="today-outline"></ion-icon>
         Hoy
       </ion-button>
 
       <ion-button class="btn create" routerLink="/admin/reservas">
-        <ion-icon slot="start" name="addCircleOutline"></ion-icon>
+        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
         Nueva reserva
       </ion-button>
     </div>
   </div>
 
+  <!-- ======================================================
+       CALENDARIO TIMELINE
+  ======================================================= -->
   <div class="timeline-card">
+
     <!-- Scroll horizontal -->
     <div class="timeline-scroll">
+
       <!-- Header -->
       <div class="tl-head" [style.gridTemplateColumns]="gridTemplate()">
         <div class="h-room">Habitación</div>
-        <div
-          class="h-day"
-          *ngFor="let d of days()"
-          [class.today]="d.isToday"
-          title="{{ d.iso }}"
-        >
+        <div class="h-day" *ngFor="let d of days()" [class.today]="d.isToday" [attr.title]="d.iso">
           {{ d.day }}
         </div>
       </div>
 
-      <!-- Rows -->
+      <!-- Body -->
       <div class="tl-body">
-        <div
-          class="tl-row"
-          *ngFor="let room of habitaciones()"
-          [style.gridTemplateColumns]="gridTemplate()"
-        >
+        <div class="tl-row" *ngFor="let room of habitaciones()" [style.gridTemplateColumns]="gridTemplate()">
+
+          <!-- Room info (sticky) -->
           <div class="room">
             <div class="code">{{ room.codigo }}</div>
             <div class="meta">{{ room.tipo }} · Piso {{ room.piso || '-' }}</div>
           </div>
 
-          <!-- background cells (para líneas) -->
+          <!-- Background cells (grid lines) -->
           <div class="cell" *ngFor="let d of days()" [class.today]="d.isToday"></div>
 
-          <!-- bars -->
-          <div
-            class="bar"
-            *ngFor="let b of barsMap().get(room.id) || []"
-            [style.gridColumn]="(b.colStart + 1) + ' / ' + (b.colEnd + 1)"
-            [class.selected]="isSelected(b.reserva.id)"
-            [class.clipL]="b.clippedLeft"
-            [class.clipR]="b.clippedRight"
-            (click)="selectReserva(b.reserva.id)"
-          >
+          <!-- Reservation bars -->
+          <div class="bar" *ngFor="let b of barsMap().get(room.id) || []"
+               [style.gridColumn]="(b.colStart + 1) + ' / ' + (b.colEnd + 1)"
+               [class.selected]="isSelected(b.reserva.id)"
+               [class.clipL]="b.clippedLeft"
+               [class.clipR]="b.clippedRight"
+               (click)="selectReserva(b.reserva.id)">
             <div class="bar-inner" [attr.data-state]="b.reserva.estado">
               <span class="txt">
+                <ion-icon name="person-outline"></ion-icon>
                 #{{ b.reserva.id }} · {{ b.reserva.huesped }}
               </span>
               <ion-chip class="st" [color]="colorEstado(b.reserva.estado)">
-                {{ b.reserva.estado }}
+                {{ formatEstado(b.reserva.estado) }}
               </ion-chip>
             </div>
           </div>
+
         </div>
       </div>
+
     </div>
 
     <!-- Hint -->
     <div class="hint">
-      Tip: haz clic en una reserva para seleccionarla (luego podemos abrir un drawer con editar / check-in / checkout).
+      <ion-icon name="information-circle-outline"></ion-icon>
+      Tip: haz clic en una reserva para seleccionarla. Luego puedes gestionar check-in/out o editar desde el panel lateral.
+    </div>
+
+  </div>
+
+  <!-- ======================================================
+       PANEL LATERAL DE DETALLE (opcional)
+  ======================================================= -->
+  <div class="detail-sidebar" *ngIf="selectedReserva()" [class.open]="selectedReserva()">
+    <div class="detail-header">
+      <h3>Detalle de reserva</h3>
+      <ion-button fill="clear" (click)="closeDetail()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </div>
+    <div class="detail-body" *ngIf="selectedReserva()">
+      <div class="detail-item">
+        <strong>Huésped:</strong> {{ selectedReserva()!.huesped }}
+      </div>
+      <div class="detail-item">
+        <strong>Habitación:</strong> {{ getRoomName(selectedReserva()!.habitacionId) }}
+      </div>
+      <div class="detail-item">
+        <strong>Check-in:</strong> {{ selectedReserva()!.checkIn | date:'dd/MM/yyyy' }}
+      </div>
+      <div class="detail-item">
+        <strong>Check-out:</strong> {{ selectedReserva()!.checkOut | date:'dd/MM/yyyy' }}
+      </div>
+      <div class="detail-item">
+        <strong>Estado:</strong>
+        <ion-chip [color]="colorEstado(selectedReserva()!.estado)">
+          {{ formatEstado(selectedReserva()!.estado) }}
+        </ion-chip>
+      </div>
+      <div class="detail-item">
+        <strong>Total:</strong> ${{ selectedReserva()!.total }}
+      </div>
+      <div class="detail-actions">
+        <ion-button expand="block" fill="outline" [routerLink]="['/admin/reservas', selectedReserva()!.id]">
+          <ion-icon slot="start" name="create-outline"></ion-icon>
+          Editar reserva
+        </ion-button>
+        <ion-button *ngIf="selectedReserva()!.estado === 'PENDIENTE'" expand="block" color="success" (click)="confirmarReserva()">
+          <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
+          Confirmar reserva
+        </ion-button>
+        <ion-button *ngIf="selectedReserva()!.estado === 'CONFIRMADA'" expand="block" color="tertiary" (click)="checkinReserva()">
+          <ion-icon slot="start" name="log-in-outline"></ion-icon>
+          Realizar check-in
+        </ion-button>
+        <ion-button *ngIf="selectedReserva()!.estado === 'CHECKIN'" expand="block" color="warning" (click)="checkoutReserva()">
+          <ion-icon slot="start" name="log-out-outline"></ion-icon>
+          Realizar check-out
+        </ion-button>
+        <ion-button expand="block" color="danger" fill="outline" (click)="cancelarReserva()">
+          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          Cancelar reserva
+        </ion-button>
+      </div>
     </div>
   </div>
+
+  <!-- Overlay para cerrar el sidebar -->
+  <div class="sidebar-overlay" *ngIf="selectedReserva()" (click)="closeDetail()"></div>
+
 </div>
