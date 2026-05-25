@@ -2,7 +2,19 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { wifiOutline, snowOutline, tvOutline, waterOutline, restaurantOutline } from 'ionicons/icons';
+import {
+  wifiOutline,
+  snowOutline,
+  tvOutline,
+  waterOutline,
+  restaurantOutline,
+  peopleOutline,
+  resizeOutline,
+  starOutline,
+  closeCircleOutline,
+  calculatorOutline,
+  calendarOutline
+} from 'ionicons/icons';
 
 export interface RoomCardData {
   id: number;
@@ -12,8 +24,11 @@ export interface RoomCardData {
   pricePerNight: number;
   oldPricePerNight?: number;
   maxGuests: number;
+  size?: number;
   available: boolean;
   breakfastIncluded?: boolean;
+  featured?: boolean;
+  rating?: number;
   features?: string[];
 }
 
@@ -27,6 +42,7 @@ export interface RoomCardData {
 export class RoomCardComponent {
   @Input() data!: RoomCardData;
   @Input() nights = 0;
+  @Input() selected = false;
 
   @Output() select = new EventEmitter<number>();
 
@@ -37,12 +53,18 @@ export class RoomCardComponent {
       tvOutline,
       waterOutline,
       restaurantOutline,
+      peopleOutline,
+      resizeOutline,
+      starOutline,
+      closeCircleOutline,
+      calculatorOutline,
+      calendarOutline
     });
   }
 
-  get total(): number {
+  get totalPrice(): number {
     if (!this.data) return 0;
-    return this.data.pricePerNight * Math.max(0, this.nights);
+    return Math.round(this.data.pricePerNight * Math.max(0, this.nights));
   }
 
   get discountPerNight(): number {
@@ -51,8 +73,14 @@ export class RoomCardComponent {
     return Math.max(0, oldP - p);
   }
 
+  get discountPercentage(): number {
+    const oldP = this.data.oldPricePerNight ?? 0;
+    if (oldP === 0) return 0;
+    return Math.round((this.discountPerNight / oldP) * 100);
+  }
+
   onSelect() {
-    if (!this.data) return;
+    if (!this.data || !this.data.available) return;
     this.select.emit(this.data.id);
   }
 
@@ -64,6 +92,6 @@ export class RoomCardComponent {
       'water-outline': 'Vista al mar',
       'restaurant-outline': 'Desayuno',
     };
-    return map[icon] ?? 'Servicio';
+    return map[icon] ?? icon.replace('-outline', '');
   }
 }

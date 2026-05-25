@@ -1,8 +1,18 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { searchOutline } from 'ionicons/icons';
+import {
+  searchOutline,
+  reloadOutline,
+  bedOutline,
+  calendarOutline,
+  wifiOutline,
+  carOutline,
+  restaurantOutline,
+  sadOutline,
+  alertCircleOutline
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-empty-state',
@@ -15,8 +25,28 @@ export class EmptyStateComponent {
   @Input() title = 'No se encontraron resultados';
   @Input() subtitle = 'Intenta ajustar filtros o cambiar fechas.';
   @Input() iconName: string = 'search-outline';
+  
+  // Variantes de tamaño
+  @Input() compact = false;
+  @Input() smallIcon = false;
+  @Input() largeIcon = false;
+  
+  // Botón de acción
+  @Input() showAction = false;
+  @Input() actionText = 'Reintentar';
+  @Output() onAction = new EventEmitter<void>();
 
   constructor() {
-    addIcons({ searchOutline });
+    addIcons({
+      searchOutline,
+      reloadOutline,
+      bedOutline,
+      calendarOutline,
+      wifiOutline,
+      carOutline,
+      restaurantOutline,
+      sadOutline,
+      alertCircleOutline
+    });
   }
 }

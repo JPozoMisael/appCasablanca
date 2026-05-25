@@ -1,70 +1,293 @@
 :host {
+  display: block;
   --brand-accent: #ff5a5f;
   --border: #e6e6e6;
+  --success: #007c2f;
+  --info: #003580;
 }
 
-.sum {
-  background: #f6f7f9;
-  border-top: 1px solid var(--border);
-  padding: 14px;
+.booking-summary {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+/* =========================================
+   HEADER
+========================================= */
+.summary-header {
+  background: linear-gradient(135deg, #003580, #004cb8);
+  padding: 16px 20px;
+  text-align: center;
+
+  h3 {
+    margin: 0 0 6px;
+    color: white;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .header-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #febb02;
+  }
+}
+
+/* =========================================
+   FECHAS
+========================================= */
+.dates-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--border);
+}
+
+.date-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  ion-icon {
+    font-size: 22px;
+    color: var(--info);
+  }
+
+  .date-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #777;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  strong {
+    font-size: 14px;
+    color: #222;
+  }
+}
+
+.date-arrow {
+  color: #aaa;
+  ion-icon {
+    font-size: 18px;
+  }
+}
+
+/* =========================================
+   HUÉSPEDES
+========================================= */
+.guests-section {
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+}
+
+.guests-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  ion-icon {
+    font-size: 18px;
+    color: var(--info);
+  }
+
+  strong {
+    font-size: 14px;
+    color: #222;
+  }
+
+  span {
+    font-size: 13px;
+    color: #666;
+  }
+}
+
+/* =========================================
+   ROWS
+========================================= */
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  padding: 10px 20px;
+  font-size: 14px;
   color: #555;
-  margin-bottom: 10px;
-  font-weight: 700;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.subtotal {
+  font-weight: 600;
+  color: #333;
 }
 
 .discount {
-  color: #007c2f;
+  color: var(--success);
+  background: #e8f5e9;
+}
+
+.tax-row {
+  color: #666;
 }
 
 .total {
-  border-top: 2px solid var(--border);
-  padding-top: 10px;
-  margin-top: 10px;
-  color: #222;
-  font-size: 16px;
+  background: #f8f9fa;
+  font-size: 18px;
+  padding: 14px 20px;
+
+  strong {
+    font-weight: 800;
+    color: #222;
+  }
 }
 
-.tax {
-  font-size: 12px;
-  color: #777;
-  text-align: center;
-  margin: 10px 0 12px;
+/* =========================================
+   PAGO INFO
+========================================= */
+.payment-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #f0f7ff;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--info);
+  border-bottom: 1px solid var(--border);
+
+  .info-tooltip {
+    cursor: help;
+    font-weight: 800;
+    color: #888;
+  }
 }
 
-.cta {
+/* =========================================
+   BOTÓN
+========================================= */
+.cta-btn {
   --background: var(--brand-accent);
-  --border-radius: 12px;
-  font-weight: 900;
-  height: 48px;
+  --background-hover: #e04e53;
+  --border-radius: 0;
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  font-weight: 800;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  height: auto;
 }
 
-.secure {
+/* =========================================
+   GARANTÍAS
+========================================= */
+.guarantees {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-  color: #666;
-  font-weight: 700;
-  font-size: 13px;
-  border-top: 1px solid var(--border);
-  padding-top: 12px;
+  padding: 14px 20px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
+.guarantee-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+
+  ion-icon {
+    font-size: 16px;
+    color: var(--success);
+  }
+}
+
+/* =========================================
+   BADGE
+========================================= */
 .badge {
-  margin-top: 10px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 10px;
-  color: #003580;
-  font-weight: 900;
-  font-size: 13px;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #fff;
+  color: var(--info);
+  font-weight: 800;
+  font-size: 12px;
+
+  ion-icon {
+    font-size: 16px;
+  }
+}
+
+/* =========================================
+   PRICE BREAKDOWN
+========================================= */
+.price-breakdown {
+  padding: 10px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--border);
+
+  .row {
+    padding: 6px 0;
+    font-size: 13px;
+    color: #666;
+  }
+}
+
+/* =========================================
+   EXTRA CHARGES
+========================================= */
+.extra-charges {
+  .row {
+    background: #fef8e7;
+    font-size: 13px;
+  }
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+@media (max-width: 768px) {
+  .dates-section {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .date-arrow {
+    transform: rotate(90deg);
+  }
+
+  .guarantees {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .summary-header h3 {
+    font-size: 16px;
+  }
 }

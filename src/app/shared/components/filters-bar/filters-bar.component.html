@@ -1,63 +1,169 @@
-<div class="fb">
-  <div class="head">
-    <div class="t">
+<div class="filters-bar" [class.collapsed]="collapsed">
+
+  <div class="filters-header">
+    <div class="title">
       <ion-icon name="filter-outline"></ion-icon>
       <span>Filtros</span>
+      <span class="badge" *ngIf="activeFiltersCount > 0">{{ activeFiltersCount }}</span>
     </div>
 
-    <button class="clear" type="button" (click)="onClear()">
-      <ion-icon name="close-outline"></ion-icon>
-      Limpiar
-    </button>
+    <div class="header-actions">
+      <button class="collapse-btn" type="button" (click)="toggleCollapse()">
+        <ion-icon [name]="collapsed ? 'chevron-down-outline' : 'chevron-up-outline'"></ion-icon>
+      </button>
+
+      <button class="clear-btn" type="button" (click)="onClear()">
+        <ion-icon name="close-outline"></ion-icon>
+        Limpiar
+      </button>
+    </div>
   </div>
 
-  <div class="grid">
-    <label class="field">
-      <span>Precio mín.</span>
-      <input
-        type="number"
-        [ngModel]="value.minPrice"
-        (ngModelChange)="update('minPrice', $event === '' ? null : $event)"
-        placeholder="0"
-      />
-    </label>
+  <div class="filters-body" [class.collapsed]="collapsed">
 
-    <label class="field">
-      <span>Precio máx.</span>
-      <input
-        type="number"
-        [ngModel]="value.maxPrice"
-        (ngModelChange)="update('maxPrice', $event === '' ? null : $event)"
-        placeholder="300"
-      />
-    </label>
+    <!-- RANGO DE PRECIOS -->
+    <div class="filter-group">
+      <div class="group-title">Rango de precios</div>
+      <div class="price-range">
+        <label class="field">
+          <span>Mínimo</span>
+          <div class="input-wrapper">
+            <span class="currency">$</span>
+            <input
+              type="number"
+              [ngModel]="value.minPrice"
+              (ngModelChange)="update('minPrice', $event === '' ? null : $event)"
+              placeholder="0"
+              min="0"
+            />
+          </div>
+        </label>
 
-    <label class="field">
-      <span>Huéspedes</span>
-      <input
-        type="number"
-        [ngModel]="value.guests"
-        (ngModelChange)="update('guests', $event === '' ? null : $event)"
-        placeholder="2"
-      />
-    </label>
+        <span class="range-separator">—</span>
 
-    <label class="check">
-      <input
-        type="checkbox"
-        [ngModel]="value.onlyAvailable"
-        (ngModelChange)="update('onlyAvailable', $event)"
-      />
-      <span>Solo disponibles</span>
-    </label>
+        <label class="field">
+          <span>Máximo</span>
+          <div class="input-wrapper">
+            <span class="currency">$</span>
+            <input
+              type="number"
+              [ngModel]="value.maxPrice"
+              (ngModelChange)="update('maxPrice', $event === '' ? null : $event)"
+              placeholder="500"
+              min="0"
+            />
+          </div>
+        </label>
+      </div>
 
-    <label class="check">
-      <input
-        type="checkbox"
-        [ngModel]="value.withBreakfast"
-        (ngModelChange)="update('withBreakfast', $event)"
-      />
-      <span>Desayuno incluido</span>
-    </label>
+      <!-- SLIDER DE PRECIO (opcional) -->
+      <div class="price-slider" *ngIf="showSlider">
+        <input
+          type="range"
+          [min]="0"
+          [max]="maxPriceLimit"
+          [ngModel]="value.maxPrice || maxPriceLimit"
+          (ngModelChange)="update('maxPrice', $event)"
+          class="slider"
+        />
+        <div class="slider-labels">
+          <span>$0</span>
+          <span>${{ maxPriceLimit }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAPACIDAD -->
+    <div class="filter-group">
+      <div class="group-title">Capacidad</div>
+      <label class="field">
+        <span>Huéspedes</span>
+        <div class="input-wrapper">
+          <ion-icon name="people-outline"></ion-icon>
+          <input
+            type="number"
+            [ngModel]="value.guests"
+            (ngModelChange)="update('guests', $event === '' ? null : $event)"
+            placeholder="2"
+            min="1"
+            max="10"
+          />
+        </div>
+      </label>
+    </div>
+
+    <!-- CARACTERÍSTICAS -->
+    <div class="filter-group">
+      <div class="group-title">Características</div>
+      
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          [ngModel]="value.onlyAvailable"
+          (ngModelChange)="update('onlyAvailable', $event)"
+        />
+        <span>Solo habitaciones disponibles</span>
+      </label>
+
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          [ngModel]="value.withBreakfast"
+          (ngModelChange)="update('withBreakfast', $event)"
+        />
+        <span>Desayuno incluido</span>
+      </label>
+
+      <label class="checkbox" *ngIf="showExtraFilters">
+        <input
+          type="checkbox"
+          [ngModel]="value.withWifi"
+          (ngModelChange)="update('withWifi', $event)"
+        />
+        <span>WiFi gratis</span>
+      </label>
+
+      <label class="checkbox" *ngIf="showExtraFilters">
+        <input
+          type="checkbox"
+          [ngModel]="value.withParking"
+          (ngModelChange)="update('withParking', $event)"
+        />
+        <span>Parqueadero</span>
+      </label>
+
+      <label class="checkbox" *ngIf="showExtraFilters">
+        <input
+          type="checkbox"
+          [ngModel]="value.withPool"
+          (ngModelChange)="update('withPool', $event)"
+        />
+        <span>Piscina</span>
+      </label>
+    </div>
+
+    <!-- TIPO DE HABITACIÓN -->
+    <div class="filter-group" *ngIf="showRoomTypes">
+      <div class="group-title">Tipo de habitación</div>
+      <div class="room-types">
+        <button
+          *ngFor="let type of roomTypes"
+          class="type-btn"
+          [class.active]="value.roomType === type.id"
+          (click)="update('roomType', type.id)">
+          {{ type.name }}
+        </button>
+      </div>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="filter-actions">
+      <button class="apply-btn" (click)="applyFilters()">
+        <ion-icon name="checkmark-outline"></ion-icon>
+        Aplicar filtros
+      </button>
+    </div>
+
   </div>
+
 </div>

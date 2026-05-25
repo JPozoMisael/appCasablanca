@@ -5,58 +5,39 @@
 /* =========================================================
    CALENDAR WRAPPER
 ========================================================= */
-
 .booking-calendar {
   width: 700px;
   max-width: calc(100vw - 24px);
-
   background: #ffffff;
-
   border-radius: 16px;
-
   overflow: hidden;
-
   position: relative;
-
-  /* 🔥 separa del searchbar */
   margin-top: 8px;
-
-  box-shadow:
-    0 8px 24px rgba(0,0,0,.16);
-
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
   border: 1px solid #e7e7e7;
 }
 
 /* =========================================================
    TOP TABS
 ========================================================= */
-
 .calendar-top {
   display: grid;
   grid-template-columns: 1fr 1fr;
-
   border-bottom: 1px solid #e5e7eb;
-
   background: #fff;
 }
 
 .tab {
   height: 56px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   position: relative;
-
   font-size: 15px;
   font-weight: 700;
-
   color: #111827;
-
   cursor: pointer;
-
-  transition: .15s ease;
+  transition: 0.15s ease;
 }
 
 .tab.active {
@@ -65,35 +46,27 @@
 
 .tab.active::after {
   content: '';
-
   position: absolute;
-
   left: 0;
   right: 0;
   bottom: 0;
-
   height: 3px;
-
   background: #006ce4;
 }
 
 /* =========================================================
    MONTHS WRAPPER
 ========================================================= */
-
 .months-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
-
   gap: 12px;
-
   padding: 14px 18px 10px;
 }
 
 /* =========================================================
    MONTH
 ========================================================= */
-
 .month {
   width: 100%;
 }
@@ -101,46 +74,39 @@
 /* =========================================================
    HEADER
 ========================================================= */
-
 .month-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   margin-bottom: 10px;
+}
+
+.month-header.right {
+  flex-direction: row-reverse;
 }
 
 .month-header h3 {
   margin: 0;
-
   font-size: 15px;
   font-weight: 700;
-
   color: #111827;
-
   text-transform: capitalize;
 }
 
 /* =========================================================
    NAVIGATION
 ========================================================= */
-
 .nav-btn {
   width: 34px;
   height: 34px;
-
   border: none;
   border-radius: 50%;
-
   background: transparent;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
-
-  transition: .15s ease;
+  transition: 0.15s ease;
 }
 
 .nav-btn:hover {
@@ -154,150 +120,144 @@
 /* =========================================================
    WEEKDAYS
 ========================================================= */
-
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-
   margin-bottom: 4px;
 }
 
 .weekdays span {
   text-align: center;
-
   font-size: 11px;
   font-weight: 700;
-
   color: #6b7280;
 }
 
 /* =========================================================
    DAYS GRID
 ========================================================= */
-
 .days-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-
   gap: 1px;
 }
 
 /* =========================================================
    DAY
 ========================================================= */
-
 .day {
   width: 36px;
   height: 36px;
-
   margin: 0 auto;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   position: relative;
-
   border-radius: 8px;
-
   font-size: 14px;
   font-weight: 500;
-
   color: #111827;
-
   cursor: pointer;
-
-  transition:
-    background .12s ease,
-    color .12s ease,
-   
+  transition: background 0.12s ease, color 0.12s ease;
 }
 
 .day:hover {
   background: #f3f4f6;
-
 }
 
 .day.empty {
   visibility: hidden;
 }
 
-/* =========================================================
-   TODAY
-========================================================= */
-
+/* TODAY */
 .day.today {
   border: 1px solid #d1d5db;
 }
 
-/* =========================================================
-   RANGE
-========================================================= */
-
+/* RANGE */
 .day.range,
 .day.preview {
   background: #e7f0fe;
-
   border-radius: 0;
 }
 
-/* =========================================================
-   START / END
-========================================================= */
-
+/* START / END */
 .day.start,
 .day.end {
   background: #006ce4;
-
   color: #ffffff;
-
   font-weight: 700;
-
   border-radius: 10px;
+}
+
+/* =========================================================
+   FLEXIBLE MODE
+========================================================= */
+.flexible-mode {
+  padding: 24px 18px;
+  text-align: center;
+}
+
+.flexible-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.flexible-btn {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.flexible-btn:hover {
+  border-color: #006ce4;
+}
+
+.flexible-btn.active {
+  border-color: #006ce4;
+  color: #006ce4;
+  background: #f0f7ff;
+}
+
+.flexible-info {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
 }
 
 /* =========================================================
    FOOTER
 ========================================================= */
-
 .calendar-footer {
   display: flex;
   align-items: center;
-
   gap: 8px;
-
   flex-wrap: wrap;
-
   padding: 12px 18px 14px;
-
   border-top: 1px solid #e5e7eb;
-
   background: #fff;
 }
 
-/* =========================================================
-   FOOTER BUTTONS
-========================================================= */
-
 .footer-btn {
   height: 34px;
-
   padding: 0 16px;
-
   border-radius: 999px;
-
   border: 1px solid #cbd5e1;
-
   background: #ffffff;
-
   font-size: 13px;
   font-weight: 600;
-
   color: #111827;
-
   cursor: pointer;
-
-  transition: .15s ease;
+  transition: 0.15s ease;
 }
 
 .footer-btn:hover {
@@ -306,66 +266,49 @@
 
 .footer-btn.active {
   border-color: #006ce4;
-
   color: #006ce4;
-
   background: #f0f7ff;
 }
 
-/* =========================================================
-   CLEAR
-========================================================= */
-
 .clear-btn {
   margin-left: auto;
-
   border: none;
   background: transparent;
-
   color: #006ce4;
-
   font-size: 14px;
   font-weight: 700;
-
   cursor: pointer;
 }
 
 /* =========================================================
    MOBILE
 ========================================================= */
-
 @media (max-width: 768px) {
-
   .booking-calendar {
     width: 100%;
     max-width: 100%;
-
     border-radius: 14px;
   }
 
   .months-wrapper {
     grid-template-columns: 1fr;
-
     gap: 18px;
-
     padding: 14px;
   }
 
   .day {
     width: 34px;
     height: 34px;
-
     font-size: 13px;
   }
 
+  .flexible-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
 }
 
-/* =========================================================
-   EXTRA SMALL
-========================================================= */
-
-@media (max-width: 600px) {
-
+@media (max-width: 480px) {
   .months-wrapper {
     padding: 18px 14px;
   }
@@ -375,10 +318,13 @@
   }
 
   .day {
-    width: 34px;
-    height: 34px;
-
-    font-size: 13px;
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
   }
 
+  .footer-btn {
+    padding: 0 12px;
+    font-size: 12px;
+  }
 }

@@ -1,35 +1,156 @@
-.es {
-  background: #fff;
+.empty-state {
+  background: #ffffff;
   border: 1px solid #e6e6e6;
-  border-radius: 16px;
-  padding: 22px 14px;
+  border-radius: 24px;
+  padding: 48px 24px;
   text-align: center;
-}
+  max-width: 500px;
+  margin: 0 auto;
+  transition: all 0.2s ease;
 
-.icon {
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 10px;
-  border-radius: 16px;
-  background: rgba(0, 108, 228, 0.1);
-  border: 1px solid rgba(0, 108, 228, 0.16);
-  display: grid;
-  place-items: center;
+  /* =========================================
+     ICONO
+  ========================================= */
+  .icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 16px;
+    border-radius: 20px;
+    background: rgba(0, 108, 228, 0.08);
+    border: 1px solid rgba(0, 108, 228, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-  ion-icon {
-    font-size: 26px;
-    color: #003580;
+    ion-icon {
+      font-size: 32px;
+      color: #003580;
+    }
+
+    /* Variantes de tamaño */
+    &.small {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+
+      ion-icon {
+        font-size: 24px;
+      }
+    }
+
+    &.large {
+      width: 96px;
+      height: 96px;
+      border-radius: 28px;
+
+      ion-icon {
+        font-size: 44px;
+      }
+    }
+  }
+
+  /* =========================================
+     TEXTO
+  ========================================= */
+  h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.3px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    max-width: 320px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  /* =========================================
+     ACTIONS
+  ========================================= */
+  .actions {
+    margin-top: 24px;
+  }
+
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #003580;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    ion-icon {
+      font-size: 16px;
+    }
+
+    &:hover {
+      background: #002a66;
+      transform: translateY(-2px);
+    }
+  }
+
+  /* =========================================
+     COMPACTO
+  ========================================= */
+  &.compact {
+    padding: 32px 20px;
+
+    .icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      margin-bottom: 12px;
+
+      ion-icon {
+        font-size: 24px;
+      }
+    }
+
+    h3 {
+      font-size: 16px;
+    }
+
+    p {
+      font-size: 12px;
+    }
   }
 }
 
-h3 {
-  margin: 8px 0 6px;
-  font-weight: 1000;
-  color: #222;
-}
+/* =========================================
+   RESPONSIVE
+========================================= */
+@media (max-width: 768px) {
+  .empty-state {
+    padding: 32px 20px;
 
-p {
-  margin: 0;
-  color: #666;
-  font-weight: 700;
+    .icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+
+      ion-icon {
+        font-size: 24px;
+      }
+    }
+
+    h3 {
+      font-size: 18px;
+    }
+
+    p {
+      font-size: 13px;
+    }
+  }
 }

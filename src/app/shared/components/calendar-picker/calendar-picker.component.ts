@@ -1,21 +1,8 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  OnChanges,
-  OnInit
-} from '@angular/core';
-
+import { Component, EventEmitter, Input, Output, OnChanges, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
-
 import { addIcons } from 'ionicons';
-
-import {
-  chevronForwardOutline,
-  chevronBackOutline
-} from 'ionicons/icons';
+import { chevronForwardOutline, chevronBackOutline } from 'ionicons/icons';
 
 export interface DateRange {
   checkIn: Date | null;
@@ -31,66 +18,29 @@ interface CalendarDay {
 @Component({
   selector: 'app-calendar-picker',
   standalone: true,
-  imports: [
-    CommonModule,
-    IonIcon
-  ],
+  imports: [CommonModule, IonIcon],
   templateUrl: './calendar-picker.component.html',
   styleUrls: ['./calendar-picker.component.scss'],
 })
-export class CalendarPickerComponent
-implements OnInit, OnChanges {
-
-  // ======================================================
-  // INPUTS
-  // ======================================================
-
+export class CalendarPickerComponent implements OnInit, OnChanges {
   @Input() checkIn: Date | null = null;
   @Input() checkOut: Date | null = null;
+  @Output() rangeChange = new EventEmitter<DateRange>();
 
-  // ======================================================
-  // OUTPUTS
-  // ======================================================
-
-  @Output() rangeChange =
-    new EventEmitter<DateRange>();
-
-  // ======================================================
-  // CALENDAR
-  // ======================================================
+  // Modo flexible
+  flexibleMode = false;
+  flexibleDays = 0;
 
   currentMonth = new Date();
-
   leftMonthDays: CalendarDay[] = [];
   rightMonthDays: CalendarDay[] = [];
-
   hoveredDate: Date | null = null;
 
-  weekDays = [
-    'Lu',
-    'Ma',
-    'Mi',
-    'Ju',
-    'Vi',
-    'Sá',
-    'Do'
-  ];
-
-  // ======================================================
-  // CONSTRUCTOR
-  // ======================================================
+  weekDays = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
 
   constructor() {
-
-    addIcons({
-      chevronForwardOutline,
-      chevronBackOutline
-    });
+    addIcons({ chevronForwardOutline, chevronBackOutline });
   }
-
-  // ======================================================
-  // INIT
-  // ======================================================
 
   ngOnInit(): void {
     this.generateCalendars();
@@ -100,304 +50,143 @@ implements OnInit, OnChanges {
     this.generateCalendars();
   }
 
-  // ======================================================
-  // GENERATE
-  // ======================================================
-
-  generateCalendars() {
-
-    this.leftMonthDays =
-      this.generateMonth(
-        this.currentMonth
-      );
-
-    const nextMonth =
-      new Date(
-        this.currentMonth.getFullYear(),
-        this.currentMonth.getMonth() + 1,
-        1
-      );
-
-    this.rightMonthDays =
-      this.generateMonth(nextMonth);
+  // ================= MODO FLEXIBLE =================
+  setFlexibleMode(enabled: boolean) {
+    this.flexibleMode = enabled;
+    if (!enabled) {
+      this.flexibleDays = 0;
+    }
   }
 
-  // ======================================================
-  // MONTH GENERATOR
-  // ======================================================
+  setFlexibleDays(days: number) {
+    this.flexibleDays = days;
+    if (this.flexibleMode && this.checkIn) {
+      // Calcular checkout flexible
+      const checkout = new Date(this.checkIn);
+      checkout.setDate(checkout.getDate() + days);
+      this.checkOut = checkout;
+      this.emit();
+    }
+  }
+
+  // ================= GENERACIÓN CALENDARIO =================
+  generateCalendars() {
+    this.leftMonthDays = this.generateMonth(this.currentMonth);
+    const nextMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 1);
+    this.rightMonthDays = this.generateMonth(nextMonth);
+  }
 
   generateMonth(monthDate: Date): CalendarDay[] {
-
-    const year =
-      monthDate.getFullYear();
-
-    const month =
-      monthDate.getMonth();
-
-    const firstDay =
-      new Date(year, month, 1);
-
-    const lastDay =
-      new Date(year, month + 1, 0);
-
-    const totalDays =
-      lastDay.getDate();
-
-    let startWeekDay =
-      firstDay.getDay();
-
-    if (startWeekDay === 0) {
-      startWeekDay = 7;
-    }
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const totalDays = lastDay.getDate();
+    let startWeekDay = firstDay.getDay();
+    if (startWeekDay === 0) startWeekDay = 7;
 
     const days: CalendarDay[] = [];
 
-    // empty spaces
+    // Días vacíos
     for (let i = 1; i < startWeekDay; i++) {
-
-      days.push({
-        date: new Date(),
-        label: 0,
-        currentMonth: false
-      });
+      days.push({ date: new Date(), label: 0, currentMonth: false });
     }
 
-    // month days
+    // Días del mes
     for (let d = 1; d <= totalDays; d++) {
-
-      days.push({
-
-        date: new Date(year, month, d),
-
-        label: d,
-
-        currentMonth: true
-      });
+      days.push({ date: new Date(year, month, d), label: d, currentMonth: true });
     }
 
     return days;
   }
 
-  // ======================================================
-  // CLICK DAY
-  // ======================================================
-
+  // ================= SELECCIÓN DE FECHAS =================
   selectDate(day: CalendarDay) {
+    if (!day.currentMonth) return;
+    const selected = new Date(day.date);
 
-    if (!day.currentMonth) {
-      return;
-    }
-
-    const selected =
-      new Date(day.date);
-
-    // reset
-    if (
-      !this.checkIn ||
-      (this.checkIn && this.checkOut)
-    ) {
-
+    if (!this.checkIn || (this.checkIn && this.checkOut)) {
       this.checkIn = selected;
       this.checkOut = null;
-
       this.emit();
-
       return;
     }
 
-    // same day
-    if (
-      this.isSameDate(
-        selected,
-        this.checkIn
-      )
-    ) {
-      return;
-    }
+    if (this.isSameDate(selected, this.checkIn)) return;
 
-    // checkout
     if (selected > this.checkIn) {
-
       this.checkOut = selected;
-
       this.emit();
-
       return;
     }
 
-    // restart
     this.checkIn = selected;
     this.checkOut = null;
-
     this.emit();
   }
 
-  // ======================================================
-  // HOVER
-  // ======================================================
-
   hoverDate(day: CalendarDay) {
-
-    if (!day.currentMonth) {
-      return;
-    }
-
+    if (!day.currentMonth) return;
     this.hoveredDate = day.date;
   }
 
-  // ======================================================
-  // STATES
-  // ======================================================
-
+  // ================= ESTADOS VISUALES =================
   isStart(date: Date): boolean {
-
-    return !!(
-      this.checkIn &&
-      this.isSameDate(
-        date,
-        this.checkIn
-      )
-    );
+    return !!(this.checkIn && this.isSameDate(date, this.checkIn));
   }
 
   isEnd(date: Date): boolean {
-
-    return !!(
-      this.checkOut &&
-      this.isSameDate(
-        date,
-        this.checkOut
-      )
-    );
+    return !!(this.checkOut && this.isSameDate(date, this.checkOut));
   }
 
   isInRange(date: Date): boolean {
-
-    if (
-      !this.checkIn ||
-      !this.checkOut
-    ) {
-      return false;
-    }
-
-    return (
-      date > this.checkIn &&
-      date < this.checkOut
-    );
+    if (!this.checkIn || !this.checkOut) return false;
+    return date > this.checkIn && date < this.checkOut;
   }
 
-  // preview hover
   isPreview(date: Date): boolean {
-
-    if (
-      !this.checkIn ||
-      this.checkOut ||
-      !this.hoveredDate
-    ) {
-      return false;
-    }
-
-    return (
-      date > this.checkIn &&
-      date < this.hoveredDate
-    );
+    if (!this.checkIn || this.checkOut || !this.hoveredDate) return false;
+    return date > this.checkIn && date < this.hoveredDate;
   }
 
-  // today
   isToday(date: Date): boolean {
-
-    return this.isSameDate(
-      date,
-      new Date()
-    );
+    return this.isSameDate(date, new Date());
   }
 
-  // ======================================================
-  // NAVIGATION
-  // ======================================================
-
+  // ================= NAVEGACIÓN =================
   prevMonth() {
-
-    this.currentMonth =
-      new Date(
-        this.currentMonth.getFullYear(),
-        this.currentMonth.getMonth() - 1,
-        1
-      );
-
+    this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() - 1, 1);
     this.generateCalendars();
   }
 
   nextMonth() {
-
-    this.currentMonth =
-      new Date(
-        this.currentMonth.getFullYear(),
-        this.currentMonth.getMonth() + 1,
-        1
-      );
-
+    this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 1);
     this.generateCalendars();
   }
 
-  // ======================================================
-  // CLEAR
-  // ======================================================
-
   clearDates() {
-
     this.checkIn = null;
     this.checkOut = null;
-
+    this.flexibleDays = 0;
     this.emit();
   }
 
-  // ======================================================
-  // HELPERS
-  // ======================================================
-
+  // ================= HELPERS =================
   getMonthName(date: Date): string {
-
-    return date.toLocaleDateString(
-      'es-EC',
-      {
-        month: 'long',
-        year: 'numeric'
-      }
-    );
-  }
-
-  isSameDate(
-    a: Date,
-    b: Date
-  ): boolean {
-
-    return (
-      a.getFullYear() === b.getFullYear() &&
-      a.getMonth() === b.getMonth() &&
-      a.getDate() === b.getDate()
-    );
-  }
-
-  // ======================================================
-  // EMIT
-  // ======================================================
-
-  emit() {
-
-    this.rangeChange.emit({
-
-      checkIn: this.checkIn,
-
-      checkOut: this.checkOut
-    });
+    return date.toLocaleDateString('es-EC', { month: 'long', year: 'numeric' });
   }
 
   get nextMonthDate(): Date {
-  return new Date(
-    this.currentMonth.getFullYear(),
-    this.currentMonth.getMonth() + 1,
-    1
-  );
-}
+    return new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 1);
+  }
+
+  isSameDate(a: Date, b: Date): boolean {
+    return a.getFullYear() === b.getFullYear() &&
+           a.getMonth() === b.getMonth() &&
+           a.getDate() === b.getDate();
+  }
+
+  emit() {
+    this.rangeChange.emit({ checkIn: this.checkIn, checkOut: this.checkOut });
+  }
 }

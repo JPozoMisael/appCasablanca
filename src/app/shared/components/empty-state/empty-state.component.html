@@ -1,7 +1,20 @@
-<div class="es">
-  <div class="icon">
+<div class="empty-state" [class.compact]="compact">
+
+  <div class="icon" [class.small]="smallIcon" [class.large]="largeIcon">
     <ion-icon [name]="iconName"></ion-icon>
   </div>
+
   <h3>{{ title }}</h3>
+
   <p>{{ subtitle }}</p>
+
+  <ng-content select="[actions]"></ng-content>
+
+  <div class="actions" *ngIf="showAction">
+    <button class="action-btn" (click)="onAction.emit()">
+      <ion-icon name="reload-outline"></ion-icon>
+      {{ actionText }}
+    </button>
+  </div>
+
 </div>

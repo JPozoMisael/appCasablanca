@@ -1,37 +1,121 @@
-<div class="sum">
-  <div class="row">
-    <span>Tu estadía ({{ nights }} noches)</span>
-    <span>${{ oldTotal }}</span>
+<div class="booking-summary">
+
+  <!-- HEADER -->
+  <div class="summary-header">
+    <h3>Resumen de tu reserva</h3>
+    <span class="header-badge">Mejor precio garantizado</span>
   </div>
 
+  <!-- FECHAS -->
+  <div class="dates-section" *ngIf="checkIn && checkOut">
+    <div class="date-item">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <div>
+        <span class="date-label">Check-in</span>
+        <strong>{{ checkIn | date:'EEE, d MMM yyyy' }}</strong>
+      </div>
+    </div>
+    <div class="date-arrow">
+      <ion-icon name="arrow-forward-outline"></ion-icon>
+    </div>
+    <div class="date-item">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <div>
+        <span class="date-label">Check-out</span>
+        <strong>{{ checkOut | date:'EEE, d MMM yyyy' }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUÉSPEDES -->
+  <div class="guests-section" *ngIf="adults || children">
+    <div class="guests-item">
+      <ion-icon name="people-outline"></ion-icon>
+      <strong>{{ adults + children }} huéspedes</strong>
+      <span *ngIf="adults > 0">{{ adults }} adulto(s)</span>
+      <span *ngIf="children > 0">· {{ children }} niño(s)</span>
+    </div>
+  </div>
+
+  <!-- PRECIO POR NOCHE -->
+  <div class="price-breakdown" *ngIf="pricePerNight">
+    <div class="row">
+      <span>{{ pricePerNight | currency:'USD':'symbol':'1.0-0' }} por noche</span>
+      <span>Total: {{ pricePerNight * nights | currency:'USD':'symbol':'1.0-0' }}</span>
+    </div>
+  </div>
+
+  <!-- CARGOS ADICIONALES -->
+  <div class="extra-charges" *ngIf="extraCharges.length > 0">
+    <div class="row" *ngFor="let charge of extraCharges">
+      <span>{{ charge.name }}</span>
+      <span>{{ charge.amount | currency:'USD':'symbol':'1.0-2' }}</span>
+    </div>
+  </div>
+
+  <!-- SUBTOTAL -->
+  <div class="row subtotal">
+    <span>Subtotal</span>
+    <span>{{ oldTotal | currency:'USD':'symbol':'1.0-2' }}</span>
+  </div>
+
+  <!-- DESCUENTO -->
   <div class="row discount" *ngIf="discount > 0">
-    <span>Descuento</span>
-    <span>- ${{ discount }}</span>
+    <span>Descuento <span *ngIf="discountPercentage">({{ discountPercentage }}%)</span></span>
+    <span>- {{ discount | currency:'USD':'symbol':'1.0-2' }}</span>
   </div>
 
+  <!-- IMPUESTOS -->
+  <div class="row tax-row">
+    <span>Impuestos y tasas</span>
+    <span>{{ taxAmount | currency:'USD':'symbol':'1.0-2' }}</span>
+  </div>
+
+  <!-- TOTAL -->
   <div class="row total">
     <strong>Total</strong>
-    <strong>${{ total }}</strong>
+    <strong>{{ total | currency:'USD':'symbol':'1.0-2' }}</strong>
   </div>
 
-  <div class="tax">Impuestos incluidos</div>
+  <!-- PAGO EN EL HOTEL -->
+  <div class="payment-info">
+    <ion-icon name="cash-outline"></ion-icon>
+    <span>Pagas en el hotel</span>
+    <span class="info-tooltip" [title]="paymentInfo">ⓘ</span>
+  </div>
 
+  <!-- BOTÓN CTA -->
   <ion-button
     expand="block"
-    class="cta"
+    class="cta-btn"
     [routerLink]="ctaLink"
     [queryParams]="ctaQueryParams || {}"
+    [disabled]="disabled"
   >
+    <ion-icon slot="start" [name]="ctaIcon"></ion-icon>
     {{ ctaText }}
   </ion-button>
 
-  <div class="secure">
-    <ion-icon name="lock-closed-outline"></ion-icon>
-    Reserva segura · Sin cargos
+  <!-- GARANTÍAS -->
+  <div class="guarantees">
+    <div class="guarantee-item">
+      <ion-icon name="lock-closed-outline"></ion-icon>
+      <span>Reserva segura</span>
+    </div>
+    <div class="guarantee-item">
+      <ion-icon name="card-outline"></ion-icon>
+      <span>Sin cargos ocultos</span>
+    </div>
+    <div class="guarantee-item">
+      <ion-icon name="shield-checkmark-outline"></ion-icon>
+      <span>Cancelación gratuita</span>
+    </div>
   </div>
 
-  <div class="badge">
-    <ion-icon name="shield-checkmark-outline"></ion-icon>
-    Igualamos el precio
+  <!-- BADGE -->
+  <div class="badge" *ngIf="showBadge">
+    <ion-icon name="gift-outline"></ion-icon>
+    <span>Igualamos el precio</span>
   </div>
+
 </div>

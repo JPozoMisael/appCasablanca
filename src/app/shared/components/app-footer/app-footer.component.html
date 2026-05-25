@@ -17,19 +17,25 @@
       <a routerLink="/inicio#sucursales">Sucursales</a>
       <a routerLink="/habitaciones">Habitaciones</a>
       <a routerLink="/ofertas">Ofertas</a>
-      <a routerLink="/login">Iniciar sesión</a>
+      <a routerLink="/login" *ngIf="!isLoggedIn">Iniciar sesión</a>
+      <a routerLink="/perfil" *ngIf="isLoggedIn">Mi perfil</a>
+      <a routerLink="/mis-reservas" *ngIf="isLoggedIn">Mis reservas</a>
+      <a *ngIf="isAdmin" routerLink="/admin">Admin</a>
     </nav>
 
-    <!-- SOCIAL -->
+    <!-- SOCIAL (con enlaces reales) -->
     <div class="social">
-      <a href="#" target="_blank">
+      <a href="https://www.instagram.com/tucuenta" target="_blank" rel="noopener noreferrer">
         <ion-icon name="logo-instagram"></ion-icon>
       </a>
-      <a href="#" target="_blank">
+      <a href="https://www.facebook.com/tucuenta" target="_blank" rel="noopener noreferrer">
         <ion-icon name="logo-facebook"></ion-icon>
       </a>
-      <a href="#" target="_blank">
+      <a href="https://wa.me/593123456789" target="_blank" rel="noopener noreferrer">
         <ion-icon name="logo-whatsapp"></ion-icon>
+      </a>
+      <a href="https://www.tiktok.com/@tucuenta" target="_blank" rel="noopener noreferrer">
+        <ion-icon name="logo-tiktok"></ion-icon>
       </a>
     </div>
 

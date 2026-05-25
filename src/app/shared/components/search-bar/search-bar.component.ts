@@ -2,13 +2,13 @@ import {
   Component,
   HostListener,
   Output,
-  EventEmitter
+  EventEmitter,
+  OnInit,
+  OnDestroy
 } from '@angular/core';
-
 import { Router } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { IonIcon, IonButton } from '@ionic/angular/standalone';
-
 import { addIcons } from 'ionicons';
 import {
   locationOutline,
@@ -20,18 +20,8 @@ import {
   pawOutline,
   checkmarkCircle
 } from 'ionicons/icons';
-
-import {
-  CalendarPickerComponent,
-  DateRange
-} from '@app/shared/components/calendar-picker/calendar-picker.component';
-
-import {
-  trigger,
-  transition,
-  style,
-  animate
-} from '@angular/animations';
+import { CalendarPickerComponent, DateRange } from '@app/shared/components/calendar-picker/calendar-picker.component';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 type GuestField = 'adults' | 'children' | 'rooms';
 
@@ -47,58 +37,48 @@ type GuestField = 'adults' | 'children' | 'rooms';
   ],
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.scss'],
-
   animations: [
     trigger('fadeSlide', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(10px)' }),
-        animate('180ms ease-out',
-          style({ opacity: 1, transform: 'translateY(0)' })
-        )
+        animate('180ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
       ]),
       transition(':leave', [
-        animate('120ms ease-in',
-          style({ opacity: 0, transform: 'translateY(10px)' })
-        )
+        animate('120ms ease-in', style({ opacity: 0, transform: 'translateY(10px)' }))
       ])
     ])
   ]
 })
-export class SearchBarComponent {
-
-  // 🔥 OUTPUT (para futuras mejoras)
+export class SearchBarComponent implements OnInit, OnDestroy {
   @Output() search = new EventEmitter<any>();
 
-  // ================= UI STATE =================
-
+  // UI State
   disabled = false;
-
   branchOpen = false;
   datesOpen = false;
   guestsOpen = false;
 
-  // ================= DATA =================
-
+  // Data
   branch: string = '';
   branchLabel: string = 'Seleccionar sucursal';
-
   checkIn: Date | null = null;
   checkOut: Date | null = null;
-
   adults = 2;
   children = 0;
   rooms = 1;
   withPets = false;
-
   buttonText: string = 'Buscar';
 
-  // ================= DATA SOURCE =================
-
+  // Data source
   branches = [
     { id: 'palmeras', name: 'Palmeras - Salinas', desc: 'Frente al mar' },
     { id: 'chipipe', name: 'Chipipe', desc: 'Zona tranquila' },
     { id: 'ballenita', name: 'Ballenita', desc: 'Vista panorámica' },
   ];
+
+  // Listeners para cerrar popups
+  private documentClickListener: any;
+  private escapeListener: any;
 
   constructor(private router: Router) {
     addIcons({
@@ -113,15 +93,55 @@ export class SearchBarComponent {
     });
   }
 
-  // ================= UX CONTROL =================
+  ngOnInit() {
+    // Cargar valores guardados en localStorage
+    this.loadFromStorage();
+  }
 
-  // ESC
+  ngOnDestroy() {
+    // Limpiar listeners si es necesario
+  }
+
+  // ================= STORAGE =================
+  private loadFromStorage() {
+    const savedSearch = localStorage.getItem('lastSearch');
+    if (savedSearch) {
+      try {
+        const data = JSON.parse(savedSearch);
+        if (data.hotel) {
+          this.branch = data.hotel;
+          const branch = this.branches.find(b => b.id === data.hotel);
+          if (branch) this.branchLabel = branch.name;
+        }
+        if (data.checkIn) this.checkIn = new Date(data.checkIn);
+        if (data.checkOut) this.checkOut = new Date(data.checkOut);
+        if (data.adults) this.adults = data.adults;
+        if (data.children) this.children = data.children;
+        if (data.rooms) this.rooms = data.rooms;
+        if (data.withPets) this.withPets = !!data.withPets;
+      } catch (e) {}
+    }
+  }
+
+  private saveToStorage() {
+    const data = {
+      hotel: this.branch,
+      checkIn: this.checkIn?.toISOString(),
+      checkOut: this.checkOut?.toISOString(),
+      adults: this.adults,
+      children: this.children,
+      rooms: this.rooms,
+      withPets: this.withPets ? 1 : 0
+    };
+    localStorage.setItem('lastSearch', JSON.stringify(data));
+  }
+
+  // ================= UX CONTROL =================
   @HostListener('document:keydown.escape')
   onEsc() {
     this.closeAll();
   }
 
-  // CLICK FUERA
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
     const target = event.target as HTMLElement;
@@ -131,7 +151,6 @@ export class SearchBarComponent {
   }
 
   // ================= TOGGLES =================
-
   toggleBranch(e: Event) {
     e.stopPropagation();
     this.branchOpen = !this.branchOpen;
@@ -160,13 +179,10 @@ export class SearchBarComponent {
   }
 
   // ================= ACCIONES =================
-
   selectBranch(slug: string) {
     this.branch = slug;
-
     const b = this.branches.find(x => x.id === slug);
     this.branchLabel = b ? b.name : 'Seleccionar sucursal';
-
     this.branchOpen = false;
   }
 
@@ -192,7 +208,6 @@ export class SearchBarComponent {
   }
 
   // ================= HELPERS =================
-
   getGuestsText(): string {
     return `${this.adults} adultos · ${this.children} niños · ${this.rooms} hab`;
   }
@@ -202,9 +217,7 @@ export class SearchBarComponent {
   }
 
   // ================= SUBMIT =================
-
   onSubmit() {
-
     if (!this.branch) {
       alert('Selecciona una sucursal');
       return;
@@ -230,8 +243,8 @@ export class SearchBarComponent {
       withPets: this.withPets ? 1 : 0,
     };
 
+    this.saveToStorage();
     this.search.emit(data);
-
     this.router.navigate([`/hotel/${this.branch}/habitaciones`], {
       queryParams: data
     });

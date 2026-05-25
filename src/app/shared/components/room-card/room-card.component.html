@@ -1,46 +1,95 @@
-<div class="rc" [class.disabled]="!data.available">
-  <div class="img">
-    <img [src]="data.imageUrl" [alt]="data.name" />
-    <div class="tag" *ngIf="data.breakfastIncluded">
-      <ion-icon name="restaurant-outline"></ion-icon>
-      <span>Desayuno incluido</span>
+<div class="room-card" [class.disabled]="!data.available" [class.selected]="selected">
+
+  <!-- IMAGEN -->
+  <div class="room-image">
+    <img [src]="data.imageUrl || 'assets/img/room-placeholder.jpg'" [alt]="data.name" />
+    
+    <!-- BADGES -->
+    <div class="image-badges">
+      <div class="badge featured" *ngIf="data.featured">
+        <ion-icon name="star-outline"></ion-icon>
+        <span>Destacado</span>
+      </div>
+      <div class="badge breakfast" *ngIf="data.breakfastIncluded">
+        <ion-icon name="restaurant-outline"></ion-icon>
+        <span>Desayuno incluido</span>
+      </div>
+      <div class="badge unavailable" *ngIf="!data.available">
+        <ion-icon name="close-circle-outline"></ion-icon>
+        <span>No disponible</span>
+      </div>
     </div>
-    <div class="tag bad" *ngIf="!data.available">
-      <span>No disponible</span>
+
+    <!-- DISCOUNT TAG -->
+    <div class="discount-tag" *ngIf="discountPerNight > 0">
+      <span>-{{ discountPercentage }}%</span>
     </div>
   </div>
 
-  <div class="body">
-    <div class="head">
-      <h3>{{ data.name }}</h3>
-      <div class="cap">Máx. {{ data.maxGuests }} huéspedes</div>
+  <!-- CONTENIDO -->
+  <div class="room-content">
+
+    <!-- HEADER -->
+    <div class="room-header">
+      <div class="room-info">
+        <h3>{{ data.name }}</h3>
+        <div class="room-meta">
+          <span class="capacity">
+            <ion-icon name="people-outline"></ion-icon>
+            Máx. {{ data.maxGuests }} huéspedes
+          </span>
+          <span class="size" *ngIf="data.size">
+            <ion-icon name="resize-outline"></ion-icon>
+            {{ data.size }} m²
+          </span>
+        </div>
+      </div>
+      <div class="room-rating" *ngIf="data.rating">
+        <div class="rating-value">{{ data.rating }}</div>
+        <div class="rating-label">Excelente</div>
+      </div>
     </div>
 
-    <p class="desc">{{ data.description }}</p>
+    <!-- DESCRIPCIÓN -->
+    <p class="room-description">{{ data.description }}</p>
 
-    <div class="features" *ngIf="data.features?.length">
-      <span class="f" *ngFor="let f of data.features">
+    <!-- CARACTERÍSTICAS -->
+    <div class="room-features" *ngIf="data.features?.length">
+      <div class="feature" *ngFor="let f of data.features">
         <ion-icon [name]="f"></ion-icon>
-        {{ getFeatureLabel(f) }}
-      </span>
+        <span>{{ getFeatureLabel(f) }}</span>
+      </div>
     </div>
 
-    <div class="price">
-      <div class="left">
-        <div class="old" *ngIf="data.oldPricePerNight && discountPerNight > 0">
+    <!-- PRECIO Y BOTÓN -->
+    <div class="room-footer">
+      <div class="price-section">
+        <div class="price-old" *ngIf="data.oldPricePerNight && discountPerNight > 0">
           ${{ data.oldPricePerNight }}
         </div>
-        <div class="now">
-          ${{ data.pricePerNight }} <span>/ noche</span>
+        <div class="price-current">
+          ${{ data.pricePerNight }}
+          <span class="per-night">/ noche</span>
         </div>
-        <div class="tot" *ngIf="nights > 0">Total: ${{ total }}</div>
+        <div class="price-total" *ngIf="nights > 0">
+          <ion-icon name="calculator-outline"></ion-icon>
+          Total: ${{ totalPrice }}
+        </div>
+        <div class="price-taxes">Impuestos incluidos</div>
       </div>
 
-      <div class="right">
-        <ion-button class="btn" expand="block" [disabled]="!data.available" (click)="onSelect()">
-          Seleccionar
+      <div class="action-section">
+        <ion-button 
+          class="select-btn" 
+          expand="block" 
+          [disabled]="!data.available"
+          (click)="onSelect()">
+          <ion-icon slot="start" name="calendar-outline"></ion-icon>
+          {{ data.available ? 'Seleccionar' : 'No disponible' }}
         </ion-button>
       </div>
     </div>
+
   </div>
+
 </div>

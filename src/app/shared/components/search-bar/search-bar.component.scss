@@ -6,7 +6,6 @@
 /* =========================================================
    SEARCH
 ========================================================= */
-
 .bk-search {
   width: 100%;
   position: relative;
@@ -16,51 +15,30 @@
 /* =========================================================
    BAR
 ========================================================= */
-
 .bk-bar {
   display: grid;
-
-  grid-template-columns:
-    1.3fr
-    1fr
-    1fr
-    200px;
-
+  grid-template-columns: 1.3fr 1fr 1fr 200px;
   background: #ffffff;
-
   border: 4px solid #febb02;
   border-radius: 12px;
-
   overflow: visible;
-
-  box-shadow:
-    0 8px 24px rgba(0,0,0,.14);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
 }
 
 /* =========================================================
    ITEMS
 ========================================================= */
-
 .bk-item {
   position: relative;
-
   min-height: 72px;
-
   padding: 12px 18px;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
-
   cursor: pointer;
-
   background: #ffffff;
-
-  transition:
-    background .15s ease;
-
+  transition: background 0.15s ease;
   border-right: 1px solid #e7e7e7;
-
   overflow: visible;
 }
 
@@ -74,29 +52,21 @@
 
 .bk-item.active {
   background: #f4f8ff;
-
-  box-shadow:
-    inset 0 0 0 2px #0071c2;
-
+  box-shadow: inset 0 0 0 2px #0071c2;
   z-index: 200;
 }
 
 /* =========================================================
    LABEL
 ========================================================= */
-
 .bk-label {
   display: flex;
   align-items: center;
   gap: 6px;
-
   font-size: 10px;
   font-weight: 700;
-
   text-transform: uppercase;
-
   color: #6b7280;
-
   margin-bottom: 4px;
 
   ion-icon {
@@ -107,13 +77,10 @@
 /* =========================================================
    VALUE
 ========================================================= */
-
 .bk-value-main {
   font-size: 16px;
   font-weight: 700;
-
   line-height: 1.2;
-
   color: #111827;
 }
 
@@ -124,7 +91,6 @@
 /* =========================================================
    BUTTON
 ========================================================= */
-
 .bk-action {
   height: 100%;
 }
@@ -132,66 +98,43 @@
 .bk-btn {
   --background: #0071c2;
   --background-hover: #005999;
-
   --border-radius: 0;
-
   margin: 0;
-
   height: 100%;
   min-height: 72px;
-
   font-size: 18px;
   font-weight: 800;
-
-  letter-spacing: -.3px;
-
+  letter-spacing: -0.3px;
   box-shadow: none;
 }
 
 /* =========================================================
    POPOVER
 ========================================================= */
-
 .bk-pop {
   position: absolute;
-
   top: calc(100% + 8px);
   left: 0;
-
   background: #ffffff;
-
   border-radius: 16px;
-
   overflow: hidden;
-
-  box-shadow:
-    0 8px 24px rgba(0,0,0,.16);
-
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
   border: 1px solid #e7e7e7;
-
   z-index: 10000;
-
-  animation: popIn .14s ease;
+  animation: popIn 0.14s ease;
 }
 
 /* =========================================================
    WIDTHS
 ========================================================= */
-
-/* SUCURSAL */
-
 .bk-item:nth-child(1) .bk-pop {
   width: 320px;
 }
-
-/* FECHAS */
 
 .bk-item:nth-child(2) .bk-pop {
   width: 700px;
   max-width: calc(100vw - 24px);
 }
-
-/* HUÉSPEDES */
 
 .bk-item:nth-child(3) .bk-pop {
   width: 320px;
@@ -200,37 +143,28 @@
 /* =========================================================
    ANIMATION
 ========================================================= */
-
 @keyframes popIn {
-
   from {
     opacity: 0;
     transform: translateY(6px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
-
 }
 
 /* =========================================================
    BRANCHES
 ========================================================= */
-
 .branch-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   padding: 14px 16px;
-
   border-bottom: 1px solid #eeeeee;
-
   cursor: pointer;
-
-  transition: .15s ease;
+  transition: 0.15s ease;
 }
 
 .branch-card:last-child {
@@ -248,33 +182,27 @@
 .branch-name {
   font-size: 15px;
   font-weight: 700;
-
   color: #111827;
 }
 
 .branch-desc {
   font-size: 12px;
-
   color: #64748b;
 }
 
 .branch-right ion-icon {
   font-size: 20px;
-
   color: #0071c2;
 }
 
 /* =========================================================
    GUESTS
 ========================================================= */
-
 .guest-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   padding: 14px 16px;
-
   border-bottom: 1px solid #eeeeee;
 }
 
@@ -282,7 +210,7 @@
   border-bottom: none;
 }
 
-.guest-row span {
+.guest-row span:first-child {
   font-size: 14px;
   font-weight: 600;
 }
@@ -290,27 +218,20 @@
 .guest-controls {
   display: flex;
   align-items: center;
-
   gap: 12px;
 }
 
 .guest-controls button {
   width: 34px;
   height: 34px;
-
   border-radius: 50%;
-
   border: 1px solid #cbd5e1;
-
   background: #ffffff;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
-
-  transition: .15s ease;
+  transition: 0.15s ease;
 }
 
 .guest-controls button:hover {
@@ -320,30 +241,23 @@
 
 .guest-controls span {
   min-width: 18px;
-
   text-align: center;
-
   font-weight: 700;
 }
 
 /* =========================================================
    PETS
 ========================================================= */
-
 .pets-row {
   cursor: pointer;
 }
 
 .pet-toggle {
   background: #eef2ff;
-
   color: #0071c2;
-
   font-size: 12px;
   font-weight: 700;
-
   padding: 5px 10px;
-
   border-radius: 999px;
 }
 
@@ -355,35 +269,28 @@
 /* =========================================================
    BACKDROP
 ========================================================= */
-
 .bk-backdrop {
   position: fixed;
   inset: 0;
-
-  background: rgba(0,0,0,.10);
-
+  background: rgba(0, 0, 0, 0.1);
   z-index: 50;
 }
 
 /* =========================================================
    RESPONSIVE
 ========================================================= */
-
 @media (max-width: 1100px) {
-
   .bk-bar {
     grid-template-columns: 1fr;
   }
 
   .bk-item {
     border-right: none;
-
     border-bottom: 1px solid #e5e7eb;
   }
 
   .bk-btn {
     min-height: 64px;
-
     font-size: 18px;
   }
 
@@ -394,42 +301,40 @@
     max-width: 100%;
   }
 
+  .bk-item .bk-pop {
+    left: 0;
+    right: 0;
+    width: 100% !important;
+  }
 }
 
 /* =========================================================
    MOBILE
 ========================================================= */
-
 @media (max-width: 768px) {
-
   .bk-bar {
     border-radius: 10px;
   }
 
   .bk-item {
     min-height: 66px;
-
     padding: 12px 14px;
   }
 
   .bk-value-main {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .bk-btn {
     min-height: 66px;
-
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .bk-pop {
     left: 0;
     right: 0;
-
     width: 100% !important;
     max-width: 100% !important;
-
     border-radius: 14px;
   }
-
 }

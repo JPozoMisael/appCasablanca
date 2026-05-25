@@ -3,73 +3,51 @@
   <!-- HEADER -->
   <div class="calendar-top">
 
-    <div class="tab active">
+    <div class="tab" [class.active]="!flexibleMode" (click)="setFlexibleMode(false)">
       Calendario
     </div>
 
-    <div class="tab">
+    <div class="tab" [class.active]="flexibleMode" (click)="setFlexibleMode(true)">
       Fechas flexibles
     </div>
 
   </div>
 
-  <!-- MONTHS -->
-  <div class="months-wrapper">
+  <!-- MODO CALENDARIO NORMAL -->
+  <div class="months-wrapper" *ngIf="!flexibleMode">
 
     <!-- LEFT -->
     <div class="month">
 
       <div class="month-header">
 
-        <button
-          class="nav-btn"
-          (click)="prevMonth()">
-
+        <button class="nav-btn" (click)="prevMonth()">
           <ion-icon name="chevron-back-outline"></ion-icon>
-
         </button>
 
-        <h3>
-          {{ getMonthName(currentMonth) }}
-        </h3>
+        <h3>{{ getMonthName(currentMonth) }}</h3>
 
       </div>
 
-      <!-- WEEK -->
+      <!-- WEEKDAYS -->
       <div class="weekdays">
-
-        <span *ngFor="let day of weekDays">
-          {{ day }}
-        </span>
-
+        <span *ngFor="let day of weekDays">{{ day }}</span>
       </div>
 
       <!-- DAYS -->
       <div class="days-grid">
-
-        <div
-          *ngFor="let day of leftMonthDays"
-
-          class="day"
-
-          [class.empty]="!day.currentMonth"
-
-          [class.start]="isStart(day.date)"
-          [class.end]="isEnd(day.date)"
-
-          [class.range]="isInRange(day.date)"
-          [class.preview]="isPreview(day.date)"
-
-          [class.today]="isToday(day.date)"
-
-          (mouseenter)="hoverDate(day)"
-
-          (click)="selectDate(day)">
-
+        <div *ngFor="let day of leftMonthDays"
+             class="day"
+             [class.empty]="!day.currentMonth"
+             [class.start]="isStart(day.date)"
+             [class.end]="isEnd(day.date)"
+             [class.range]="isInRange(day.date)"
+             [class.preview]="isPreview(day.date)"
+             [class.today]="isToday(day.date)"
+             (mouseenter)="hoverDate(day)"
+             (click)="selectDate(day)">
           {{ day.label || '' }}
-
         </div>
-
       </div>
 
     </div>
@@ -79,93 +57,73 @@
 
       <div class="month-header right">
 
-        <h3>
-          {{ getMonthName(nextMonthDate) }}
-        </h3>
+        <h3>{{ getMonthName(nextMonthDate) }}</h3>
 
-        <button
-          class="nav-btn"
-          (click)="nextMonth()">
-
+        <button class="nav-btn" (click)="nextMonth()">
           <ion-icon name="chevron-forward-outline"></ion-icon>
-
         </button>
 
       </div>
 
-      <!-- WEEK -->
+      <!-- WEEKDAYS -->
       <div class="weekdays">
-
-        <span *ngFor="let day of weekDays">
-          {{ day }}
-        </span>
-
+        <span *ngFor="let day of weekDays">{{ day }}</span>
       </div>
 
       <!-- DAYS -->
       <div class="days-grid">
-
-        <div
-          *ngFor="let day of rightMonthDays"
-
-          class="day"
-
-          [class.empty]="!day.currentMonth"
-
-          [class.start]="isStart(day.date)"
-          [class.end]="isEnd(day.date)"
-
-          [class.range]="isInRange(day.date)"
-          [class.preview]="isPreview(day.date)"
-
-          [class.today]="isToday(day.date)"
-
-          (mouseenter)="hoverDate(day)"
-
-          (click)="selectDate(day)">
-
+        <div *ngFor="let day of rightMonthDays"
+             class="day"
+             [class.empty]="!day.currentMonth"
+             [class.start]="isStart(day.date)"
+             [class.end]="isEnd(day.date)"
+             [class.range]="isInRange(day.date)"
+             [class.preview]="isPreview(day.date)"
+             [class.today]="isToday(day.date)"
+             (mouseenter)="hoverDate(day)"
+             (click)="selectDate(day)">
           {{ day.label || '' }}
-
         </div>
-
       </div>
 
     </div>
 
   </div>
 
+  <!-- MODO FECHAS FLEXIBLES -->
+  <div class="flexible-mode" *ngIf="flexibleMode">
+    <div class="flexible-options">
+      <button class="flexible-btn" [class.active]="flexibleDays === 1" (click)="setFlexibleDays(1)">
+        ± 1 día
+      </button>
+      <button class="flexible-btn" [class.active]="flexibleDays === 2" (click)="setFlexibleDays(2)">
+        ± 2 días
+      </button>
+      <button class="flexible-btn" [class.active]="flexibleDays === 3" (click)="setFlexibleDays(3)">
+        ± 3 días
+      </button>
+      <button class="flexible-btn" [class.active]="flexibleDays === 7" (click)="setFlexibleDays(7)">
+        ± 7 días
+      </button>
+    </div>
+    <p class="flexible-info">
+      Te mostraremos hoteles con disponibilidad en fechas cercanas a tu búsqueda
+    </p>
+  </div>
+
   <!-- FOOTER -->
   <div class="calendar-footer">
 
-    <button
-      class="footer-btn active">
-
+    <button class="footer-btn" [class.active]="!flexibleMode" (click)="setFlexibleMode(false)">
       Fechas exactas
-
     </button>
 
-    <button class="footer-btn">
-      ± 1 día
+    <button class="footer-btn" [class.active]="flexibleMode" (click)="setFlexibleMode(true)">
+      Fechas flexibles
     </button>
 
-    <button class="footer-btn">
-      ± 2 días
-    </button>
-
-    <button class="footer-btn">
-      ± 3 días
-    </button>
-
-    <button class="footer-btn">
-      ± 7 días
-    </button>
-
-    <button
-      class="clear-btn"
-      (click)="clearDates()">
-
+    <button class="clear-btn" (click)="clearDates()">
       Limpiar
-
     </button>
 
   </div>

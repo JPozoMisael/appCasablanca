@@ -23,23 +23,25 @@
            (click)="$event.stopPropagation()">
 
         <div
-  class="branch-card"
-  *ngFor="let b of branches"
-  (click)="selectBranch(b.id)"
-  [class.active]="branch === b.id">
+          class="branch-card"
+          *ngFor="let b of branches"
+          (click)="selectBranch(b.id)"
+          [class.active]="branch === b.id">
 
-  <div class="branch-left">
-    <div class="branch-name">{{ b.name }}</div>
-    <div class="branch-desc">{{ b.desc }}</div>
-  </div>
+          <div class="branch-left">
+            <div class="branch-name">{{ b.name }}</div>
+            <div class="branch-desc">{{ b.desc }}</div>
+          </div>
 
-  <div class="branch-right">
-    <ion-icon *ngIf="branch === b.id"
-              name="checkmark-circle"></ion-icon>
-  </div>
+          <div class="branch-right">
+            <ion-icon *ngIf="branch === b.id"
+                      name="checkmark-circle"></ion-icon>
+          </div>
 
-</div>
+        </div>
+
       </div>
+
     </div>
 
     <!-- FECHAS -->
@@ -73,6 +75,7 @@
         </app-calendar-picker>
 
       </div>
+
     </div>
 
     <!-- HUÉSPEDES -->
@@ -97,11 +100,11 @@
         <div class="guest-row">
           <span>Adultos</span>
           <div class="guest-controls">
-            <button (click)="dec('adults')">
+            <button (click)="dec('adults'); $event.stopPropagation()">
               <ion-icon name="remove-outline"></ion-icon>
             </button>
             <span>{{ adults }}</span>
-            <button (click)="inc('adults')">
+            <button (click)="inc('adults'); $event.stopPropagation()">
               <ion-icon name="add-outline"></ion-icon>
             </button>
           </div>
@@ -110,11 +113,11 @@
         <div class="guest-row">
           <span>Niños</span>
           <div class="guest-controls">
-            <button (click)="dec('children')">
+            <button (click)="dec('children'); $event.stopPropagation()">
               <ion-icon name="remove-outline"></ion-icon>
             </button>
             <span>{{ children }}</span>
-            <button (click)="inc('children')">
+            <button (click)="inc('children'); $event.stopPropagation()">
               <ion-icon name="add-outline"></ion-icon>
             </button>
           </div>
@@ -123,17 +126,17 @@
         <div class="guest-row">
           <span>Habitaciones</span>
           <div class="guest-controls">
-            <button (click)="dec('rooms')">
+            <button (click)="dec('rooms'); $event.stopPropagation()">
               <ion-icon name="remove-outline"></ion-icon>
             </button>
             <span>{{ rooms }}</span>
-            <button (click)="inc('rooms')">
+            <button (click)="inc('rooms'); $event.stopPropagation()">
               <ion-icon name="add-outline"></ion-icon>
             </button>
           </div>
         </div>
 
-        <div class="guest-row pets-row" (click)="togglePets()">
+        <div class="guest-row pets-row" (click)="togglePets(); $event.stopPropagation()">
           <span>
             <ion-icon name="paw-outline"></ion-icon>
             Mascotas
@@ -144,6 +147,7 @@
         </div>
 
       </div>
+
     </div>
 
     <!-- BOTÓN -->
