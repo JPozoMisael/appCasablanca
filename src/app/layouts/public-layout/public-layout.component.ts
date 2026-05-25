@@ -14,17 +14,14 @@ import { AppHeaderComponent } from '@app/shared/components/app-header/app-header
 })
 export class PublicLayoutComponent {
   currentYear = new Date().getFullYear();
-
   headerHidden = false;
 
   private lastTop = 0;
   private ticking = false;
 
-  // ahora recibe el evento "scroll" normal
-  onScroll(ev: Event) {
-    const el = ev.target as HTMLElement | null;
-    const top = el?.scrollTop ?? 0;
-
+  // ✅ CORREGIDO: IonScroll emite un CustomEvent, no un Event estándar
+  onScroll(event: CustomEvent) {
+    const top = event.detail?.scrollTop ?? 0;
     const delta = top - this.lastTop;
 
     if (this.ticking) return;

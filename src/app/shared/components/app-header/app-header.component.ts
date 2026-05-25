@@ -28,10 +28,10 @@ export class AppHeaderComponent implements OnInit {
   @Input() title = 'Hotel Casa Blanca';
   @Input() subtitle = 'Salinas, Santa Elena';
   @Input() logoText = 'CB';
+  @Input() hiddenOnScroll = false;  // ✅ AGREGADO: Input para controlar ocultamiento desde el padre
 
   menuOpen = false;
   userMenuOpen = false;
-  hiddenOnScroll = false;
   isLoggedIn = false;
   isAdmin = false;
   userInitials = '';
@@ -57,6 +57,7 @@ export class AppHeaderComponent implements OnInit {
     this.checkAuthStatus();
     // Escuchar cambios en localStorage (para cuando el usuario se loguea/desloguea)
     window.addEventListener('storage', () => this.checkAuthStatus());
+    window.addEventListener('scroll', () => this.onScroll());
   }
 
   checkAuthStatus() {

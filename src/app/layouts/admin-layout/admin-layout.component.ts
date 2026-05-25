@@ -14,8 +14,7 @@ import {
   logOutOutline,
   clipboardOutline,
   shieldCheckmarkOutline,
-  personCircleOutline,
-} from 'ionicons/icons';
+  personCircleOutline, menuOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-admin-layout',
@@ -35,17 +34,7 @@ import {
 })
 export class AdminLayoutComponent {
   constructor() {
-    addIcons({
-      gridOutline,
-      calendarOutline,
-      bedOutline,
-      peopleOutline,
-      analyticsOutline,
-      logOutOutline,
-      clipboardOutline,
-      shieldCheckmarkOutline,
-      personCircleOutline,
-    });
+    addIcons({menuOutline,gridOutline,calendarOutline,clipboardOutline,bedOutline,peopleOutline,analyticsOutline,shieldCheckmarkOutline,logOutOutline,personCircleOutline,});
   }
 
   logout(): void {
