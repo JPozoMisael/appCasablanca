@@ -38,12 +38,11 @@ import {
   logInOutline,
   logOutOutline,
   alertCircleOutline,
+  pricetagOutline,
+  restaurantOutline,
+  cardOutline,
+  analyticsOutline,
 } from 'ionicons/icons';
-
-
-// =========================================
-// TIPOS LOCALES
-// =========================================
 
 type EstadoReserva =
   | 'CONFIRMADA'
@@ -51,11 +50,6 @@ type EstadoReserva =
   | 'CHECKIN'
   | 'CHECKOUT'
   | 'CANCELADA';
-
-
-// =========================================
-// COMPONENT
-// =========================================
 
 @Component({
   selector: 'app-dashboard',
@@ -75,28 +69,17 @@ type EstadoReserva =
 })
 export class DashboardPage implements OnInit {
 
-  // =======================================
-  // SIGNALS — estado principal
-  // =======================================
-
   totalHabitaciones   = signal(0);
   habitacionesOcupadas = signal(0);
   ingresosMes          = signal(0);
   reservasHoy          = signal<ReservaHoy[]>([]);
 
-  // Para tendencias (opcionales, vienen del servicio)
   ingresosMesAnterior  = signal(0);
   reservasAyer         = signal(0);
   disponiblesAyer      = signal(0);
 
-  // Estado de carga
   loadingStats    = signal(true);
   loadingReservas = signal(true);
-
-
-  // =======================================
-  // COMPUTED — derivados automáticos
-  // =======================================
 
   reservasHoyCount = computed(() => this.reservasHoy().length);
 
@@ -107,12 +90,9 @@ export class DashboardPage implements OnInit {
   ocupacionPorcentaje = computed(() =>
     this.totalHabitaciones() === 0
       ? 0
-      : Math.round(
-          (this.habitacionesOcupadas() / this.totalHabitaciones()) * 100
-        )
+      : Math.round((this.habitacionesOcupadas() / this.totalHabitaciones()) * 100)
   );
 
-  // Tendencia ingresos vs mes anterior
   tendenciaIngresos = computed(() => {
     const ant = this.ingresosMesAnterior();
     const act = this.ingresosMes();
@@ -120,21 +100,18 @@ export class DashboardPage implements OnInit {
     return Math.round(((act - ant) / ant) * 100);
   });
 
-  // Tendencia reservas vs ayer
   tendenciaReservas = computed(() => {
     const ayer = this.reservasAyer();
     if (ayer === 0) return null;
     return this.reservasHoyCount() - ayer;
   });
 
-  // Tendencia disponibles vs ayer
   tendenciaDisponibles = computed(() => {
     const ayer = this.disponiblesAyer();
     if (ayer === 0) return null;
     return this.habitacionesDisponibles() - ayer;
   });
 
-  // Reservas agrupadas por tipo de movimiento
   checkins = computed(() =>
     this.reservasHoy().filter((r) => r.estado === 'CHECKIN')
   );
@@ -153,7 +130,6 @@ export class DashboardPage implements OnInit {
     this.reservasHoy().filter((r) => r.estado === 'CANCELADA')
   );
 
-  // ¿Hay algún grupo con datos?
   hayReservas = computed(
     () =>
       this.checkins().length > 0 ||
@@ -162,18 +138,12 @@ export class DashboardPage implements OnInit {
       this.canceladas().length > 0
   );
 
-  // Ingresos formateados con separador de miles
   ingresosMesFormateado = computed(() =>
     this.ingresosMes().toLocaleString('es-EC', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     })
   );
-
-
-  // =======================================
-  // CONSTRUCTOR
-  // =======================================
 
   constructor(private dashboardService: DashboardService) {
     addIcons({
@@ -190,23 +160,17 @@ export class DashboardPage implements OnInit {
       logInOutline,
       logOutOutline,
       alertCircleOutline,
+      pricetagOutline,
+      restaurantOutline,
+      cardOutline,
+      analyticsOutline,
     });
   }
-
-
-  // =======================================
-  // INIT
-  // =======================================
 
   ngOnInit(): void {
     this.loadStats();
     this.loadReservasHoy();
   }
-
-
-  // =======================================
-  // LOAD STATS
-  // =======================================
 
   loadStats(): void {
     this.loadingStats.set(true);
@@ -217,14 +181,12 @@ export class DashboardPage implements OnInit {
         this.habitacionesOcupadas.set(data?.habitacionesOcupadas ?? 0);
         this.ingresosMes.set(Number(data?.ingresosMes ?? 0));
 
-        // Tendencias opcionales — solo si el servicio las devuelve
         this.ingresosMesAnterior.set(Number(data?.ingresosMesAnterior ?? 0));
         this.reservasAyer.set(Number(data?.reservasAyer ?? 0));
         this.disponiblesAyer.set(Number(data?.disponiblesAyer ?? 0));
 
         this.loadingStats.set(false);
       },
-
       error: (err) => {
         console.error('Error dashboard stats:', err);
         this.totalHabitaciones.set(0);
@@ -235,11 +197,6 @@ export class DashboardPage implements OnInit {
     });
   }
 
-
-  // =======================================
-  // LOAD RESERVAS
-  // =======================================
-
   loadReservasHoy(): void {
     this.loadingReservas.set(true);
 
@@ -248,7 +205,6 @@ export class DashboardPage implements OnInit {
         this.reservasHoy.set(Array.isArray(reservas) ? reservas : []);
         this.loadingReservas.set(false);
       },
-
       error: (err) => {
         console.error('Error reservas hoy:', err);
         this.reservasHoy.set([]);
@@ -256,11 +212,6 @@ export class DashboardPage implements OnInit {
       },
     });
   }
-
-
-  // =======================================
-  // COLOR ESTADO (Ion chip)
-  // =======================================
 
   colorEstado(estado: string): string {
     const colores: Record<string, string> = {
@@ -273,11 +224,6 @@ export class DashboardPage implements OnInit {
     return colores[estado] ?? 'medium';
   }
 
-
-  // =======================================
-  // INICIALES DE HUÉSPED
-  // =======================================
-
   iniciales(nombre: string): string {
     if (!nombre) return '?';
     return nombre
@@ -288,22 +234,12 @@ export class DashboardPage implements OnInit {
       .toUpperCase();
   }
 
-
-  // =======================================
-  // FORMATO FECHA CORTA  "DD/MM"
-  // =======================================
-
   formatoFechaCorta(iso: string): string {
     if (!iso) return '-';
     const parts = iso.split('-');
     if (parts.length !== 3) return iso;
     return `${parts[2]}/${parts[1]}`;
   }
-
-
-  // =======================================
-  // LABEL DE TENDENCIA
-  // =======================================
 
   labelTendencia(delta: number | null, unidad = ''): string {
     if (delta === null) return '';
