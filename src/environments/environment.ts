@@ -4,7 +4,7 @@
 
 export const environment = {
   production: true,
-  apiUrl: 'http://api.95.216.170.195.nip.io/api/v1'
+  apiUrl: 'https://apicasablanca.onrender.com/api/v1'
 };
 /*
  * For easier debugging in development mode, you can import the following file
