@@ -502,82 +502,81 @@
        MAP
   ======================================================= -->
 
-  <section class="map-section">
+  <!-- ======================================================
+     FEATURED LOCATIONS (Reemplaza el mapa)
+======================================================= -->
 
-    <div class="container">
+<section class="featured-locations">
+  <div class="container">
 
-      <div class="section-head">
+    <div class="section-head">
+      <div>
+        <h2>Descubre nuestras ubicaciones</h2>
+        <p class="subtitle">Tres experiencias únicas frente al mar</p>
+      </div>
+    </div>
 
-        <div>
+    <div class="locations-grid">
 
-          <h2>
-            Encuéntranos en Salinas
-          </h2>
-
-          <p class="subtitle">
-            Ubicaciones estratégicas frente al mar
-          </p>
-
+      <!-- Chipipe -->
+      <div class="location-card" (click)="goToHotel('chipipe')">
+        <div class="location-image">
+          <img src="assets/img/chipipe.jpg" alt="Chipipe">
+          <div class="location-badge">⭐ 4.8</div>
+          <div class="location-overlay"></div>
         </div>
-
+        <div class="location-content">
+          <h3>Chipipe</h3>
+          <p>Playa tranquila ideal para familias. Aguas calmadas y excelente vista al mar.</p>
+          <div class="location-features">
+            <span><ion-icon name="water-outline"></ion-icon> Playa tranquila</span>
+            <span><ion-icon name="restaurant-outline"></ion-icon> Restaurantes</span>
+            <span><ion-icon name="car-outline"></ion-icon> Fácil acceso</span>
+          </div>
+          <button class="location-btn">Ver hoteles →</button>
+        </div>
       </div>
 
-      <div class="map-layout">
-
-        <!-- SIDEBAR -->
-
-        <div class="map-sidebar">
-
-          <div class="map-hotel">
-
-            <h3>
-              Casa Blanca Chipipe
-            </h3>
-
-            <p>
-              Playa tranquila ideal para familias.
-            </p>
-
-          </div>
-
-          <div class="map-hotel">
-
-            <h3>
-              Casa Blanca Palmeras
-            </h3>
-
-            <p>
-              Cerca del malecón y vida nocturna.
-            </p>
-
-          </div>
-
-          <div class="map-hotel">
-
-            <h3>
-              Casa Blanca Ballenita
-            </h3>
-
-            <p>
-              Atardeceres y vistas panorámicas.
-            </p>
-
-          </div>
-
+      <!-- Palmeras -->
+      <div class="location-card" (click)="goToHotel('palmeras')">
+        <div class="location-image">
+          <img src="assets/img/palmeras.jpg" alt="Palmeras">
+          <div class="location-badge">⭐ 4.9</div>
+          <div class="location-overlay"></div>
         </div>
-
-        <!-- MAP -->
-
-        <div class="map-frame">
-
-          <iframe [src]="mapEmbedUrl"></iframe>
-
+        <div class="location-content">
+          <h3>Palmeras</h3>
+          <p>Zona vibrante cerca del malecón. Ideal para disfrutar la vida nocturna.</p>
+          <div class="location-features">
+            <span><ion-icon name="sunny-outline"></ion-icon> Malecón</span>
+            <span><ion-icon name="beer-outline"></ion-icon> Bares</span>
+            <span><ion-icon name="walk-outline"></ion-icon> Zona peatonal</span>
+          </div>
+          <button class="location-btn">Ver hoteles →</button>
         </div>
+      </div>
 
+      <!-- Ballenita -->
+      <div class="location-card" (click)="goToHotel('ballenita')">
+        <div class="location-image">
+          <img src="assets/img/ballenita.jpg" alt="Ballenita">
+          <div class="location-badge">⭐ 4.7</div>
+          <div class="location-overlay"></div>
+        </div>
+        <div class="location-content">
+          <h3>Ballenita</h3>
+          <p>Atardeceres espectaculares y vistas panorámicas. Perfecto para desconectar.</p>
+          <div class="location-features">
+            <span><ion-icon name="boat-outline"></ion-icon> Vistas únicas</span>
+            <span><ion-icon name="fish-outline"></ion-icon> Gastronomía</span>
+            <span><ion-icon name="moon-outline"></ion-icon> Relax total</span>
+          </div>
+          <button class="location-btn">Ver hoteles →</button>
+        </div>
       </div>
 
     </div>
 
-  </section>
-
+  </div>
+</section>
 </div>

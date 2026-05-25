@@ -1,13 +1,14 @@
-.home {
+/* =========================================================
+   HOME PAGE
+========================================================= */
+:host {
+  display: block;
   background: #f5f7fa;
-  color: #0f172a;
-  overflow-x: hidden;
 }
 
 /* =========================================================
    CONTAINER
 ========================================================= */
-
 .container {
   width: 100%;
   max-width: 1280px;
@@ -16,778 +17,297 @@
 }
 
 /* =========================================================
-   TITLES
+   SECTION HEAD
 ========================================================= */
-
 .section-head {
-  margin-bottom: 28px;
-}
+  margin-bottom: 32px;
+  text-align: center;
 
-h2 {
-  margin: 0 0 8px;
+  h2 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #0f172a;
+  }
 
-  font-size: 34px;
-  font-weight: 900;
-
-  letter-spacing: -1px;
-}
-
-.subtitle {
-  margin: 0;
-
-  color: #64748b;
-
-  font-size: 16px;
-  line-height: 1.6;
+  .subtitle {
+    margin: 0;
+    font-size: 16px;
+    color: #64748b;
+  }
 }
 
 /* =========================================================
-   SEARCH
+   FEATURED LOCATIONS
 ========================================================= */
-
-.search-section {
+.featured-locations {
+  padding: 64px 0;
   background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-
-  padding: 16px 0 0;
-
-  position: relative;
-  z-index: 100;
 }
 
-/* =========================================================
-   HERO
-========================================================= */
-
-.hero {
-  position: relative;
-
-  overflow: hidden;
-
-  background:
-    linear-gradient(
-      180deg,
-      #003580 0%,
-      #004cb8 100%
-    );
-
-  padding: 56px 0 72px;
-}
-
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-
-  background:
-    radial-gradient(
-      circle at top right,
-      rgba(255,255,255,.08),
-      transparent 40%
-    );
-}
-
-.hero-content {
-  position: relative;
-  z-index: 5;
-
+.locations-grid {
   display: grid;
-  grid-template-columns: 1.2fr .8fr;
-
-  gap: 40px;
-
-  align-items: center;
-
-  max-width: 1280px;
-
-  margin: 0 auto;
-
-  padding: 0 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-top: 20px;
 }
 
-/* LEFT */
-
-.hero-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  background: rgba(255,255,255,.12);
-
-  padding: 10px 16px;
-
-  border-radius: 999px;
-
-  color: #ffffff;
-
-  font-size: 13px;
-  font-weight: 700;
-
-  margin-bottom: 24px;
-}
-
-.hero-left h1 {
-  margin: 0 0 18px;
-
-  max-width: 720px;
-
-  font-size: 64px;
-  line-height: 1.02;
-
-  letter-spacing: -2px;
-
-  color: #ffffff;
-
-  font-weight: 900;
-
-  em {
-    color: #febb02;
-    font-style: normal;
-  }
-}
-
-.hero-left p {
-  max-width: 620px;
-
-  margin: 0;
-
-  color: rgba(255,255,255,.92);
-
-  font-size: 18px;
-  line-height: 1.7;
-}
-
-/* STATS */
-
-.hero-stats {
-  display: flex;
-  gap: 18px;
-
-  margin-top: 30px;
-}
-
-.hero-stat {
-  background: rgba(255,255,255,.1);
-
-  padding: 16px 18px;
-
-  border-radius: 18px;
-
-  min-width: 140px;
-
-  strong {
-    display: block;
-
-    color: #ffffff;
-
-    font-size: 28px;
-    font-weight: 900;
-
-    margin-bottom: 4px;
-  }
-
-  span {
-    color: rgba(255,255,255,.82);
-
-    font-size: 13px;
-  }
-}
-
-/* BENEFITS */
-
-.hero-benefits {
-  display: flex;
-  flex-wrap: wrap;
-
-  gap: 12px;
-
-  margin-top: 28px;
-}
-
-.hero-benefit {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  background: rgba(255,255,255,.1);
-
-  padding: 10px 14px;
-
-  border-radius: 999px;
-
-  color: #ffffff;
-
-  font-size: 13px;
-  font-weight: 700;
-}
-
-/* =========================================================
-   HERO CARD
-========================================================= */
-
-.hero-card {
+.location-card {
   background: #ffffff;
-
-  border-radius: 28px;
-
+  border-radius: 24px;
   overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 
-  box-shadow:
-    0 24px 60px rgba(0,0,0,.18);
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+
+    .location-image img {
+      transform: scale(1.05);
+    }
+
+    .location-btn {
+      background: #003580;
+    }
+  }
 }
 
-.hero-card-image {
+.location-image {
   position: relative;
-
-  height: 280px;
+  height: 240px;
+  overflow: hidden;
 
   img {
     width: 100%;
     height: 100%;
-
     object-fit: cover;
+    transition: transform 0.4s ease;
   }
 }
 
-.hero-card-overlay {
+.location-overlay {
   position: absolute;
-  inset: 0;
-
-  background:
-    linear-gradient(
-      to top,
-      rgba(0,0,0,.45),
-      transparent
-    );
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
 }
 
-.hero-card-badge {
+.location-badge {
   position: absolute;
-
-  top: 18px;
-  left: 18px;
-
-  background: #009812;
-
-  color: #ffffff;
-
-  padding: 8px 12px;
-
-  border-radius: 999px;
-
-  font-size: 12px;
-  font-weight: 700;
+  top: 16px;
+  right: 16px;
+  background: #febb02;
+  color: #003580;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  z-index: 2;
 }
 
-.hero-card-body {
-  padding: 22px;
-}
-
-.hero-card-header {
-  display: flex;
-  justify-content: space-between;
-
-  gap: 16px;
-
-  margin-bottom: 18px;
+.location-content {
+  padding: 20px;
 
   h3 {
     margin: 0 0 8px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #0f172a;
+  }
 
-    font-size: 28px;
-    font-weight: 900;
+  p {
+    margin: 0 0 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #64748b;
   }
 }
 
-.hero-location {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  color: #64748b;
-
-  font-size: 14px;
-}
-
-.hero-rating {
-  background: #003b95;
-
-  color: #ffffff;
-
-  min-width: 74px;
-
-  padding: 10px;
-
-  border-radius: 14px;
-
-  text-align: center;
-
-  strong {
-    display: block;
-
-    font-size: 22px;
-    font-weight: 900;
-  }
-
-  span {
-    font-size: 11px;
-  }
-}
-
-.hero-features {
+.location-features {
   display: flex;
   flex-wrap: wrap;
-
-  gap: 8px;
-
+  gap: 12px;
   margin-bottom: 20px;
 
   span {
-    background: #f1f5f9;
-
-    padding: 6px 10px;
-
-    border-radius: 999px;
-
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 20px;
+
+    ion-icon {
+      font-size: 14px;
+      color: #003580;
+    }
   }
 }
 
-.hero-card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.hero-price {
-
-  small {
-    display: block;
-
-    color: #64748b;
-
-    margin-bottom: 4px;
-  }
-
-  strong {
-    font-size: 38px;
-    font-weight: 900;
-  }
-
-  span {
-    color: #64748b;
-  }
-}
-
-.hero-card-footer button {
-  height: 46px;
-
-  border: none;
-  border-radius: 12px;
-
-  padding: 0 18px;
-
+.location-btn {
+  width: 100%;
   background: #006ce4;
-
-  color: #ffffff;
-
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
   font-weight: 700;
-
+  font-size: 14px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 /* =========================================================
-   SECTIONS
+   BENEFITS SECTION
 ========================================================= */
-
-.popular-hotels,
-.services,
-.map-section,
-.experience-section {
-  padding: 72px 0;
+.benefits-section {
+  padding: 64px 0;
+  background: #f8f9fa;
 }
 
-/* =========================================================
-   HOTEL LIST
-========================================================= */
-
-.hotel-list {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.hotel-item {
+.benefits-grid {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  margin-top: 30px;
+}
 
+.benefit-card {
+  text-align: center;
+  padding: 32px 20px;
+  border-radius: 20px;
   background: #ffffff;
-
-  border-radius: 24px;
-
-  overflow: hidden;
-
-  border: 1px solid #e5e7eb;
-
-  cursor: pointer;
-
-  transition: .18s ease;
+  transition: all 0.3s ease;
 
   &:hover {
-    transform: translateY(-3px);
-
-    box-shadow:
-      0 18px 40px rgba(0,0,0,.08);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   }
-}
-
-.hotel-image {
-  height: 100%;
-
-  img {
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-  }
-}
-
-.hotel-content {
-  padding: 22px;
-}
-
-.hotel-top {
-  display: flex;
-  justify-content: space-between;
-
-  gap: 18px;
-
-  margin-bottom: 14px;
-
-  h3 {
-    margin: 0 0 8px;
-
-    font-size: 28px;
-    font-weight: 900;
-  }
-}
-
-.hotel-location {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  color: #64748b;
-}
-
-.hotel-score {
-  width: 48px;
-  height: 48px;
-
-  border-radius: 12px;
-
-  background: #003b95;
-
-  color: #ffffff;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-weight: 900;
-}
-
-.hotel-features {
-  display: flex;
-  flex-wrap: wrap;
-
-  gap: 8px;
-
-  margin-bottom: 14px;
-
-  span {
-    background: #eff6ff;
-
-    color: #006ce4;
-
-    padding: 6px 10px;
-
-    border-radius: 999px;
-
-    font-size: 12px;
-    font-weight: 700;
-  }
-}
-
-.hotel-description {
-  color: #64748b;
-
-  line-height: 1.7;
-
-  margin-bottom: 22px;
-}
-
-.hotel-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.hotel-price {
-
-  small {
-    display: block;
-
-    color: #64748b;
-
-    margin-bottom: 4px;
-  }
-
-  strong {
-    font-size: 34px;
-    font-weight: 900;
-  }
-
-  span {
-    color: #64748b;
-  }
-}
-
-.hotel-bottom button {
-  height: 44px;
-
-  border: none;
-  border-radius: 12px;
-
-  background: #006ce4;
-
-  color: #ffffff;
-
-  padding: 0 18px;
-
-  font-weight: 700;
-}
-
-/* =========================================================
-   SERVICES
-========================================================= */
-
-.services-list {
-  display: flex;
-  flex-wrap: wrap;
-
-  gap: 14px;
-}
-
-.service-chip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  background: #ffffff;
-
-  border: 1px solid #e5e7eb;
-
-  border-radius: 999px;
-
-  padding: 12px 18px;
-
-  font-weight: 700;
 
   ion-icon {
-    color: #006ce4;
-    font-size: 20px;
+    font-size: 48px;
+    color: #003580;
+    margin-bottom: 16px;
   }
-}
 
-/* =========================================================
-   EXPERIENCE
-========================================================= */
-
-.experience-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-
-  gap: 24px;
-}
-
-.experience-card {
-  position: relative;
-
-  height: 420px;
-
-  overflow: hidden;
-
-  border-radius: 28px;
-}
-
-.experience-card img {
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-}
-
-.experience-overlay {
-  position: absolute;
-  inset: 0;
-
-  background:
-    linear-gradient(
-      to top,
-      rgba(0,0,0,.8),
-      transparent
-    );
-}
-
-.experience-content {
-  position: absolute;
-
-  left: 24px;
-  right: 24px;
-  bottom: 24px;
-
-  z-index: 5;
-
-  color: #ffffff;
-
-  h3 {
-    margin: 14px 0 10px;
-
-    font-size: 34px;
-    font-weight: 900;
+  h4 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
   }
 
   p {
     margin: 0;
-
-    line-height: 1.6;
+    font-size: 14px;
+    color: #64748b;
+    line-height: 1.5;
   }
 }
 
-.experience-badge {
-  display: inline-flex;
-
-  padding: 8px 12px;
-
-  border-radius: 999px;
-
-  background: #009812;
-
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.experience-badge.blue {
-  background: #006ce4;
-}
-
-.experience-badge.dark {
-  background: #0f172a;
-}
-
 /* =========================================================
-   MAP
+   NEWSLETTER SECTION
 ========================================================= */
-
-.map-layout {
-  display: grid;
-  grid-template-columns: 340px 1fr;
-
-  gap: 22px;
+.newsletter-section {
+  padding: 64px 0;
+  background: linear-gradient(135deg, #003580 0%, #004cb8 100%);
+  color: white;
+  text-align: center;
 }
 
-.map-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+.newsletter-content {
+  max-width: 600px;
+  margin: 0 auto;
 
-.map-hotel {
-  background: #ffffff;
-
-  border: 1px solid #e5e7eb;
-
-  border-radius: 22px;
-
-  padding: 22px;
-
-  h3 {
-    margin: 0 0 10px;
-
-    font-size: 22px;
+  h2 {
+    margin: 0 0 12px;
+    font-size: 32px;
     font-weight: 800;
   }
 
   p {
-    margin: 0;
-
-    color: #64748b;
-
-    line-height: 1.7;
+    margin: 0 0 24px;
+    font-size: 16px;
+    opacity: 0.9;
   }
 }
 
-.map-frame {
-  overflow: hidden;
+.newsletter-form {
+  display: flex;
+  gap: 12px;
+  max-width: 500px;
+  margin: 0 auto;
 
-  border-radius: 28px;
-
-  iframe {
-    width: 100%;
-    min-height: 540px;
-
+  input {
+    flex: 1;
+    padding: 14px 18px;
     border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+  }
+
+  button {
+    background: #febb02;
+    border: none;
+    padding: 0 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    color: #003580;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #ffd700;
+    }
   }
 }
 
 /* =========================================================
    RESPONSIVE
 ========================================================= */
-
-@media (max-width: 1200px) {
-
-  .hero-content,
-  .map-layout {
-    grid-template-columns: 1fr;
+@media (max-width: 1024px) {
+  .locations-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .experience-grid {
+  .benefits-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-
-  .container,
-  .hero-content {
-    padding: 0 18px;
+  .container {
+    padding: 0 16px;
   }
 
-  .hero-left h1 {
-    font-size: 42px;
-  }
-
-  .hero-stats {
-    flex-direction: column;
-  }
-
-  .hotel-item {
+  .locations-grid,
+  .benefits-grid {
     grid-template-columns: 1fr;
   }
 
-  .experience-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .hotel-bottom,
-  .hero-card-footer {
+  .newsletter-form {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+    padding: 0 20px;
   }
 
-  h2 {
+  .newsletter-form button {
+    padding: 14px;
+  }
+
+  .section-head h2 {
     font-size: 28px;
   }
 }
