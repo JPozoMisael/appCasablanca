@@ -4,8 +4,14 @@
     <p>Gestión de llegadas y salidas de huéspedes</p>
   </div>
 
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-state">
+    <ion-icon name="refresh-outline" class="spinner"></ion-icon>
+    <p>Cargando reservas...</p>
+  </div>
+
   <!-- Stats -->
-  <div class="stats-grid">
+  <div class="stats-grid" *ngIf="!loading()">
     <div class="stat-card">
       <div class="stat-icon blue">
         <ion-icon name="log-in-outline"></ion-icon>
@@ -36,7 +42,7 @@
   </div>
 
   <!-- Search -->
-  <div class="search-bar">
+  <div class="search-bar" *ngIf="!loading()">
     <ion-icon name="search-outline"></ion-icon>
     <input 
       type="text" 
@@ -47,7 +53,7 @@
   </div>
 
   <!-- Tabs -->
-  <div class="tabs">
+  <div class="tabs" *ngIf="!loading()">
     <button class="tab-btn" [class.active]="activeTab === 'checkin'" (click)="activeTab = 'checkin'">
       <ion-icon name="log-in-outline"></ion-icon>
       Check-in
@@ -59,7 +65,7 @@
   </div>
 
   <!-- Lista de reservas -->
-  <div class="reservas-list">
+  <div class="reservas-list" *ngIf="!loading()">
     <div class="reserva-card" *ngFor="let r of reservasFiltradas()">
       <div class="reserva-info">
         <div class="guest-avatar">{{ getInitials(r.huesped) }}</div>
@@ -90,4 +96,4 @@
       <p>No hay {{ activeTab === 'checkin' ? 'check-ins' : 'check-outs' }} pendientes</p>
     </div>
   </div>
-</ion-content>
+</ion-content>  

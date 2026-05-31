@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon, IonButton, IonChip, IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -13,8 +13,8 @@ import {
   trendingUpOutline,
   statsChartOutline,
   businessOutline,
-  informationCircleOutline
-} from 'ionicons/icons';
+  informationCircleOutline, refreshOutline } from 'ionicons/icons';
+import { ReportesService } from '@app/core/services/reportes.service';
 
 type Tab = 'general' | 'ingresos' | 'ocupacion' | 'habitaciones';
 type Periodo = 'hoy' | '7d' | '30d' | 'mes';
@@ -37,20 +37,20 @@ interface TopItem {
   templateUrl: './reportes.page.html',
   styleUrls: ['./reportes.page.scss'],
 })
-export class ReportesPage {
+export class ReportesPage implements OnInit {
   tab = signal<Tab>('general');
   periodo = signal<Periodo>('7d');
+  loading = signal(true);
 
-  kpi = computed(() => {
-    switch (this.periodo()) {
-      case 'hoy': return { ingresos: 180, ocupacion: 62, reservas: 5, ticket: 36 };
-      case '7d': return { ingresos: 2840, ocupacion: 71, reservas: 38, ticket: 75 };
-      case '30d': return { ingresos: 11840, ocupacion: 66, reservas: 142, ticket: 83 };
-      case 'mes': return { ingresos: 9240, ocupacion: 69, reservas: 110, ticket: 84 };
-      default: return { ingresos: 0, ocupacion: 0, reservas: 0, ticket: 0 };
-    }
-  });
+  // Datos reales desde la API
+  kpiData = signal({ ingresos: 0, ocupacion: 0, reservas: 0, ticket: 0 });
+  ingresosData = signal<SeriePoint[]>([]);
+  ocupacionData = signal<SeriePoint[]>([]);
+  topHabitacionesData = signal<TopItem[]>([]);
 
+  // Computed para la vista
+  kpi = computed(() => this.kpiData());
+  
   resumen = computed(() => {
     const k = this.kpi();
     return [
@@ -61,63 +61,116 @@ export class ReportesPage {
     ];
   });
 
-  ingresosSerie = computed<SeriePoint[]>(() => {
-    const p = this.periodo();
-    if (p === 'hoy') return [{ label: 'Hoy', value: 180 }];
-    if (p === 'mes') {
-      return [
-        { label: '1', value: 280 }, { label: '5', value: 840 }, { label: '10', value: 660 },
-        { label: '15', value: 920 }, { label: '20', value: 710 }, { label: '25', value: 1050 },
-        { label: '30', value: 880 }
-      ];
-    }
-    return [
-      { label: 'Lun', value: 320 }, { label: 'Mar', value: 410 }, { label: 'Mié', value: 260 },
-      { label: 'Jue', value: 520 }, { label: 'Vie', value: 610 }, { label: 'Sáb', value: 430 },
-      { label: 'Dom', value: 290 }
-    ];
-  });
-
-  ocupacionSerie = computed<SeriePoint[]>(() => {
-    if (this.periodo() === 'hoy') return [{ label: 'Hoy', value: 62 }];
-    return [
-      { label: 'Lun', value: 64 }, { label: 'Mar', value: 70 }, { label: 'Mié', value: 68 },
-      { label: 'Jue', value: 73 }, { label: 'Vie', value: 78 }, { label: 'Sáb', value: 74 },
-      { label: 'Dom', value: 69 }
-    ];
-  });
-
-  topHabitaciones = computed<TopItem[]>(() => {
-    const p = this.periodo();
-    if (p === 'hoy') {
-      return [
-        { name: 'Suite Presidencial', value: 95, category: '301' },
-        { name: 'Doble Deluxe', value: 60, category: '204' },
-        { name: 'Doble Estándar', value: 25, category: '210' }
-      ];
-    }
-    return [
-      { name: 'Suite Presidencial', value: 1480, category: '301' },
-      { name: 'Doble Deluxe', value: 1220, category: '204' },
-      { name: 'Suite Ejecutiva', value: 980, category: '303' },
-      { name: 'Doble Estándar', value: 860, category: '210' },
-      { name: 'Simple Premium', value: 740, category: '105' }
-    ];
-  });
+  ingresosSerie = computed(() => this.ingresosData());
+  ocupacionSerie = computed(() => this.ocupacionData());
+  topHabitaciones = computed(() => this.topHabitacionesData());
 
   maxIngresos = computed(() => Math.max(1, ...this.ingresosSerie().map(s => s.value)));
   maxOcupacion = computed(() => Math.max(1, ...this.ocupacionSerie().map(s => s.value)));
 
-  constructor() {
-    addIcons({
-      analyticsOutline, cashOutline, bedOutline, clipboardOutline, downloadOutline,
-      calendarOutline, todayOutline, trendingUpOutline, statsChartOutline, businessOutline,
-      informationCircleOutline
+  constructor(private reportesService: ReportesService) {
+    addIcons({downloadOutline,refreshOutline,calendarOutline,todayOutline,cashOutline,bedOutline,clipboardOutline,trendingUpOutline,statsChartOutline,businessOutline,informationCircleOutline,analyticsOutline});
+  }
+
+  ngOnInit() {
+    this.cargarDatos();
+  }
+
+  private getFechasPorPeriodo(): { desde: string; hasta: string } {
+    const hoy = new Date();
+    const hasta = hoy.toISOString().split('T')[0];
+    let desde = hoy;
+    
+    switch (this.periodo()) {
+      case 'hoy':
+        desde = hoy;
+        break;
+      case '7d':
+        desde.setDate(hoy.getDate() - 7);
+        break;
+      case '30d':
+        desde.setDate(hoy.getDate() - 30);
+        break;
+      case 'mes':
+        desde = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        break;
+    }
+    
+    return {
+      desde: desde.toISOString().split('T')[0],
+      hasta: hasta
+    };
+  }
+
+  private calcularTicketPromedio(ingresos: number, reservas: number): number {
+    if (reservas === 0) return 0;
+    return Math.round(ingresos / reservas);
+  }
+
+  cargarDatos() {
+    this.loading.set(true);
+    const fechas = this.getFechasPorPeriodo();
+    
+    // Cargar ingresos
+    this.reportesService.ingresos(fechas).subscribe({
+      next: (data) => {
+        if (data) {
+          const ingresos = data.total || 0;
+          this.kpiData.update(k => ({ ...k, ingresos }));
+          // Transformar datos para la serie
+          if (data.serie && Array.isArray(data.serie)) {
+            this.ingresosData.set(data.serie);
+          }
+        }
+      },
+      error: (err) => console.error('Error ingresos:', err)
+    });
+
+    // Cargar ocupación
+    this.reportesService.ocupacion(fechas).subscribe({
+      next: (data) => {
+        if (data) {
+          const ocupacion = data.promedio || 0;
+          this.kpiData.update(k => ({ ...k, ocupacion }));
+          if (data.serie && Array.isArray(data.serie)) {
+            this.ocupacionData.set(data.serie);
+          }
+        }
+      },
+      error: (err) => console.error('Error ocupación:', err)
+    });
+
+    // Cargar reservas
+    this.reportesService.reservas(fechas).subscribe({
+      next: (data) => {
+        if (data) {
+          const reservas = data.total || 0;
+          this.kpiData.update(k => ({ 
+            ...k, 
+            reservas,
+            ticket: this.calcularTicketPromedio(k.ingresos, reservas)
+          }));
+          
+          // Cargar top habitaciones si está disponible
+          if (data.topHabitaciones && Array.isArray(data.topHabitaciones)) {
+            this.topHabitacionesData.set(data.topHabitaciones);
+          }
+        }
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error reservas:', err);
+        this.loading.set(false);
+      }
     });
   }
 
   setTab(v: Tab) { this.tab.set(v); }
-  setPeriodo(p: Periodo) { this.periodo.set(p); }
+  
+  setPeriodo(p: Periodo) { 
+    this.periodo.set(p);
+    this.cargarDatos();
+  }
 
   exportResumenCSV() {
     const rows = [['Métrica', 'Valor'], ...this.resumen().map(r => [r.label, r.value])];

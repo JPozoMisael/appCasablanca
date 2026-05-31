@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon, IonButton, IonChip } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -17,6 +17,8 @@ import {
   trashOutline,
   peopleOutline
 } from 'ionicons/icons';
+import { HabitacionesService } from '@app/core/services/habitaciones.service';
+import { Habitacion as HabitacionModel } from '@app/shared/models/habitacion.model';
 
 type EstadoHab = 'DISPONIBLE' | 'OCUPADA' | 'LIMPIEZA' | 'MANTENIMIENTO';
 type TipoHab = 'SIMPLE' | 'DOBLE' | 'TRIPLE' | 'SUITE';
@@ -42,15 +44,9 @@ type ModalMode = 'create' | 'edit';
   templateUrl: './habitaciones.page.html',
   styleUrls: ['./habitaciones.page.scss'],
 })
-export class AdminHabitacionesPage {
-  habitaciones = signal<Habitacion[]>([
-    { id: 1, codigo: '101', piso: 1, tipo: 'SIMPLE', capacidad: 1, tarifa: 25, estado: 'DISPONIBLE', notas: 'WiFi, TV, Aire acondicionado' },
-    { id: 2, codigo: '105', piso: 1, tipo: 'SIMPLE', capacidad: 1, tarifa: 25, estado: 'OCUPADA' },
-    { id: 3, codigo: '204', piso: 2, tipo: 'DOBLE', capacidad: 2, tarifa: 40, estado: 'DISPONIBLE', notas: 'Vista al mar, Balcón' },
-    { id: 4, codigo: '210', piso: 2, tipo: 'DOBLE', capacidad: 2, tarifa: 40, estado: 'LIMPIEZA' },
-    { id: 5, codigo: '301', piso: 3, tipo: 'SUITE', capacidad: 3, tarifa: 60, estado: 'OCUPADA', notas: 'Jacuzzi, Minibar, Vista panorámica' },
-    { id: 6, codigo: '303', piso: 3, tipo: 'SUITE', capacidad: 3, tarifa: 60, estado: 'MANTENIMIENTO', notas: 'A/C en revisión' },
-  ]);
+export class AdminHabitacionesPage implements OnInit {
+  habitaciones = signal<Habitacion[]>([]);
+  loading = signal(true);
 
   q = signal('');
   fEstado = signal<EstadoHab | 'TODOS'>('TODOS');
@@ -62,12 +58,63 @@ export class AdminHabitacionesPage {
     id: 0, codigo: '', piso: 1, tipo: 'SIMPLE', capacidad: 1, tarifa: 0, estado: 'DISPONIBLE', notas: ''
   });
 
-  constructor() {
+  constructor(private habitacionesService: HabitacionesService) {
     addIcons({
       bedOutline, searchOutline, addCircleOutline, createOutline, eyeOutline,
       closeOutline, syncOutline, checkmarkCircleOutline, constructOutline,
       pauseCircleOutline, downloadOutline, trashOutline, peopleOutline
     });
+  }
+
+  ngOnInit() {
+    this.cargarHabitaciones();
+  }
+
+  cargarHabitaciones() {
+    this.loading.set(true);
+    // Obtener habitaciones de la API (necesitas un endpoint para listar todas)
+    // Por ahora usamos el servicio existente
+    this.habitacionesService.getByHotel('palmeras').subscribe({
+      next: (habitaciones) => {
+        const transformed = habitaciones.map(h => this.transformHabitacion(h));
+        this.habitaciones.set(transformed);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargar habitaciones:', err);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  private transformHabitacion(h: HabitacionModel): Habitacion {
+  return {
+    id: h.id,
+    codigo: h.numero,
+    piso: 1, // TODO: Obtener del modelo cuando esté disponible
+    tipo: this.mapTipo(h.tipo),
+    capacidad: h.capacidad,
+    tarifa: h.precioNoche,
+    estado: this.mapEstado(h.estado),
+    notas: h.descripcion || undefined,  // ← convertir null a undefined
+    imagenUrl: h.imagenUrl || undefined // ← convertir null a undefined
+  };
+}
+
+  private mapTipo(tipo: string): TipoHab {
+    const tipoUpper = tipo.toUpperCase();
+    if (tipoUpper.includes('DOBLE')) return 'DOBLE';
+    if (tipoUpper.includes('TRIPLE')) return 'TRIPLE';
+    if (tipoUpper.includes('SUITE')) return 'SUITE';
+    return 'SIMPLE';
+  }
+
+  private mapEstado(estado: string): EstadoHab {
+    const estadoUpper = estado.toUpperCase();
+    if (estadoUpper === 'OCUPADA') return 'OCUPADA';
+    if (estadoUpper === 'LIMPIEZA') return 'LIMPIEZA';
+    if (estadoUpper === 'MANTENIMIENTO') return 'MANTENIMIENTO';
+    return 'DISPONIBLE';
   }
 
   total = () => this.habitaciones().length;

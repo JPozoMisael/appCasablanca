@@ -1,4 +1,6 @@
 <ion-content class="ion-padding">
+
+  <!-- HEADER -->
   <div class="tarifas-header">
     <div>
       <h1>Gestión de tarifas</h1>
@@ -10,48 +12,75 @@
     </button>
   </div>
 
-  <!-- Filtros -->
-  <div class="filters">
-    <div class="search-box">
-      <ion-icon name="search-outline"></ion-icon>
-      <input type="text" placeholder="Buscar por tipo de habitación..." [(ngModel)]="searchTerm">
+  <!-- LOADING STATE -->
+  <div *ngIf="loading()" class="loading-state">
+    <ion-icon name="refresh-outline" class="spinner"></ion-icon>
+    <p>Cargando tarifas...</p>
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <ng-container *ngIf="!loading()">
+
+    <!-- FILTROS -->
+    <div class="filters">
+      <div class="search-box">
+        <ion-icon name="search-outline"></ion-icon>
+        <input type="text" placeholder="Buscar por tipo de habitación..." [(ngModel)]="searchTerm">
+      </div>
     </div>
-  </div>
 
-  <!-- Tabla -->
-  <div class="table-container">
-    <table class="tarifas-table">
-      <thead>
-        <tr>
-          <th>Tipo habitación</th>
-          <th>Temporada</th>
-          <th>Precio / noche</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let t of tarifasFiltradas()">
-          <td><strong>{{ t.tipo }}</strong></td>
-          <td>{{ t.temporada }}</td>
-          <td class="price">${{ t.precio }}</td>
-          <td><span class="status-badge" [class.active]="t.estado === 'activo'">{{ t.estado === 'activo' ? 'Activa' : 'Inactiva' }}</span></td>
-          <td class="actions">
-            <button class="icon-btn" (click)="editar(t)"><ion-icon name="create-outline"></ion-icon></button>
-            <button class="icon-btn danger" (click)="eliminar(t)"><ion-icon name="trash-outline"></ion-icon></button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- TABLA -->
+    <div class="table-container">
+      <div *ngIf="tarifasFiltradas().length === 0" class="empty-state">
+        <ion-icon name="pricetag-outline"></ion-icon>
+        <p>No hay tarifas registradas</p>
+      </div>
 
-  <!-- Modal -->
+      <table class="tarifas-table" *ngIf="tarifasFiltradas().length > 0">
+        <thead>
+          <tr>
+            <th>Tipo habitación</th>
+            <th>Temporada</th>
+            <th>Precio / noche</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of tarifasFiltradas()">
+            <td><strong>{{ t.tipo }}</strong></td>
+            <td>{{ t.temporada }}</td>
+            <td class="price">${{ t.precio }}</td>
+            <td>
+              <span class="status-badge" [class.active]="t.estado === 'activo'">
+                {{ t.estado === 'activo' ? 'Activa' : 'Inactiva' }}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="icon-btn" (click)="editar(t)" title="Editar">
+                <ion-icon name="create-outline"></ion-icon>
+              </button>
+              <button class="icon-btn danger" (click)="eliminar(t)" title="Eliminar">
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+       </table>
+    </div>
+
+  </ng-container>
+
+  <!-- MODAL -->
   <div class="modal" *ngIf="modalAbierto" (click)="cerrarModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ editando ? 'Editar tarifa' : 'Nueva tarifa' }}</h3>
-        <button class="close-btn" (click)="cerrarModal()"><ion-icon name="close-outline"></ion-icon></button>
+        <button class="close-btn" (click)="cerrarModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
       </div>
+
       <div class="modal-body">
         <div class="field">
           <label>Tipo de habitación</label>
@@ -62,6 +91,7 @@
             <option value="Suite">Suite</option>
           </select>
         </div>
+
         <div class="field">
           <label>Temporada</label>
           <select [(ngModel)]="formData.temporada">
@@ -70,15 +100,21 @@
             <option value="Alta">Alta</option>
           </select>
         </div>
+
         <div class="field">
           <label>Precio por noche ($)</label>
-          <input type="number" [(ngModel)]="formData.precio">
+          <input type="number" [(ngModel)]="formData.precio" placeholder="0.00">
         </div>
       </div>
+
       <div class="modal-footer">
         <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
         <button class="btn-save" (click)="guardar()">Guardar</button>
       </div>
     </div>
   </div>
+
+  <!-- BACKDROP DEL MODAL -->
+  <div class="modal-backdrop" *ngIf="modalAbierto" (click)="cerrarModal()"></div>
+
 </ion-content>

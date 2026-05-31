@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon, IonButton, IonChip } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -16,17 +16,17 @@ import {
   logInOutline,
   logOutOutline,
   downloadOutline,
-  closeCircleOutline
-} from 'ionicons/icons';
+  closeCircleOutline, refreshOutline } from 'ionicons/icons';
+import { ReservasService } from '@app/core/services/reservas.service';
+import { Reserva as ReservaModel, EstadoReserva } from '@app/shared/models/reserva.model';
 
-type EstadoReserva = 'PENDIENTE' | 'CONFIRMADA' | 'CHECKIN' | 'CHECKOUT' | 'CANCELADA';
-
-interface Reserva {
+interface ReservaUI {
   id: number;
   codigo?: string;
   huesped: string;
   documento?: string;
   habitacion: string;
+  habitacionId: number;
   fechaEntrada: string;
   fechaSalida: string;
   estado: EstadoReserva;
@@ -44,16 +44,18 @@ type ModalMode = 'create' | 'edit';
   templateUrl: './reservas.page.html',
   styleUrls: ['./reservas.page.scss'],
 })
-export class AdminReservasPage {
-  reservas = signal<Reserva[]>([
-    { id: 3001, codigo: 'RES-3001', huesped: 'Carlos Ruiz', documento: '0901234567', habitacion: 'Doble · 204', fechaEntrada: '2026-01-14', fechaSalida: '2026-01-16', estado: 'CONFIRMADA', total: 120, anticipo: 50 },
-    { id: 3002, codigo: 'RES-3002', huesped: 'María Paredes', documento: '0912345678', habitacion: 'Suite · 301', fechaEntrada: '2026-01-14', fechaSalida: '2026-01-15', estado: 'CHECKIN', total: 95, anticipo: 95 },
-    { id: 3003, codigo: 'RES-3003', huesped: 'Kevin Andrade', documento: '0923456789', habitacion: 'Simple · 105', fechaEntrada: '2026-01-18', fechaSalida: '2026-01-21', estado: 'PENDIENTE', total: 150, anticipo: 0 },
-    { id: 3004, codigo: 'RES-3004', huesped: 'Ana Cedeño', documento: '0934567890', habitacion: 'Doble · 210', fechaEntrada: '2026-01-20', fechaSalida: '2026-01-22', estado: 'CONFIRMADA', total: 180, anticipo: 80, notas: 'Cama adicional' },
-    { id: 3005, codigo: 'RES-3005', huesped: 'Jorge Vera', documento: '0945678901', habitacion: 'Suite · 303', fechaEntrada: '2026-01-22', fechaSalida: '2026-01-23', estado: 'CANCELADA', total: 0, anticipo: 0 }
+export class AdminReservasPage implements OnInit {
+  reservas = signal<ReservaUI[]>([]);
+  loading = signal(true);
+  
+  habitaciones = signal<{ id: number; nombre: string }[]>([
+    { id: 1, nombre: 'Simple · 101' },
+    { id: 2, nombre: 'Simple · 105' },
+    { id: 3, nombre: 'Doble · 204' },
+    { id: 4, nombre: 'Doble · 210' },
+    { id: 5, nombre: 'Suite · 301' },
+    { id: 6, nombre: 'Suite · 303' }
   ]);
-
-  habitaciones = signal<string[]>(['Simple · 101', 'Simple · 105', 'Doble · 204', 'Doble · 210', 'Suite · 301', 'Suite · 303']);
 
   q = signal('');
   fEstado = signal<EstadoReserva | 'TODOS'>('TODOS');
@@ -62,13 +64,50 @@ export class AdminReservasPage {
   modalOpen = signal(false);
   modalMode = signal<ModalMode>('create');
 
-  form = signal<Reserva>({
-    id: 0, codigo: '', huesped: '', documento: '', habitacion: this.habitaciones()[0],
+  form = signal<ReservaUI>({
+    id: 0, codigo: '', huesped: '', documento: '', habitacion: this.habitaciones()[0].nombre,
+    habitacionId: this.habitaciones()[0].id,
     fechaEntrada: '', fechaSalida: '', estado: 'PENDIENTE', total: 0, anticipo: 0, notas: ''
   });
 
-  constructor() {
-    addIcons({ searchOutline, addCircleOutline, createOutline, eyeOutline, closeOutline, syncOutline, calendarOutline, timeOutline, personOutline, bedOutline, logInOutline, logOutOutline, downloadOutline, closeCircleOutline });
+  constructor(private reservasService: ReservasService) {
+    addIcons({addCircleOutline,calendarOutline,logInOutline,logOutOutline,timeOutline,refreshOutline,searchOutline,downloadOutline,bedOutline,eyeOutline,createOutline,syncOutline,closeCircleOutline,closeOutline,personOutline});
+  }
+
+  ngOnInit() {
+    this.cargarReservas();
+  }
+
+  cargarReservas() {
+    this.loading.set(true);
+    this.reservasService.getAll().subscribe({
+      next: (reservas) => {
+        const transformed = reservas.map(r => this.transformReserva(r));
+        this.reservas.set(transformed);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargar reservas:', err);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  private transformReserva(r: ReservaModel): ReservaUI {
+    return {
+      id: r.id,
+      codigo: r.codigo || `RES-${r.id}`,
+      huesped: `Huésped ${r.huespedId}`,
+      documento: undefined,
+      habitacion: `Habitación ${r.habitacionId}`,
+      habitacionId: r.habitacionId,
+      fechaEntrada: r.checkIn,
+      fechaSalida: r.checkOut,
+      estado: r.estado,
+      total: r.total,
+      anticipo: undefined,
+      notas: undefined
+    };
   }
 
   get todayIso() { return new Date().toISOString().split('T')[0]; }
@@ -81,63 +120,168 @@ export class AdminReservasPage {
   filtradas = computed(() => {
     let items = this.reservas();
     const query = this.q().trim().toLowerCase();
-    if (query) items = items.filter(r => (r.codigo || '').toLowerCase().includes(query) || r.huesped.toLowerCase().includes(query) || (r.documento || '').toLowerCase().includes(query) || r.habitacion.toLowerCase().includes(query));
+    if (query) {
+      items = items.filter(r => 
+        (r.codigo || '').toLowerCase().includes(query) || 
+        r.huesped.toLowerCase().includes(query) || 
+        r.habitacion.toLowerCase().includes(query)
+      );
+    }
     if (this.fEstado() !== 'TODOS') items = items.filter(r => r.estado === this.fEstado());
     if (this.fDesde()) items = items.filter(r => r.fechaEntrada >= this.fDesde());
     if (this.fHasta()) items = items.filter(r => r.fechaEntrada <= this.fHasta());
     return items.sort((a, b) => a.fechaEntrada.localeCompare(b.fechaEntrada) || b.id - a.id);
   });
 
-  setEstadoFilter(v: string) { this.fEstado.set(v as any); }
-  getInitials(nombre: string) { return nombre.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase(); }
-  formatDate(iso: string) { const parts = iso.split('-'); return `${parts[2]}/${parts[1]}`; }
+  setEstadoFilter(v: string) { this.fEstado.set(v as EstadoReserva); }
+  
+  getInitials(nombre: string) { 
+    return nombre.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase(); 
+  }
+  
+  formatDate(iso: string) { 
+    if (!iso) return '';
+    const parts = iso.split('-'); 
+    return `${parts[2]}/${parts[1]}`; 
+  }
 
   getEstadoClass(estado: EstadoReserva): string {
-    return { PENDIENTE: 'pendiente', CONFIRMADA: 'confirmada', CHECKIN: 'checkin', CHECKOUT: 'checkout', CANCELADA: 'cancelada' }[estado] || '';
+    const map: Record<EstadoReserva, string> = {
+      PENDIENTE: 'pendiente',
+      CONFIRMADA: 'confirmada',
+      CHECKIN: 'checkin',
+      CHECKOUT: 'checkout',
+      CANCELADA: 'cancelada'
+    };
+    return map[estado] || '';
   }
 
   formatEstado(estado: EstadoReserva): string {
-    return { PENDIENTE: 'Pendiente', CONFIRMADA: 'Confirmada', CHECKIN: 'Check-in', CHECKOUT: 'Check-out', CANCELADA: 'Cancelada' }[estado] || estado;
+    const map: Record<EstadoReserva, string> = {
+      PENDIENTE: 'Pendiente',
+      CONFIRMADA: 'Confirmada',
+      CHECKIN: 'Check-in',
+      CHECKOUT: 'Check-out',
+      CANCELADA: 'Cancelada'
+    };
+    return map[estado] || estado;
   }
 
-  openCreate() { this.modalMode.set('create'); this.form.set({ id: 0, codigo: '', huesped: '', documento: '', habitacion: this.habitaciones()[0], fechaEntrada: this.todayIso, fechaSalida: this.todayIso, estado: 'PENDIENTE', total: 0, anticipo: 0, notas: '' }); this.modalOpen.set(true); }
-  openEdit(r: Reserva) { this.modalMode.set('edit'); this.form.set({ ...r }); this.modalOpen.set(true); }
-  openDetail(r: Reserva) { alert(`Reserva ${r.codigo || r.id}\nHuésped: ${r.huesped}\nDocumento: ${r.documento || '—'}\nHabitación: ${r.habitacion}\nEntrada: ${r.fechaEntrada}\nSalida: ${r.fechaSalida}\nEstado: ${this.formatEstado(r.estado)}\nTotal: $${r.total}\nAnticipo: $${r.anticipo || 0}\nNotas: ${r.notas || 'Ninguna'}`); }
+  openCreate() { 
+    this.modalMode.set('create'); 
+    const defaultHab = this.habitaciones()[0];
+    this.form.set({ 
+      id: 0, codigo: '', huesped: '', documento: '', 
+      habitacion: defaultHab.nombre,
+      habitacionId: defaultHab.id,
+      fechaEntrada: this.todayIso, fechaSalida: this.todayIso, 
+      estado: 'PENDIENTE', total: 0, anticipo: 0, notas: '' 
+    }); 
+    this.modalOpen.set(true); 
+  }
+  
+  openEdit(r: ReservaUI) { 
+    this.modalMode.set('edit'); 
+    this.form.set({ ...r }); 
+    this.modalOpen.set(true); 
+  }
+  
+  openDetail(r: ReservaUI) { 
+    alert(`Reserva ${r.codigo || r.id}\nHuésped: ${r.huesped}\nHabitación: ${r.habitacion}\nEntrada: ${r.fechaEntrada}\nSalida: ${r.fechaSalida}\nEstado: ${this.formatEstado(r.estado)}\nTotal: $${r.total}`); 
+  }
+  
   closeModal() { this.modalOpen.set(false); }
-  patch<K extends keyof Reserva>(key: K, value: Reserva[K]) { this.form.set({ ...this.form(), [key]: value }); }
+  
+  patch<K extends keyof ReservaUI>(key: K, value: ReservaUI[K]) { 
+    this.form.set({ ...this.form(), [key]: value }); 
+  }
+
+  onHabitacionChange(event: any) {
+    const nombre = event.target.value;
+    const habitacion = this.habitaciones().find(h => h.nombre === nombre);
+    if (habitacion) {
+      this.form.set({ 
+        ...this.form(), 
+        habitacion: habitacion.nombre,
+        habitacionId: habitacion.id
+      });
+    }
+  }
 
   save() {
     const f = this.form();
-    if (!f.huesped.trim() || !f.habitacion || !f.fechaEntrada || !f.fechaSalida) { alert('Complete los campos obligatorios'); return; }
-    if (f.fechaSalida < f.fechaEntrada) { alert('La fecha de salida debe ser posterior a la entrada'); return; }
+    if (!f.habitacion || !f.fechaEntrada || !f.fechaSalida) { 
+      alert('Complete los campos obligatorios'); 
+      return; 
+    }
+    if (f.fechaSalida < f.fechaEntrada) { 
+      alert('La fecha de salida debe ser posterior a la entrada'); 
+      return; 
+    }
+    
+    // ✅ FORMATO CORRECTO para tu servicio
+    const payload = {
+      cliente_id: 1,        // TODO: Seleccionar cliente real
+      hotel_id: 1,          // TODO: Seleccionar hotel real
+      fecha_entrada: f.fechaEntrada,
+      fecha_salida: f.fechaSalida,
+      num_huespedes: 1,     // TODO: Calcular desde adultos + niños
+      habitaciones: [
+        { habitacion_id: f.habitacionId }
+      ],
+      observaciones: f.notas
+    };
+
     if (this.modalMode() === 'create') {
-      const nextId = Math.max(...this.reservas().map(r => r.id), 0) + 1;
-      this.reservas.set([{ ...f, id: nextId, codigo: `RES-${nextId}` }, ...this.reservas()]);
+      this.reservasService.create(payload).subscribe({
+        next: () => this.cargarReservas(),
+        error: (err) => console.error('Error crear reserva:', err)
+      });
     } else {
-      this.reservas.set(this.reservas().map(r => r.id === f.id ? { ...f } : r));
+      // Para actualizar, solo algunos campos son permitidos
+      const updatePayload = {
+        fecha_entrada: f.fechaEntrada,
+        fecha_salida: f.fechaSalida,
+        num_huespedes: 1,
+        observaciones: f.notas,
+        estado: f.estado
+      };
+      this.reservasService.update(f.id, updatePayload).subscribe({
+        next: () => this.cargarReservas(),
+        error: (err) => console.error('Error actualizar reserva:', err)
+      });
     }
     this.closeModal();
   }
 
-  cycleEstado(r: Reserva) {
+  cycleEstado(r: ReservaUI) {
     const order: EstadoReserva[] = ['PENDIENTE', 'CONFIRMADA', 'CHECKIN', 'CHECKOUT', 'CANCELADA'];
     const idx = order.indexOf(r.estado);
-    this.reservas.set(this.reservas().map(x => x.id === r.id ? { ...x, estado: order[(idx + 1) % order.length] } : x));
+    const nextEstado = order[(idx + 1) % order.length];
+    
+    this.reservasService.update(r.id, { estado: nextEstado }).subscribe({
+      next: () => this.cargarReservas(),
+      error: (err) => console.error('Error cambiar estado:', err)
+    });
   }
 
-  confirmCancel(r: Reserva) {
-    if (confirm(`¿Cancelar reserva ${r.codigo || r.id} de ${r.huesped}?`)) {
-      this.reservas.set(this.reservas().map(x => x.id === r.id ? { ...x, estado: 'CANCELADA', total: 0 } : x));
+  confirmCancel(r: ReservaUI) {
+    if (confirm(`¿Cancelar reserva ${r.codigo || r.id}?`)) {
+      this.reservasService.cancel(r.id).subscribe({
+        next: () => this.cargarReservas(),
+        error: (err) => console.error('Error cancelar reserva:', err)
+      });
     }
   }
 
   exportData() {
     const data = this.filtradas();
-    const csv = [['ID', 'Código', 'Huésped', 'Documento', 'Habitación', 'Entrada', 'Salida', 'Estado', 'Total', 'Anticipo', 'Notas'].join(',')];
-    data.forEach(r => csv.push([r.id, r.codigo || '', r.huesped, r.documento || '', r.habitacion, r.fechaEntrada, r.fechaSalida, r.estado, r.total, r.anticipo || 0, r.notas || ''].join(',')));
+    const csv = [['ID', 'Código', 'Huésped', 'Habitación', 'Entrada', 'Salida', 'Estado', 'Total'].join(',')];
+    data.forEach(r => csv.push([r.id, r.codigo || '', r.huesped, r.habitacion, r.fechaEntrada, r.fechaSalida, r.estado, r.total].join(',')));
     const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `reservas_${this.todayIso}.csv`; a.click(); URL.revokeObjectURL(url);
+    a.href = url; a.download = `reservas_${this.todayIso}.csv`; a.click(); 
+    URL.revokeObjectURL(url);
   }
 }

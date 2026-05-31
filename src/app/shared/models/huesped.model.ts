@@ -1,3 +1,5 @@
+export type TipoHuesped = 'NORMAL' | 'FRECUENTE' | 'VIP';
+
 export interface Huesped {
   id: number;
   nombres: string;
@@ -7,5 +9,6 @@ export interface Huesped {
   telefono?: string | null;
   nacionalidad?: string | null;
   fechaNacimiento?: string | null;
+  tipo?: TipoHuesped | null;  // ← Agregar campo tipo
   creadoEn?: string;
 }

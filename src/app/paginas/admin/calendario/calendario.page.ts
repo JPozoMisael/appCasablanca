@@ -25,6 +25,8 @@ import {
   trashOutline
 } from 'ionicons/icons';
 
+import { CalendarioService } from '@app/core/services/calendario.service';
+
 type EstadoReserva =
   | 'CONFIRMADA'
   | 'PENDIENTE'
@@ -71,33 +73,20 @@ interface Bar {
   styleUrls: ['./calendario.page.scss'],
 })
 export class CalendarioPage implements OnInit {
-
   viewDate = signal<Date>(this.startOfMonth(new Date()));
   selectedReservaId = signal<number | null>(null);
+  loading = signal(true);
+
   selectedReserva = computed(() => {
     const id = this.selectedReservaId();
     if (!id) return null;
     return this.reservas().find(r => r.id === id) || null;
   });
 
-  habitaciones = signal<HabitacionRow[]>([
-    { id: 1, codigo: '101', tipo: 'Simple', piso: '1' },
-    { id: 2, codigo: '105', tipo: 'Simple', piso: '1' },
-    { id: 3, codigo: '204', tipo: 'Doble', piso: '2' },
-    { id: 4, codigo: '210', tipo: 'Doble', piso: '2' },
-    { id: 5, codigo: '301', tipo: 'Suite', piso: '3' },
-    { id: 6, codigo: '303', tipo: 'Suite', piso: '3' },
-  ]);
+  habitaciones = signal<HabitacionRow[]>([]);
+  reservas = signal<Reserva[]>([]);
 
-  reservas = signal<Reserva[]>([
-    { id: 2001, huesped: 'Carlos Ruiz', habitacionId: 3, checkIn: '2026-01-14', checkOut: '2026-01-16', estado: 'CONFIRMADA', total: 120 },
-    { id: 2002, huesped: 'María Paredes', habitacionId: 5, checkIn: '2026-01-14', checkOut: '2026-01-15', estado: 'CHECKIN', total: 95 },
-    { id: 2003, huesped: 'Kevin Andrade', habitacionId: 2, checkIn: '2026-01-18', checkOut: '2026-01-21', estado: 'PENDIENTE', total: 150 },
-    { id: 2004, huesped: 'Ana Cedeño', habitacionId: 4, checkIn: '2026-01-20', checkOut: '2026-01-22', estado: 'CONFIRMADA', total: 180 },
-    { id: 2005, huesped: 'Jorge Vera', habitacionId: 6, checkIn: '2026-01-22', checkOut: '2026-01-23', estado: 'CANCELADA', total: 0 },
-  ]);
-
-  constructor() {
+  constructor(private calendarioService: CalendarioService) {
     addIcons({
       chevronBackOutline,
       chevronForwardOutline,
@@ -116,14 +105,22 @@ export class CalendarioPage implements OnInit {
   }
 
   ngOnInit() {
-    // Cargar datos reales desde API aquí
     this.loadData();
   }
 
   loadData() {
-    // Aquí conectarías con tu servicio
-    // this.calendarioService.getHabitaciones().subscribe(...)
-    // this.calendarioService.getReservas().subscribe(...)
+    this.loading.set(true);
+    Promise.all([
+      this.calendarioService.getHabitaciones().toPromise(),
+      this.calendarioService.getReservas().toPromise()
+    ]).then(([habitaciones, reservas]) => {
+      if (habitaciones) this.habitaciones.set(habitaciones);
+      if (reservas) this.reservas.set(reservas);
+      this.loading.set(false);
+    }).catch(err => {
+      console.error('Error cargando datos del calendario:', err);
+      this.loading.set(false);
+    });
   }
 
   // =================== Navegación ===================
@@ -159,30 +156,37 @@ export class CalendarioPage implements OnInit {
   confirmarReserva() {
     const reserva = this.selectedReserva();
     if (!reserva) return;
-    console.log('Confirmar reserva:', reserva);
-    // Aquí llamar al servicio para confirmar
-    this.updateReservaEstado(reserva.id, 'CONFIRMADA');
+    this.calendarioService.actualizarEstado(reserva.id, 'CONFIRMADA').subscribe({
+      next: () => this.loadData(),
+      error: (err) => console.error('Error confirmar reserva:', err)
+    });
   }
 
   checkinReserva() {
     const reserva = this.selectedReserva();
     if (!reserva) return;
-    console.log('Check-in reserva:', reserva);
-    this.updateReservaEstado(reserva.id, 'CHECKIN');
+    this.calendarioService.realizarCheckIn(reserva.id).subscribe({
+      next: () => this.loadData(),
+      error: (err) => console.error('Error check-in:', err)
+    });
   }
 
   checkoutReserva() {
     const reserva = this.selectedReserva();
     if (!reserva) return;
-    console.log('Check-out reserva:', reserva);
-    this.updateReservaEstado(reserva.id, 'CHECKOUT');
+    this.calendarioService.realizarCheckOut(reserva.id).subscribe({
+      next: () => this.loadData(),
+      error: (err) => console.error('Error check-out:', err)
+    });
   }
 
   cancelarReserva() {
     const reserva = this.selectedReserva();
     if (!reserva) return;
-    console.log('Cancelar reserva:', reserva);
-    this.updateReservaEstado(reserva.id, 'CANCELADA');
+    this.calendarioService.cancelarReserva(reserva.id).subscribe({
+      next: () => this.loadData(),
+      error: (err) => console.error('Error cancelar reserva:', err)
+    });
   }
 
   private updateReservaEstado(id: number, nuevoEstado: EstadoReserva) {

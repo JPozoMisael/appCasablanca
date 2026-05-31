@@ -25,19 +25,8 @@ import {
   constructOutline,
   personOutline,
   callOutline,
-  mailOutline
-} from 'ionicons/icons';
-
-interface ReservaCheck {
-  id: number;
-  huesped: string;
-  habitacion: string;
-  fechaEntrada: string;
-  fechaSalida: string;
-  tipo: 'checkin' | 'checkout';
-  documento?: string;
-  telefono?: string;
-}
+  mailOutline, refreshOutline } from 'ionicons/icons';
+import { CheckinOutService, ReservaCheck } from '@app/core/services/checkinout.service';
 
 @Component({
   selector: 'app-checkin-out',
@@ -60,62 +49,84 @@ interface ReservaCheck {
 export class CheckinOutPage implements OnInit {
   searchTerm: string = '';
   activeTab: 'checkin' | 'checkout' = 'checkin';
+  loading = signal(true);
   
-  reservas = signal<ReservaCheck[]>([
-    { id: 1, huesped: 'Carlos Ruiz', habitacion: '204 · Doble', fechaEntrada: '2026-05-25', fechaSalida: '2026-05-27', tipo: 'checkin', documento: '0901234567' },
-    { id: 2, huesped: 'María Paredes', habitacion: '301 · Suite', fechaEntrada: '2026-05-25', fechaSalida: '2026-05-26', tipo: 'checkin', documento: '0912345678' },
-    { id: 3, huesped: 'Kevin Andrade', habitacion: '105 · Simple', fechaEntrada: '2026-05-24', fechaSalida: '2026-05-25', tipo: 'checkout', documento: '0923456789' },
-    { id: 4, huesped: 'Ana Cedeño', habitacion: '210 · Doble', fechaEntrada: '2026-05-23', fechaSalida: '2026-05-25', tipo: 'checkout', documento: '0934567890' },
-  ]);
+  checkins = signal<ReservaCheck[]>([]);
+  checkouts = signal<ReservaCheck[]>([]);
 
   reservasFiltradas = computed(() => {
-    let filtered = this.reservas().filter(r => r.tipo === this.activeTab);
+    const source = this.activeTab === 'checkin' ? this.checkins() : this.checkouts();
+    let filtered = [...source];
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(r => 
         r.huesped.toLowerCase().includes(term) ||
-        (r.documento && r.documento.includes(term)) ||
+        (r.documento && r.documento.toLowerCase().includes(term)) ||
         r.habitacion.toLowerCase().includes(term)
       );
     }
     return filtered;
   });
 
-  checkinsCount = computed(() => this.reservas().filter(r => r.tipo === 'checkin').length);
-  checkoutsCount = computed(() => this.reservas().filter(r => r.tipo === 'checkout').length);
+  checkinsCount = computed(() => this.checkins().length);
+  checkoutsCount = computed(() => this.checkouts().length);
   pendientesCount = computed(() => this.checkinsCount() + this.checkoutsCount());
 
-  constructor() {
-    addIcons({
-      logInOutline,
-      logOutOutline,
-      searchOutline,
-      calendarOutline,
-      peopleOutline,
-      bedOutline,
-      timeOutline,
-      checkmarkCircleOutline,
-      closeCircleOutline,
-      constructOutline,
-      personOutline,
-      callOutline,
-      mailOutline
+  constructor(private checkinoutService: CheckinOutService) {
+    addIcons({refreshOutline,logInOutline,logOutOutline,timeOutline,searchOutline,personOutline,peopleOutline,calendarOutline,bedOutline,checkmarkCircleOutline,closeCircleOutline,constructOutline,callOutline,mailOutline});
+  }
+
+  ngOnInit() {
+    this.cargarDatos();
+  }
+
+  cargarDatos() {
+    this.loading.set(true);
+    Promise.all([
+      this.checkinoutService.getCheckinsPendientes().toPromise(),
+      this.checkinoutService.getCheckoutsPendientes().toPromise()
+    ]).then(([checkins, checkouts]) => {
+      if (checkins) this.checkins.set(checkins);
+      if (checkouts) this.checkouts.set(checkouts);
+      this.loading.set(false);
+    }).catch(err => {
+      console.error('Error cargando datos:', err);
+      this.loading.set(false);
     });
   }
 
-  ngOnInit() {}
-
   getInitials(nombre: string): string {
+    if (!nombre) return '?';
     return nombre.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
   }
 
   filtrarReservas() {
-    // El computed se actualiza automáticamente
+    // El computed se actualiza automáticamente cuando cambia searchTerm
   }
 
   procesar(reserva: ReservaCheck) {
     const action = reserva.tipo === 'checkin' ? 'Check-in' : 'Check-out';
-    alert(`${action} realizado para ${reserva.huesped}`);
-    // Aquí llamarías al servicio para procesar
+    const confirmMsg = `¿Confirmar ${action} para ${reserva.huesped}?`;
+    
+    if (confirm(confirmMsg)) {
+      const obs = reserva.tipo === 'checkin' 
+        ? this.checkinoutService.realizarCheckIn(reserva.id)
+        : this.checkinoutService.realizarCheckOut(reserva.id);
+      
+      obs.subscribe({
+        next: (success) => {
+          if (success) {
+            alert(`${action} realizado correctamente`);
+            this.cargarDatos();
+          } else {
+            alert(`Error al realizar ${action}`);
+          }
+        },
+        error: (err) => {
+          console.error(`Error al realizar ${action}:`, err);
+          alert(`Error: ${err.error?.message || 'No se pudo completar la operación'}`);
+        }
+      });
+    }
   }
 }

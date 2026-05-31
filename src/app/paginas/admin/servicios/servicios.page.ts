@@ -16,17 +16,8 @@ import {
   waterOutline,
   carOutline,
   snowOutline,
-  beerOutline
-} from 'ionicons/icons';
-
-interface Servicio {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-  estado: 'activo' | 'inactivo';
-  icono: string;
-}
+  beerOutline, refreshOutline } from 'ionicons/icons';
+import { ServiciosService, Servicio } from '@app/core/services/servicios.service';
 
 @Component({
   selector: 'app-servicios',
@@ -39,12 +30,9 @@ export class ServiciosPage implements OnInit {
   searchTerm = '';
   modalAbierto = false;
   editando = false;
+  loading = signal(true);
   
-  servicios = signal<Servicio[]>([
-    { id: 1, nombre: 'Desayuno Buffet', descripcion: 'Desayuno americano completo', precio: 15, estado: 'activo', icono: 'restaurant-outline' },
-    { id: 2, nombre: 'Spa', descripcion: 'Masajes y tratamientos', precio: 50, estado: 'activo', icono: 'water-outline' },
-    { id: 3, nombre: 'Traslado Aeropuerto', descripcion: 'Ida y vuelta', precio: 35, estado: 'activo', icono: 'car-outline' },
-  ]);
+  servicios = signal<Servicio[]>([]);
 
   formData = { nombre: '', descripcion: '', precio: 0, icono: 'restaurant-outline' };
   editId = 0;
@@ -54,25 +42,27 @@ export class ServiciosPage implements OnInit {
     return this.servicios().filter(s => s.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()));
   });
 
-  constructor() {
-    addIcons({
-      restaurantOutline,
-      searchOutline,
-      addCircleOutline,
-      createOutline,
-      trashOutline,
-      constructOutline,
-      saveOutline,
-      closeOutline,
-      wifiOutline,
-      waterOutline,
-      carOutline,
-      snowOutline,
-      beerOutline
-    });
+  constructor(private serviciosService: ServiciosService) {
+    addIcons({addCircleOutline,refreshOutline,searchOutline,restaurantOutline,createOutline,trashOutline,closeOutline,constructOutline,saveOutline,wifiOutline,waterOutline,carOutline,snowOutline,beerOutline});
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.cargarServicios();
+  }
+
+  cargarServicios() {
+    this.loading.set(true);
+    this.serviciosService.getAll().subscribe({
+      next: (servicios) => {
+        this.servicios.set(servicios);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargar servicios:', err);
+        this.loading.set(false);
+      }
+    });
+  }
 
   abrirModal() {
     this.editando = false;
@@ -83,7 +73,12 @@ export class ServiciosPage implements OnInit {
   editar(s: Servicio) {
     this.editando = true;
     this.editId = s.id;
-    this.formData = { nombre: s.nombre, descripcion: s.descripcion, precio: s.precio, icono: s.icono };
+    this.formData = { 
+      nombre: s.nombre, 
+      descripcion: s.descripcion, 
+      precio: s.precio, 
+      icono: s.icono 
+    };
     this.modalAbierto = true;
   }
 
@@ -92,18 +87,30 @@ export class ServiciosPage implements OnInit {
   }
 
   guardar() {
-    if (this.editando) {
-      this.servicios.set(this.servicios().map(s => s.id === this.editId ? { ...s, ...this.formData } : s));
-    } else {
-      const newId = Math.max(...this.servicios().map(s => s.id), 0) + 1;
-      this.servicios.set([...this.servicios(), { id: newId, ...this.formData, estado: 'activo' }]);
+    if (this.formData.nombre && this.formData.precio > 0) {
+      if (this.editando) {
+        this.serviciosService.update(this.editId, this.formData).subscribe({
+          next: () => this.cargarServicios(),
+          error: (err) => console.error('Error actualizar:', err)
+        });
+      } else {
+        this.serviciosService.create(this.formData).subscribe({
+          next: () => this.cargarServicios(),
+          error: (err) => console.error('Error crear:', err)
+        });
+      }
     }
     this.cerrarModal();
   }
 
   eliminar(s: Servicio) {
     if (confirm(`¿Eliminar ${s.nombre}?`)) {
-      this.servicios.set(this.servicios().filter(x => x.id !== s.id));
+      this.serviciosService.delete(s.id).subscribe({
+        next: (success) => {
+          if (success) this.cargarServicios();
+        },
+        error: (err) => console.error('Error eliminar:', err)
+      });
     }
   }
 }

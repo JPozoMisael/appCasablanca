@@ -19,16 +19,8 @@ import {
   trashOutline,
   constructOutline,
   saveOutline,
-  closeOutline
-} from 'ionicons/icons';
-
-interface Tarifa {
-  id: number;
-  tipo: string;
-  temporada: string;
-  precio: number;
-  estado: 'activo' | 'inactivo';
-}
+  closeOutline, refreshOutline } from 'ionicons/icons';
+import { TarifasService, Tarifa } from '@app/core/services/tarifas.service';
 
 @Component({
   selector: 'app-tarifas',
@@ -41,13 +33,9 @@ export class TarifasPage implements OnInit {
   searchTerm: string = '';
   modalAbierto = false;
   editando = false;
+  loading = signal(true);
   
-  tarifas = signal<Tarifa[]>([
-    { id: 1, tipo: 'Simple', temporada: 'Alta', precio: 120, estado: 'activo' },
-    { id: 2, tipo: 'Doble', temporada: 'Alta', precio: 180, estado: 'activo' },
-    { id: 3, tipo: 'Suite', temporada: 'Alta', precio: 250, estado: 'activo' },
-    { id: 4, tipo: 'Simple', temporada: 'Baja', precio: 80, estado: 'activo' },
-  ]);
+  tarifas = signal<Tarifa[]>([]);
 
   formData = { tipo: '', temporada: '', precio: 0 };
   editId = 0;
@@ -58,20 +46,27 @@ export class TarifasPage implements OnInit {
     return this.tarifas().filter(t => t.tipo.toLowerCase().includes(term));
   });
 
-  constructor() {
-    addIcons({
-      pricetagOutline,
-      searchOutline,
-      addCircleOutline,
-      createOutline,
-      trashOutline,
-      constructOutline,
-      saveOutline,
-      closeOutline
-    });
+  constructor(private tarifasService: TarifasService) {
+    addIcons({addCircleOutline,refreshOutline,searchOutline,pricetagOutline,createOutline,trashOutline,closeOutline,constructOutline,saveOutline});
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.cargarTarifas();
+  }
+
+  cargarTarifas() {
+    this.loading.set(true);
+    this.tarifasService.getAll().subscribe({
+      next: (tarifas) => {
+        this.tarifas.set(tarifas);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error cargar tarifas:', err);
+        this.loading.set(false);
+      }
+    });
+  }
 
   abrirModal() {
     this.editando = false;
@@ -91,18 +86,30 @@ export class TarifasPage implements OnInit {
   }
 
   guardar() {
-    if (this.editando) {
-      this.tarifas.set(this.tarifas().map(t => t.id === this.editId ? { ...t, ...this.formData } : t));
-    } else {
-      const newId = Math.max(...this.tarifas().map(t => t.id), 0) + 1;
-      this.tarifas.set([...this.tarifas(), { id: newId, ...this.formData, estado: 'activo' }]);
+    if (this.formData.tipo && this.formData.precio > 0) {
+      if (this.editando) {
+        this.tarifasService.update(this.editId, this.formData).subscribe({
+          next: () => this.cargarTarifas(),
+          error: (err) => console.error('Error actualizar:', err)
+        });
+      } else {
+        this.tarifasService.create(this.formData).subscribe({
+          next: () => this.cargarTarifas(),
+          error: (err) => console.error('Error crear:', err)
+        });
+      }
     }
     this.cerrarModal();
   }
 
   eliminar(t: Tarifa) {
     if (confirm(`¿Eliminar tarifa para ${t.tipo} - ${t.temporada}?`)) {
-      this.tarifas.set(this.tarifas().filter(x => x.id !== t.id));
+      this.tarifasService.delete(t.id).subscribe({
+        next: (success) => {
+          if (success) this.cargarTarifas();
+        },
+        error: (err) => console.error('Error eliminar:', err)
+      });
     }
   }
 }

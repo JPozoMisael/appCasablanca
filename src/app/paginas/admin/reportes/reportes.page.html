@@ -22,205 +22,216 @@
     </div>
   </div>
 
-  <!-- =====================================================
-       PERIOD SELECTOR
-  ====================================================== -->
-  <div class="period-card">
-    <div class="period-title">
-      <ion-icon name="calendar-outline"></ion-icon>
-      <span>Período</span>
-    </div>
-    <div class="period-chips">
-      <button class="chip" [class.active]="periodo() === 'hoy'" (click)="setPeriodo('hoy')">
-        <ion-icon name="today-outline"></ion-icon> Hoy
-      </button>
-      <button class="chip" [class.active]="periodo() === '7d'" (click)="setPeriodo('7d')">
-        7 días
-      </button>
-      <button class="chip" [class.active]="periodo() === '30d'" (click)="setPeriodo('30d')">
-        30 días
-      </button>
-      <button class="chip" [class.active]="periodo() === 'mes'" (click)="setPeriodo('mes')">
-        Este mes
-      </button>
-    </div>
+  <!-- LOADING STATE -->
+  <div *ngIf="loading()" class="loading-state">
+    <ion-icon name="refresh-outline" class="spinner"></ion-icon>
+    <p>Cargando reportes...</p>
   </div>
 
-  <!-- =====================================================
-       KPIs
-  ====================================================== -->
-  <div class="kpis">
-    <div class="kpi-card revenue">
-      <div class="kpi-icon">
-        <ion-icon name="cash-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Ingresos</span>
-        <strong>${{ kpi().ingresos | number }}</strong>
-        <small>Total período</small>
-      </div>
-    </div>
+  <!-- CONTENIDO PRINCIPAL -->
+  <ng-container *ngIf="!loading()">
 
-    <div class="kpi-card occupancy">
-      <div class="kpi-icon">
-        <ion-icon name="bed-outline"></ion-icon>
+    <!-- =====================================================
+         PERIOD SELECTOR
+    ====================================================== -->
+    <div class="period-card">
+      <div class="period-title">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>Período</span>
       </div>
-      <div class="kpi-info">
-        <span>Ocupación</span>
-        <strong>{{ kpi().ocupacion }}%</strong>
-        <small>Promedio período</small>
-      </div>
-    </div>
-
-    <div class="kpi-card bookings">
-      <div class="kpi-icon">
-        <ion-icon name="clipboard-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Reservas</span>
-        <strong>{{ kpi().reservas }}</strong>
-        <small>Cantidad</small>
-      </div>
-    </div>
-
-    <div class="kpi-card ticket">
-      <div class="kpi-icon">
-        <ion-icon name="trending-up-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Ticket promedio</span>
-        <strong>${{ kpi().ticket | number }}</strong>
-        <small>Ingresos / reservas</small>
-      </div>
-    </div>
-  </div>
-
-  <!-- =====================================================
-       TABS
-  ====================================================== -->
-  <div class="tabs-card">
-    <div class="tabs-buttons">
-      <button class="tab-btn" [class.active]="tab() === 'general'" (click)="setTab('general')">
-        <ion-icon name="stats-chart-outline"></ion-icon>
-        General
-      </button>
-      <button class="tab-btn" [class.active]="tab() === 'ingresos'" (click)="setTab('ingresos')">
-        <ion-icon name="cash-outline"></ion-icon>
-        Ingresos
-      </button>
-      <button class="tab-btn" [class.active]="tab() === 'ocupacion'" (click)="setTab('ocupacion')">
-        <ion-icon name="bed-outline"></ion-icon>
-        Ocupación
-      </button>
-      <button class="tab-btn" [class.active]="tab() === 'habitaciones'" (click)="setTab('habitaciones')">
-        <ion-icon name="business-outline"></ion-icon>
-        Top habitaciones
-      </button>
-    </div>
-  </div>
-
-  <!-- =====================================================
-       CONTENT GRID
-  ====================================================== -->
-  <div class="grid">
-
-    <!-- TAB: GENERAL -->
-    <div class="card full" *ngIf="tab() === 'general'">
-      <div class="card-head">
-        <div>
-          <h3>Resumen ejecutivo</h3>
-          <p>Vista rápida para decisiones operativas</p>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="summary-grid">
-          <div class="summary-item" *ngFor="let r of resumen()">
-            <span class="summary-label">{{ r.label }}</span>
-            <span class="summary-value">{{ r.value }}</span>
-          </div>
-        </div>
-        <div class="info-note">
-          <ion-icon name="information-circle-outline"></ion-icon>
-          <span>Los datos se actualizan automáticamente según el período seleccionado</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB: INGRESOS -->
-    <div class="card full" *ngIf="tab() === 'ingresos'">
-      <div class="card-head">
-        <div>
-          <h3>Ingresos por período</h3>
-          <p>Evolución diaria de ingresos</p>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="chart-container">
-          <div class="bars-container">
-            <div class="bar-wrapper" *ngFor="let p of ingresosSerie()">
-              <div class="bar" [style.height.%]="pct(p.value, maxIngresos())"></div>
-              <span class="bar-label">{{ p.label }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="chart-legend">
-          <span class="legend-dot revenue"></span>
-          <span>Ingresos en dólares ($)</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB: OCUPACIÓN -->
-    <div class="card full" *ngIf="tab() === 'ocupacion'">
-      <div class="card-head">
-        <div>
-          <h3>Ocupación por período</h3>
-          <p>Porcentaje de ocupación diaria</p>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="chart-container">
-          <div class="bars-container">
-            <div class="bar-wrapper" *ngFor="let p of ocupacionSerie()">
-              <div class="bar occupancy-bar" [style.height.%]="pct(p.value, maxOcupacion())"></div>
-              <span class="bar-label">{{ p.label }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="chart-legend">
-          <span class="legend-dot occupancy"></span>
-          <span>Porcentaje de ocupación (%)</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB: TOP HABITACIONES -->
-    <div class="card full" *ngIf="tab() === 'habitaciones'">
-      <div class="card-head">
-        <div>
-          <h3>Top habitaciones</h3>
-          <p>Mejores ingresos en el período</p>
-        </div>
-        <button class="mini-btn" (click)="exportTopCSV()">
-          <ion-icon name="download-outline"></ion-icon>
-          Exportar CSV
+      <div class="period-chips">
+        <button class="chip" [class.active]="periodo() === 'hoy'" (click)="setPeriodo('hoy')">
+          <ion-icon name="today-outline"></ion-icon> Hoy
+        </button>
+        <button class="chip" [class.active]="periodo() === '7d'" (click)="setPeriodo('7d')">
+          7 días
+        </button>
+        <button class="chip" [class.active]="periodo() === '30d'" (click)="setPeriodo('30d')">
+          30 días
+        </button>
+        <button class="chip" [class.active]="periodo() === 'mes'" (click)="setPeriodo('mes')">
+          Este mes
         </button>
       </div>
-      <div class="card-body">
-        <div class="top-list">
-          <div class="top-item" *ngFor="let t of topHabitaciones(); let i = index">
-            <div class="top-rank">{{ i + 1 }}</div>
-            <div class="top-info">
-              <strong>{{ t.name }}</strong>
-              <span>{{ t.category || 'Habitación' }}</span>
-            </div>
-            <div class="top-value">${{ t.value | number }}</div>
-            <div class="top-badge">TOP</div>
-          </div>
+    </div>
+
+    <!-- =====================================================
+         KPIs
+    ====================================================== -->
+    <div class="kpis">
+      <div class="kpi-card revenue">
+        <div class="kpi-icon">
+          <ion-icon name="cash-outline"></ion-icon>
+        </div>
+        <div class="kpi-info">
+          <span>Ingresos</span>
+          <strong>${{ kpi().ingresos | number }}</strong>
+          <small>Total período</small>
+        </div>
+      </div>
+
+      <div class="kpi-card occupancy">
+        <div class="kpi-icon">
+          <ion-icon name="bed-outline"></ion-icon>
+        </div>
+        <div class="kpi-info">
+          <span>Ocupación</span>
+          <strong>{{ kpi().ocupacion }}%</strong>
+          <small>Promedio período</small>
+        </div>
+      </div>
+
+      <div class="kpi-card bookings">
+        <div class="kpi-icon">
+          <ion-icon name="clipboard-outline"></ion-icon>
+        </div>
+        <div class="kpi-info">
+          <span>Reservas</span>
+          <strong>{{ kpi().reservas }}</strong>
+          <small>Cantidad</small>
+        </div>
+      </div>
+
+      <div class="kpi-card ticket">
+        <div class="kpi-icon">
+          <ion-icon name="trending-up-outline"></ion-icon>
+        </div>
+        <div class="kpi-info">
+          <span>Ticket promedio</span>
+          <strong>${{ kpi().ticket | number }}</strong>
+          <small>Ingresos / reservas</small>
         </div>
       </div>
     </div>
 
-  </div>
+    <!-- =====================================================
+         TABS
+    ====================================================== -->
+    <div class="tabs-card">
+      <div class="tabs-buttons">
+        <button class="tab-btn" [class.active]="tab() === 'general'" (click)="setTab('general')">
+          <ion-icon name="stats-chart-outline"></ion-icon>
+          General
+        </button>
+        <button class="tab-btn" [class.active]="tab() === 'ingresos'" (click)="setTab('ingresos')">
+          <ion-icon name="cash-outline"></ion-icon>
+          Ingresos
+        </button>
+        <button class="tab-btn" [class.active]="tab() === 'ocupacion'" (click)="setTab('ocupacion')">
+          <ion-icon name="bed-outline"></ion-icon>
+          Ocupación
+        </button>
+        <button class="tab-btn" [class.active]="tab() === 'habitaciones'" (click)="setTab('habitaciones')">
+          <ion-icon name="business-outline"></ion-icon>
+          Top habitaciones
+        </button>
+      </div>
+    </div>
+
+    <!-- =====================================================
+         CONTENT GRID
+    ====================================================== -->
+    <div class="grid">
+
+      <!-- TAB: GENERAL -->
+      <div class="card full" *ngIf="tab() === 'general'">
+        <div class="card-head">
+          <div>
+            <h3>Resumen ejecutivo</h3>
+            <p>Vista rápida para decisiones operativas</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="summary-grid">
+            <div class="summary-item" *ngFor="let r of resumen()">
+              <span class="summary-label">{{ r.label }}</span>
+              <span class="summary-value">{{ r.value }}</span>
+            </div>
+          </div>
+          <div class="info-note">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            <span>Los datos se actualizan automáticamente según el período seleccionado</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: INGRESOS -->
+      <div class="card full" *ngIf="tab() === 'ingresos'">
+        <div class="card-head">
+          <div>
+            <h3>Ingresos por período</h3>
+            <p>Evolución diaria de ingresos</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <div class="bars-container">
+              <div class="bar-wrapper" *ngFor="let p of ingresosSerie()">
+                <div class="bar" [style.height.%]="pct(p.value, maxIngresos())"></div>
+                <span class="bar-label">{{ p.label }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-dot revenue"></span>
+            <span>Ingresos en dólares ($)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: OCUPACIÓN -->
+      <div class="card full" *ngIf="tab() === 'ocupacion'">
+        <div class="card-head">
+          <div>
+            <h3>Ocupación por período</h3>
+            <p>Porcentaje de ocupación diaria</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <div class="bars-container">
+              <div class="bar-wrapper" *ngFor="let p of ocupacionSerie()">
+                <div class="bar occupancy-bar" [style.height.%]="pct(p.value, maxOcupacion())"></div>
+                <span class="bar-label">{{ p.label }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <span class="legend-dot occupancy"></span>
+            <span>Porcentaje de ocupación (%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: TOP HABITACIONES -->
+      <div class="card full" *ngIf="tab() === 'habitaciones'">
+        <div class="card-head">
+          <div>
+            <h3>Top habitaciones</h3>
+            <p>Mejores ingresos en el período</p>
+          </div>
+          <button class="mini-btn" (click)="exportTopCSV()">
+            <ion-icon name="download-outline"></ion-icon>
+            Exportar CSV
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="top-list">
+            <div class="top-item" *ngFor="let t of topHabitaciones(); let i = index">
+              <div class="top-rank">{{ i + 1 }}</div>
+              <div class="top-info">
+                <strong>{{ t.name }}</strong>
+                <span>{{ t.category || 'Habitación' }}</span>
+              </div>
+              <div class="top-value">${{ t.value | number }}</div>
+              <div class="top-badge">TOP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </ng-container>
 
 </div>

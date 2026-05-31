@@ -31,8 +31,36 @@
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
+.btn-primary:hover {
+  background: #002a66;
+  transform: translateY(-1px);
+}
+
+/* Loading State */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #64748b;
+}
+
+.spinner {
+  font-size: 48px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Filters */
 .filters {
   margin-bottom: 24px;
 }
@@ -45,7 +73,7 @@
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 10px 16px;
-  max-width: 300px;
+  max-width: 350px;
 }
 
 .search-box ion-icon {
@@ -58,8 +86,23 @@
   border: none;
   background: none;
   outline: none;
+  font-size: 14px;
 }
 
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+}
+
+.empty-state ion-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+/* Table */
 .table-container {
   overflow-x: auto;
 }
@@ -67,6 +110,7 @@
 .tarifas-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 600px;
 }
 
 .tarifas-table th,
@@ -119,6 +163,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s;
+}
+
+.icon-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
 }
 
 .icon-btn.danger:hover {
@@ -127,14 +177,22 @@
   color: #dc2626;
 }
 
-.modal {
+/* Modal */
+.modal-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  padding: 20px;
 }
 
 .modal-content {
@@ -144,6 +202,7 @@
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 .modal-header {
@@ -157,13 +216,24 @@
 .modal-header h3 {
   margin: 0;
   font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+  background: white;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: #f8fafc;
 }
 
 .modal-body {
@@ -189,6 +259,13 @@
   border: 1px solid #e2e8f0;
   border-radius: 10px;
   font-size: 14px;
+  outline: none;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: #003580;
+  box-shadow: 0 0 0 2px rgba(0, 53, 128, 0.1);
 }
 
 .modal-footer {
@@ -197,6 +274,7 @@
   gap: 12px;
   padding: 20px;
   border-top: 1px solid #e6e6e6;
+  background: #f8fafc;
 }
 
 .btn-cancel,
@@ -205,15 +283,42 @@
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .btn-cancel {
   background: white;
-  border: 1px solid #e6e6e6;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+.btn-cancel:hover {
+  background: #f8fafc;
 }
 
 .btn-save {
   background: #003580;
   border: none;
   color: white;
+}
+
+.btn-save:hover {
+  background: #002a66;
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tarifas-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+
+  .modal-content {
+    width: 95%;
+  }
 }

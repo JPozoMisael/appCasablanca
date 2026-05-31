@@ -1,4 +1,6 @@
 <ion-content class="ion-padding">
+
+  <!-- HEADER -->
   <div class="servicios-header">
     <div>
       <h1>Servicios adicionales</h1>
@@ -10,50 +12,77 @@
     </button>
   </div>
 
-  <!-- Filtros -->
-  <div class="search-box">
-    <ion-icon name="search-outline"></ion-icon>
-    <input type="text" placeholder="Buscar servicio..." [(ngModel)]="searchTerm">
+  <!-- LOADING STATE -->
+  <div *ngIf="loading()" class="loading-state">
+    <ion-icon name="refresh-outline" class="spinner"></ion-icon>
+    <p>Cargando servicios...</p>
   </div>
 
-  <!-- Grid de servicios -->
-  <div class="servicios-grid">
-    <div class="servicio-card" *ngFor="let s of serviciosFiltrados()">
-      <div class="servicio-icon">
-        <ion-icon [name]="s.icono"></ion-icon>
-      </div>
-      <div class="servicio-info">
-        <h3>{{ s.nombre }}</h3>
-        <p>{{ s.descripcion }}</p>
-        <span class="precio">${{ s.precio }}</span>
-      </div>
-      <div class="servicio-actions">
-        <button class="icon-btn" (click)="editar(s)"><ion-icon name="create-outline"></ion-icon></button>
-        <button class="icon-btn danger" (click)="eliminar(s)"><ion-icon name="trash-outline"></ion-icon></button>
+  <!-- CONTENIDO PRINCIPAL -->
+  <ng-container *ngIf="!loading()">
+
+    <!-- FILTROS -->
+    <div class="search-box">
+      <ion-icon name="search-outline"></ion-icon>
+      <input type="text" placeholder="Buscar servicio..." [(ngModel)]="searchTerm">
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div *ngIf="serviciosFiltrados().length === 0" class="empty-state">
+      <ion-icon name="restaurant-outline"></ion-icon>
+      <p>No hay servicios registrados</p>
+    </div>
+
+    <!-- GRID DE SERVICIOS -->
+    <div class="servicios-grid" *ngIf="serviciosFiltrados().length > 0">
+      <div class="servicio-card" *ngFor="let s of serviciosFiltrados()">
+        <div class="servicio-icon">
+          <ion-icon [name]="s.icono"></ion-icon>
+        </div>
+        <div class="servicio-info">
+          <h3>{{ s.nombre }}</h3>
+          <p>{{ s.descripcion }}</p>
+          <span class="precio">${{ s.precio }}</span>
+        </div>
+        <div class="servicio-actions">
+          <button class="icon-btn" (click)="editar(s)" title="Editar">
+            <ion-icon name="create-outline"></ion-icon>
+          </button>
+          <button class="icon-btn danger" (click)="eliminar(s)" title="Eliminar">
+            <ion-icon name="trash-outline"></ion-icon>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Modal -->
+  </ng-container>
+
+  <!-- MODAL -->
   <div class="modal" *ngIf="modalAbierto" (click)="cerrarModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>{{ editando ? 'Editar servicio' : 'Nuevo servicio' }}</h3>
-        <button class="close-btn" (click)="cerrarModal()"><ion-icon name="close-outline"></ion-icon></button>
+        <button class="close-btn" (click)="cerrarModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
       </div>
+
       <div class="modal-body">
         <div class="field">
           <label>Nombre</label>
-          <input type="text" [(ngModel)]="formData.nombre">
+          <input type="text" [(ngModel)]="formData.nombre" placeholder="Ej: Desayuno Buffet">
         </div>
+
         <div class="field">
           <label>Descripción</label>
-          <textarea rows="2" [(ngModel)]="formData.descripcion"></textarea>
+          <textarea rows="2" [(ngModel)]="formData.descripcion" placeholder="Descripción del servicio"></textarea>
         </div>
+
         <div class="field">
           <label>Precio ($)</label>
-          <input type="number" [(ngModel)]="formData.precio">
+          <input type="number" [(ngModel)]="formData.precio" placeholder="0.00" step="0.01">
         </div>
+
         <div class="field">
           <label>Icono</label>
           <select [(ngModel)]="formData.icono">
@@ -66,10 +95,15 @@
           </select>
         </div>
       </div>
+
       <div class="modal-footer">
         <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
         <button class="btn-save" (click)="guardar()">Guardar</button>
       </div>
     </div>
   </div>
-</ion-content>
+
+  <!-- BACKDROP DEL MODAL -->
+  <div class="modal-backdrop" *ngIf="modalAbierto" (click)="cerrarModal()"></div>
+
+</ion-content>  

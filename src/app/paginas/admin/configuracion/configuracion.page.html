@@ -1,26 +1,100 @@
 <ion-content class="ion-padding">
+  
+  <!-- HEADER -->
   <div class="config-header">
-    <h1>Configuración del sistema</h1>
-    <p>Ajustes generales del hotel</p>
-  </div>
-
-  <div class="config-grid">
-    <div class="config-card" *ngFor="let config of configs()">
-      <div class="config-icon">
-        <ion-icon [name]="config.icon"></ion-icon>
-      </div>
-      <div class="config-content">
-        <h3>{{ config.title }}</h3>
-        <p>{{ config.description }}</p>
-      </div>
-      <button class="config-btn">Configurar</button>
+    <div>
+      <h1>Configuración del sistema</h1>
+      <p>Ajustes generales del hotel</p>
     </div>
   </div>
 
-  <div class="save-bar">
-    <button class="btn-save">
-      <ion-icon name="save-outline"></ion-icon>
-      Guardar cambios
-    </button>
+  <!-- LOADING STATE -->
+  <div *ngIf="loading()" class="loading-state">
+    <ion-icon name="refresh-outline" class="spinner"></ion-icon>
+    <p>Cargando configuración...</p>
   </div>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <ng-container *ngIf="!loading()">
+
+    <!-- SECCIONES -->
+    <div class="config-sections">
+      <div class="config-section" *ngFor="let seccion of secciones()">
+        <div class="section-header" (click)="toggleSeccion(seccion)">
+          <div class="section-icon">
+            <ion-icon [name]="seccion.icon"></ion-icon>
+          </div>
+          <div class="section-title">
+            <h3>{{ seccion.title }}</h3>
+            <p>{{ seccion.description }}</p>
+          </div>
+          <ion-icon class="section-chevron" [name]="seccion.expanded ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+        </div>
+        
+        <div class="section-body" *ngIf="seccion.expanded">
+          <div *ngIf="seccion.items.length === 0" class="empty-config">
+            <ion-icon name="settings-outline"></ion-icon>
+            <p>No hay configuraciones disponibles para esta sección</p>
+          </div>
+          
+          <div class="config-item" *ngFor="let item of seccion.items">
+            <div class="config-item-label">
+              <label>{{ formatLabel(item.clave) }}</label>
+              <small>{{ getItemDescription(item.clave) }}</small>
+            </div>
+            <div class="config-item-control">
+              <!-- Text input -->
+              <ion-input *ngIf="item.tipo === 'text'" 
+                        [value]="getItemValue(item)" 
+                        (ionChange)="onValueChange(item, $event.detail.value)"
+                        placeholder="Ingrese valor">
+              </ion-input>
+              
+              <!-- Number input -->
+              <ion-input *ngIf="item.tipo === 'number'" 
+                        type="number"
+                        [value]="getItemValue(item)" 
+                        (ionChange)="onValueChange(item, $event.detail.value)">
+              </ion-input>
+              
+              <!-- Boolean toggle -->
+              <ion-toggle *ngIf="item.tipo === 'boolean'" 
+                          [checked]="getItemValue(item) === 'true' || getItemValue(item) === true"
+                          (ionChange)="onValueChange(item, $event.detail.checked)">
+                {{ getItemValue(item) ? 'Activado' : 'Desactivado' }}
+              </ion-toggle>
+              
+              <!-- Select -->
+              <ion-select *ngIf="getSelectOptions(item.clave)" 
+                          [value]="getItemValue(item)" 
+                          (ionChange)="onValueChange(item, $event.detail.value)">
+                <ion-select-option *ngFor="let opt of getSelectOptions(item.clave)" [value]="opt.value">
+                  {{ opt.label }}
+                </ion-select-option>
+              </ion-select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAVE BAR -->
+    <div class="save-bar" *ngIf="hasChanges()">
+      <div class="save-bar-content">
+        <span>Hay cambios sin guardar</span>
+        <div class="save-actions">
+          <button class="btn-cancel" (click)="cancelarCambios()">
+            <ion-icon name="close-outline"></ion-icon>
+            Cancelar
+          </button>
+          <button class="btn-save" (click)="guardarCambios()" [disabled]="saving()">
+            <ion-icon [name]="saving() ? 'refresh-outline' : 'save-outline'" [class.spinning]="saving()"></ion-icon>
+            {{ saving() ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
 </ion-content>

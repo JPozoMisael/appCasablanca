@@ -18,155 +18,171 @@
     </div>
   </div>
 
-  <!-- =====================================================
-       KPIs
-  ====================================================== -->
-  <div class="kpis">
-    <div class="kpi-card total">
-      <div class="kpi-icon">
-        <ion-icon name="people-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Total huéspedes</span>
-        <strong>{{ total() }}</strong>
-        <small>Registrados en el sistema</small>
-      </div>
-    </div>
-
-    <div class="kpi-card new">
-      <div class="kpi-icon">
-        <ion-icon name="calendar-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Nuevos (mes)</span>
-        <strong>{{ nuevosMes() }}</strong>
-        <small>Altas en el mes actual</small>
-      </div>
-    </div>
-
-    <div class="kpi-card vip">
-      <div class="kpi-icon">
-        <ion-icon name="star-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Frecuentes/VIP</span>
-        <strong>{{ frecuentes() }}</strong>
-        <small>Clientes con prioridad</small>
-      </div>
-    </div>
-
-    <div class="kpi-card active">
-      <div class="kpi-icon">
-        <ion-icon name="shield-checkmark-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Con reservas activas</span>
-        <strong>{{ conReservasActivas() }}</strong>
-        <small>Reservas en curso</small>
-      </div>
-    </div>
+  <!-- LOADING STATE -->
+  <div *ngIf="loading()" class="loading-state">
+    <ion-icon name="refresh-outline" class="spinner"></ion-icon>
+    <p>Cargando huéspedes...</p>
   </div>
 
-  <!-- =====================================================
-       FILTERS
-  ====================================================== -->
-  <div class="filters-card">
-    <div class="search-box">
-      <ion-icon name="search-outline"></ion-icon>
-      <input type="text" placeholder="Buscar: nombre, documento, email, teléfono..."
-             [value]="q()" (input)="q.set(($any($event.target).value || ''))">
-    </div>
+  <!-- CONTENIDO PRINCIPAL -->
+  <ng-container *ngIf="!loading()">
 
-    <div class="filter-group">
-      <div class="select-box">
-        <label>Tipo</label>
-        <select [value]="fTipo()" (change)="setTipoFilter(($any($event.target).value))">
-          <option value="TODOS">Todos</option>
-          <option value="NORMAL">Normal</option>
-          <option value="FRECUENTE">Frecuente</option>
-          <option value="VIP">VIP</option>
-        </select>
+    <!-- =====================================================
+         KPIs
+    ====================================================== -->
+    <div class="kpis">
+      <div class="kpi-card total">
+        <div class="kpi-icon">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <div class="kpi-info">
+          <span>Total huéspedes</span>
+          <strong>{{ total() }}</strong>
+          <small>Registrados en el sistema</small>
+        </div>
+      </div>
+
+      <div class="kpi-card new">
+        <div class="kpi-icon">
+          <ion-icon name="calendar-outline"></ion-icon>
+        </div>
+        <div class="kpi-info">
+          <span>Nuevos (mes)</span>
+          <strong>{{ nuevosMes() }}</strong>
+          <small>Altas en el mes actual</small>
+        </div>
+      </div>
+
+      <div class="kpi-card vip">
+        <div class="kpi-icon">
+          <ion-icon name="star-outline"></ion-icon>
+        </div>
+        <div class="kpi-info">
+          <span>Frecuentes/VIP</span>
+          <strong>{{ frecuentes() }}</strong>
+          <small>Clientes con prioridad</small>
+        </div>
+      </div>
+
+      <div class="kpi-card active">
+        <div class="kpi-icon">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+        </div>
+        <div class="kpi-info">
+          <span>Con reservas activas</span>
+          <strong>{{ conReservasActivas() }}</strong>
+          <small>Reservas en curso</small>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- =====================================================
-       TABLE CARD
-  ====================================================== -->
-  <div class="table-card">
-    <div class="table-head">
-      <div>
-        <h3>Listado de huéspedes</h3>
-        <p>{{ filtrados().length }} resultado(s)</p>
+    <!-- =====================================================
+         FILTERS
+    ====================================================== -->
+    <div class="filters-card">
+      <div class="search-box">
+        <ion-icon name="search-outline"></ion-icon>
+        <input type="text" placeholder="Buscar: nombre, documento, email, teléfono..."
+               [value]="q()" (input)="q.set(($any($event.target).value || ''))">
       </div>
-      <div class="table-head-actions">
-        <button class="mini-btn" (click)="exportData()">
-          <ion-icon name="download-outline"></ion-icon>
-          Exportar
-        </button>
+
+      <div class="filter-group">
+        <div class="select-box">
+          <label>Tipo</label>
+          <select [value]="fTipo()" (change)="setTipoFilter(($any($event.target).value))">
+            <option value="TODOS">Todos</option>
+            <option value="NORMAL">Normal</option>
+            <option value="FRECUENTE">Frecuente</option>
+            <option value="VIP">VIP</option>
+          </select>
+        </div>
       </div>
     </div>
 
-    <div class="table-wrapper">
-      <table class="guest-table">
-        <thead>
-          <tr>
-            <th>Huésped</th>
-            <th>Documento</th>
-            <th>Contacto</th>
-            <th>Tipo</th>
-            <th class="actions-col">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let h of filtrados()">
-            <td class="guest-cell">
-              <div class="guest-info">
-                <div class="guest-avatar">{{ getInitials(h.nombres) }}</div>
-                <div class="guest-details">
-                  <strong>{{ h.nombres }}</strong>
-                  <span>ID #{{ h.id }}</span>
+    <!-- =====================================================
+         TABLE CARD
+    ====================================================== -->
+    <div class="table-card">
+      <div class="table-head">
+        <div>
+          <h3>Listado de huéspedes</h3>
+          <p>{{ filtrados().length }} resultado(s)</p>
+        </div>
+        <div class="table-head-actions">
+          <button class="mini-btn" (click)="exportData()">
+            <ion-icon name="download-outline"></ion-icon>
+            Exportar
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <div *ngIf="filtrados().length === 0" class="empty-state">
+          <ion-icon name="people-outline"></ion-icon>
+          <p>No hay huéspedes registrados</p>
+        </div>
+
+        <table class="guest-table" *ngIf="filtrados().length > 0">
+          <thead>
+            <tr>
+              <th>Huésped</th>
+              <th>Documento</th>
+              <th>Contacto</th>
+              <th>Tipo</th>
+              <th class="actions-col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let h of filtrados()">
+              <td class="guest-cell">
+                <div class="guest-info">
+                  <div class="guest-avatar">{{ getInitials(h.nombres, h.apellidos) }}</div>
+                  <div class="guest-details">
+                    <strong>{{ h.nombres }} {{ h.apellidos }}</strong>
+                    <span>ID #{{ h.id }}</span>
+                  </div>
                 </div>
-              </div>
-            </td>
-            <td>
-              <div class="document-cell">
-                <ion-icon name="id-card-outline"></ion-icon>
-                <span>{{ h.documento }}</span>
-              </div>
-            </td>
-            <td>
-              <div class="contact-cell">
-                <span><ion-icon name="call-outline"></ion-icon> {{ h.telefono || '—' }}</span>
-                <span><ion-icon name="mail-outline"></ion-icon> {{ h.email || '—' }}</span>
-              </div>
-            </td>
-            <td>
-              <div class="type-pill" [class]="getTipoClass(h.tipo)">
-                {{ formatTipo(h.tipo) }}
-              </div>
-            </td>
-            <td class="actions-col">
-              <div class="table-actions">
-                <button class="icon-btn" title="Ver detalles" (click)="openDetail(h)">
-                  <ion-icon name="eye-outline"></ion-icon>
-                </button>
-                <button class="icon-btn" title="Editar" (click)="openEdit(h)">
-                  <ion-icon name="create-outline"></ion-icon>
-                </button>
-                <button class="icon-btn" title="Cambiar tipo" (click)="cycleTipo(h)">
-                  <ion-icon name="sync-outline"></ion-icon>
-                </button>
-                <button class="icon-btn danger" title="Eliminar" (click)="confirmDelete(h)">
-                  <ion-icon name="trash-outline"></ion-icon>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+              <td>
+                <div class="document-cell">
+                  <ion-icon name="id-card-outline"></ion-icon>
+                  <span>{{ h.documento || '—' }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="contact-cell">
+                  <span><ion-icon name="call-outline"></ion-icon> {{ h.telefono || '—' }}</span>
+                  <span><ion-icon name="mail-outline"></ion-icon> {{ h.email || '—' }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="type-pill" [class]="getTipoClass(h.tipo)">
+                  {{ formatTipo(h.tipo) }}
+                </div>
+              </td>
+              <td class="actions-col">
+                <div class="table-actions">
+                  <button class="icon-btn" title="Ver detalles" (click)="openDetail(h)">
+                    <ion-icon name="eye-outline"></ion-icon>
+                  </button>
+                  <button class="icon-btn" title="Editar" (click)="openEdit(h)">
+                    <ion-icon name="create-outline"></ion-icon>
+                  </button>
+                  <button class="icon-btn" title="Cambiar tipo" (click)="cycleTipo(h)">
+                    <ion-icon name="sync-outline"></ion-icon>
+                  </button>
+                  <button class="icon-btn danger" title="Eliminar" (click)="confirmDelete(h)">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
+
+  </ng-container>
 
   <!-- =====================================================
        MODAL
@@ -187,12 +203,19 @@
 
       <div class="modal-body">
         <div class="form-grid">
-          <div class="field"><label>Nombres *</label><input type="text" placeholder="Nombre completo" [value]="form().nombres" (input)="patch('nombres', ($any($event.target).value || ''))"></div>
-          <div class="field"><label>Documento *</label><input type="text" placeholder="Cédula / pasaporte" [value]="form().documento" (input)="patch('documento', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Nombres *</label><input type="text" placeholder="Nombre" [value]="form().nombres" (input)="patch('nombres', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Apellidos *</label><input type="text" placeholder="Apellidos" [value]="form().apellidos" (input)="patch('apellidos', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Documento</label><input type="text" placeholder="Cédula / pasaporte" [value]="form().documento || ''" (input)="patch('documento', ($any($event.target).value || ''))"></div>
           <div class="field"><label>Teléfono</label><input type="text" placeholder="Ej: 0999999999" [value]="form().telefono || ''" (input)="patch('telefono', ($any($event.target).value || ''))"></div>
           <div class="field"><label>Email</label><input type="email" placeholder="correo@dominio.com" [value]="form().email || ''" (input)="patch('email', ($any($event.target).value || ''))"></div>
-          <div class="field"><label>Tipo</label><select [value]="form().tipo" (change)="patch('tipo', $any($event.target).value)"><option value="NORMAL">Normal</option><option value="FRECUENTE">Frecuente</option><option value="VIP">VIP</option></select></div>
-          <div class="field"><label>Fecha registro</label><input type="date" [value]="form().createdAt" (input)="patch('createdAt', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Nacionalidad</label><input type="text" placeholder="Nacionalidad" [value]="form().nacionalidad || ''" (input)="patch('nacionalidad', ($any($event.target).value || ''))"></div>
+          <div class="field"><label>Tipo</label>
+            <select [value]="form().tipo" (change)="patch('tipo', $any($event.target).value)">
+              <option value="NORMAL">Normal</option>
+              <option value="FRECUENTE">Frecuente</option>
+              <option value="VIP">VIP</option>
+            </select>
+          </div>
           <div class="field full"><label>Notas</label><textarea rows="3" placeholder="Observaciones…" [value]="form().notas || ''" (input)="patch('notas', ($any($event.target).value || ''))"></textarea></div>
         </div>
       </div>
