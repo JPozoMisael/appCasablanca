@@ -101,6 +101,18 @@ export class HabitacionesService {
       );
   }
 
+
+  getAll(): Observable<Habitacion[]> {
+  return this.api
+    .get<any>(API_ENDPOINTS.habitaciones.list)
+    .pipe(
+      map((res: any) => this.safeMapArray(res)),
+      catchError((err: any) => {
+        console.error('ERROR getAll:', err);
+        return of([]);
+      })
+    );
+}
   // ======================================================
   // POR HOTEL
   // ======================================================

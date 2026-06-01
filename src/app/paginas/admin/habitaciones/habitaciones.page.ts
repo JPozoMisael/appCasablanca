@@ -71,21 +71,19 @@ export class AdminHabitacionesPage implements OnInit {
   }
 
   cargarHabitaciones() {
-    this.loading.set(true);
-    // Obtener habitaciones de la API (necesitas un endpoint para listar todas)
-    // Por ahora usamos el servicio existente
-    this.habitacionesService.getByHotel('palmeras').subscribe({
-      next: (habitaciones) => {
-        const transformed = habitaciones.map(h => this.transformHabitacion(h));
-        this.habitaciones.set(transformed);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        console.error('Error cargar habitaciones:', err);
-        this.loading.set(false);
-      }
-    });
-  }
+  this.loading.set(true);
+  this.habitacionesService.getAll().subscribe({
+    next: (habitaciones) => {
+      const transformed = habitaciones.map(h => this.transformHabitacion(h));
+      this.habitaciones.set(transformed);
+      this.loading.set(false);
+    },
+    error: (err) => {
+      console.error('Error cargar habitaciones:', err);
+      this.loading.set(false);
+    }
+  });
+}
 
   private transformHabitacion(h: HabitacionModel): Habitacion {
   return {

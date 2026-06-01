@@ -79,14 +79,14 @@ export const API_ENDPOINTS = {
 
   // ================= REPORTS =================
 reportes: {
-  ingresos: `${API_BASE}/reportes/ingresos`,
-  ocupacion: `${API_BASE}/reportes/ocupacion`,
-  reservas: `${API_BASE}/reportes/reservas/estado`,
-  dashboard: `${API_BASE}/reportes/dashboard`,
-  cancelaciones: `${API_BASE}/reportes/cancelaciones`,
-  hotelesTop: `${API_BASE}/reportes/hoteles/top`,
-  serviciosTop: `${API_BASE}/reportes/servicios/top`,
-  clientesFrecuentes: `${API_BASE}/reportes/clientes/frecuentes`,
+  ingresos: `${API_BASE}/reports/ingresos`,
+  ocupacion: `${API_BASE}/reports/ocupacion`,
+  reservas: `${API_BASE}/reports/reservas/estado`,
+  dashboard: `${API_BASE}/reports/dashboard`,
+  cancelaciones: `${API_BASE}/reports/cancelaciones`,
+  hotelesTop: `${API_BASE}/reports/hoteles/top`,
+  serviciosTop: `${API_BASE}/reports/servicios/top`,
+  clientesFrecuentes: `${API_BASE}/reports/clientes/frecuentes`,
 },
 
   // ================= DASHBOARD =================
