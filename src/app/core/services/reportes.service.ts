@@ -11,9 +11,7 @@ interface ApiResponse<T> {
   meta?: any;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ReportesService {
 
   constructor(private api: ApiService) {}
@@ -21,9 +19,12 @@ export class ReportesService {
   // ================= INGRESOS =================
   ingresos(params: { desde: string; hasta: string }): Observable<any> {
     return this.api
-      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.ingresos, params)  // ← sin wrapper { params: ... }
+      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.ingresos, {
+        fecha_inicio: params.desde,
+        fecha_fin: params.hasta
+      })
       .pipe(
-        map(res => res.data),
+        map(res => res?.data ?? null),
         catchError(err => {
           console.error('ERROR ingresos:', err);
           return of(null);
@@ -34,9 +35,12 @@ export class ReportesService {
   // ================= OCUPACIÓN =================
   ocupacion(params: { desde: string; hasta: string }): Observable<any> {
     return this.api
-      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.ocupacion, params)  // ← sin wrapper
+      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.ocupacion, {
+        fecha_inicio: params.desde,
+        fecha_fin: params.hasta
+      })
       .pipe(
-        map(res => res.data),
+        map(res => res?.data ?? null),
         catchError(err => {
           console.error('ERROR ocupación:', err);
           return of(null);
@@ -44,15 +48,44 @@ export class ReportesService {
       );
   }
 
-  // ================= RESERVAS =================
+  // ================= RESERVAS POR ESTADO =================
   reservas(params: { desde: string; hasta: string }): Observable<any> {
     return this.api
-      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.reservas, params)  // ← sin wrapper
+      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.reservas)
       .pipe(
-        map(res => res.data),
+        map(res => res?.data ?? null),
         catchError(err => {
           console.error('ERROR reservas:', err);
-          return of([]);
+          return of(null);
+        })
+      );
+  }
+
+  // ================= DASHBOARD =================
+  dashboard(): Observable<any> {
+    return this.api
+      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.dashboard)
+      .pipe(
+        map(res => res?.data ?? null),
+        catchError(err => {
+          console.error('ERROR dashboard:', err);
+          return of(null);
+        })
+      );
+  }
+
+  // ================= CANCELACIONES =================
+  cancelaciones(params: { desde: string; hasta: string }): Observable<any> {
+    return this.api
+      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.cancelaciones, {
+        fecha_inicio: params.desde,
+        fecha_fin: params.hasta
+      })
+      .pipe(
+        map(res => res?.data ?? null),
+        catchError(err => {
+          console.error('ERROR cancelaciones:', err);
+          return of(null);
         })
       );
   }
