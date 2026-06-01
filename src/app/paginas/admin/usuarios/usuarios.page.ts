@@ -14,8 +14,8 @@ type ModalMode = 'create' | 'edit';
 
 interface UsuarioForm {
   id: number;
-  nombres: string;
-  apellidos: string;
+  nombre: string;
+  apellido: string;
   email: string;
   rol: RolUsuario;
   password?: string;
@@ -39,10 +39,10 @@ export class AdminUsuariosPage implements OnInit {
   modalMode = signal<ModalMode>('create');
   form = signal<UsuarioForm>({
     id: 0,
-    nombres: '',
-    apellidos: '',
+    nombre: '',
+    apellido: '',
     email: '',
-    rol: 'RECEPCION',
+    rol: 'recepcion',
     password: '',
   });
 
@@ -73,24 +73,24 @@ export class AdminUsuariosPage implements OnInit {
   }
 
   total = () => this.usuarios().length;
-  activos = () => this.usuarios().filter(u => u.activo === true).length;
-  admins = () => this.usuarios().filter(u => u.rol === 'ADMIN' || u.rol === 'GERENCIA').length;
-  bloqueados = () => this.usuarios().filter(u => u.activo === false).length;
+  activos = () => this.usuarios().filter(u => u.estado === 'activo').length;
+  admins = () => this.usuarios().filter(u => u.rol === 'admin' || u.rol === 'gerencia').length;
+  bloqueados = () => this.usuarios().filter(u => u.estado !== 'activo').length;
 
   filtrados = computed(() => {
     let items = this.usuarios();
     const query = this.q().trim().toLowerCase();
     if (query) {
       items = items.filter(u =>
-        (u.nombres + ' ' + u.apellidos).toLowerCase().includes(query) ||
+        (u.nombre + ' ' + u.apellido).toLowerCase().includes(query) ||
         u.email.toLowerCase().includes(query) ||
         u.rol.toLowerCase().includes(query)
       );
     }
-    if (this.fRol() !== 'TODOS') items = items.filter(u => u.rol === this.fRol());
+    if (this.fRol() !== 'TODOS') items = items.filter(u => u.rol === this.fRol().toLowerCase());
     if (this.fEstado() !== 'TODOS') {
       const isActive = this.fEstado() === 'ACTIVO';
-      items = items.filter(u => u.activo === isActive);
+      items = items.filter(u => (u.estado === 'activo') === isActive);
     }
     return items.sort((a, b) => b.id - a.id);
   });
@@ -98,52 +98,54 @@ export class AdminUsuariosPage implements OnInit {
   setRolFilter(v: string) { this.fRol.set(v); }
   setEstadoFilter(v: string) { this.fEstado.set(v); }
 
-  getInitials(nombres: string, apellidos: string): string {
-    const n = nombres?.charAt(0) ?? '?';
-    const a = apellidos?.charAt(0) ?? '?';
+  getInitials(nombre: string, apellido: string): string {
+    const n = nombre?.charAt(0) ?? '?';
+    const a = apellido?.charAt(0) ?? '?';
     return (n + a).toUpperCase();
   }
 
   formatRol(rol: RolUsuario): string {
     const roles: Record<RolUsuario, string> = {
-      ADMIN: 'Admin',
-      GERENCIA: 'Gerencia',
-      RECEPCION: 'Recepción',
-      CLIENTE: 'Cliente'
+      admin: 'Admin',
+      super_admin: 'Super Admin',
+      gerencia: 'Gerencia',
+      recepcion: 'Recepción',
+      cliente: 'Cliente'
     };
     return roles[rol] || rol;
   }
 
   getRolClass(rol: RolUsuario): string {
     const classes: Record<RolUsuario, string> = {
-      ADMIN: 'admin',
-      GERENCIA: 'gerencia',
-      RECEPCION: 'recepcion',
-      CLIENTE: 'cliente'
+      admin: 'admin',
+      super_admin: 'super-admin',
+      gerencia: 'gerencia',
+      recepcion: 'recepcion',
+      cliente: 'cliente'
     };
     return classes[rol] || '';
   }
 
-  getEstadoClass(activo: boolean): string {
-    return activo ? 'activo' : 'bloqueado';
+  getEstadoClass(estado: string): string {
+    return estado === 'activo' ? 'activo' : 'bloqueado';
   }
 
-  formatEstado(activo: boolean): string {
-    return activo ? 'Activo' : 'Bloqueado';
+  formatEstado(estado: string): string {
+    return estado === 'activo' ? 'Activo' : 'Bloqueado';
   }
 
   openDetail(u: Usuario) {
-    alert(`Usuario: ${u.nombres} ${u.apellidos}\nEmail: ${u.email}\nRol: ${this.formatRol(u.rol)}\nEstado: ${this.formatEstado(u.activo)}\nTeléfono: ${u.telefono || '—'}\nCreado: ${u.creadoEn || '—'}`);
+    alert(`Usuario: ${u.nombre} ${u.apellido}\nEmail: ${u.email}\nRol: ${this.formatRol(u.rol)}\nEstado: ${this.formatEstado(u.estado ?? '')}\nTeléfono: ${u.telefono || '—'}\nCreado: ${u.creadoEn || '—'}`);
   }
 
   openCreate() {
     this.modalMode.set('create');
     this.form.set({
       id: 0,
-      nombres: '',
-      apellidos: '',
+      nombre: '',
+      apellido: '',
       email: '',
-      rol: 'RECEPCION',
+      rol: 'recepcion',
       password: ''
     });
     this.modalOpen.set(true);
@@ -153,8 +155,8 @@ export class AdminUsuariosPage implements OnInit {
     this.modalMode.set('edit');
     this.form.set({
       id: u.id,
-      nombres: u.nombres,
-      apellidos: u.apellidos,
+      nombre: u.nombre,
+      apellido: u.apellido,
       email: u.email,
       rol: u.rol,
       password: ''
@@ -170,7 +172,7 @@ export class AdminUsuariosPage implements OnInit {
 
   save() {
     const f = this.form();
-    if (!f.nombres.trim() || !f.apellidos.trim() || !f.email.trim()) {
+    if (!f.nombre.trim() || !f.apellido.trim() || !f.email.trim()) {
       alert('Complete los campos obligatorios');
       return;
     }
@@ -180,8 +182,8 @@ export class AdminUsuariosPage implements OnInit {
     }
 
     const usuarioData: Partial<Usuario> = {
-      nombres: f.nombres.trim(),
-      apellidos: f.apellidos.trim(),
+      nombre: f.nombre.trim(),
+      apellido: f.apellido.trim(),
       email: f.email.toLowerCase(),
       rol: f.rol,
       password: f.password || undefined
@@ -213,15 +215,15 @@ export class AdminUsuariosPage implements OnInit {
   }
 
   toggleEstado(u: Usuario) {
-    const nextEstado = !u.activo;
-    this.usuariosService.update(u.id, { activo: nextEstado }).subscribe({
+    const nextEstado = u.estado === 'activo' ? 'inactivo' : 'activo';
+    this.usuariosService.update(u.id, { estado: nextEstado }).subscribe({
       next: () => this.cargarUsuarios(),
       error: (err) => console.error('Error cambiar estado:', err)
     });
   }
 
   confirmDelete(u: Usuario) {
-    if (confirm(`¿Eliminar usuario "${u.nombres} ${u.apellidos}"?`)) {
+    if (confirm(`¿Eliminar usuario "${u.nombre} ${u.apellido}"?`)) {
       this.usuariosService.delete(u.id).subscribe({
         next: (success) => {
           if (success) this.cargarUsuarios();

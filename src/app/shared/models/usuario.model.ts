@@ -1,13 +1,14 @@
-export type RolUsuario = 'ADMIN' | 'RECEPCION' | 'GERENCIA' | 'CLIENTE';
+export type RolUsuario = 'admin' | 'recepcion' | 'gerencia' | 'cliente' | 'super_admin';
 
 export interface Usuario {
   id: number;
-  nombres: string;
-  apellidos: string;
+  nombre: string;
+  apellido: string;
   email: string;
   telefono?: string | null;
   rol: RolUsuario;
-  activo: boolean;
+  activo?: boolean;
+  estado?: string;
   password?: string;
   creadoEn?: string;
   actualizadoEn?: string;
