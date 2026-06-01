@@ -99,7 +99,9 @@ export class AdminUsuariosPage implements OnInit {
   setEstadoFilter(v: string) { this.fEstado.set(v); }
 
   getInitials(nombres: string, apellidos: string): string {
-    return (nombres.charAt(0) + apellidos.charAt(0)).toUpperCase();
+    const n = nombres?.charAt(0) ?? '?';
+    const a = apellidos?.charAt(0) ?? '?';
+    return (n + a).toUpperCase();
   }
 
   formatRol(rol: RolUsuario): string {
@@ -177,12 +179,11 @@ export class AdminUsuariosPage implements OnInit {
       return;
     }
 
-    const usuarioData = {
+    const usuarioData: Partial<Usuario> = {
       nombres: f.nombres.trim(),
       apellidos: f.apellidos.trim(),
       email: f.email.toLowerCase(),
       rol: f.rol,
-      activo: true,
       password: f.password || undefined
     };
 
@@ -192,7 +193,10 @@ export class AdminUsuariosPage implements OnInit {
           if (usuario) this.cargarUsuarios();
           this.closeModal();
         },
-        error: (err) => console.error('Error crear:', err)
+        error: (err) => {
+          console.error('Error crear usuario:', err);
+          alert('Error al crear el usuario');
+        }
       });
     } else {
       this.usuariosService.update(f.id, usuarioData).subscribe({
@@ -200,7 +204,10 @@ export class AdminUsuariosPage implements OnInit {
           if (usuario) this.cargarUsuarios();
           this.closeModal();
         },
-        error: (err) => console.error('Error actualizar:', err)
+        error: (err) => {
+          console.error('Error actualizar usuario:', err);
+          alert('Error al actualizar el usuario');
+        }
       });
     }
   }

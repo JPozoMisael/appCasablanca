@@ -8,6 +8,7 @@ export interface Usuario {
   telefono?: string | null;
   rol: RolUsuario;
   activo: boolean;
+  password?: string;
   creadoEn?: string;
   actualizadoEn?: string;
 }
