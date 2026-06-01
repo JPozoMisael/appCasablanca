@@ -5,7 +5,6 @@ import { map, catchError } from 'rxjs/operators';
 import { API_ENDPOINTS } from '../config/endpoints';
 import { ApiService } from './api.service';
 
-// 🔥 tipo base opcional (puedes refinar luego)
 interface ApiResponse<T> {
   ok: boolean;
   data: T;
@@ -21,9 +20,8 @@ export class ReportesService {
 
   // ================= INGRESOS =================
   ingresos(params: { desde: string; hasta: string }): Observable<any> {
-
     return this.api
-      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.ingresos, { params })
+      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.ingresos, params)  // ← sin wrapper { params: ... }
       .pipe(
         map(res => res.data),
         catchError(err => {
@@ -35,9 +33,8 @@ export class ReportesService {
 
   // ================= OCUPACIÓN =================
   ocupacion(params: { desde: string; hasta: string }): Observable<any> {
-
     return this.api
-      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.ocupacion, { params })
+      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.ocupacion, params)  // ← sin wrapper
       .pipe(
         map(res => res.data),
         catchError(err => {
@@ -49,9 +46,8 @@ export class ReportesService {
 
   // ================= RESERVAS =================
   reservas(params: { desde: string; hasta: string }): Observable<any> {
-
     return this.api
-      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.reservas, { params })
+      .get<ApiResponse<any>>(API_ENDPOINTS.reportes.reservas, params)  // ← sin wrapper
       .pipe(
         map(res => res.data),
         catchError(err => {
@@ -60,5 +56,4 @@ export class ReportesService {
         })
       );
   }
-
 }
