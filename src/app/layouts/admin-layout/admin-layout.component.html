@@ -55,7 +55,7 @@
             <span>Habitaciones</span>
           </a>
 
-          <a routerLink="/admin/tarifas" routerLinkActive="active">
+          <a *ngIf="canAccess('super_admin','admin') "routerLink="/admin/tarifas" routerLinkActive="active">
             <ion-icon name="pricetag-outline"></ion-icon>
             <span>Tarifas</span>
           </a>

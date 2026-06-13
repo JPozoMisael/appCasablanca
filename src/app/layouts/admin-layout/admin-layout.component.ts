@@ -20,8 +20,7 @@ import {
   cardOutline,
   settingsOutline,
   swapHorizontalOutline,
-  closeOutline
-} from 'ionicons/icons';
+  closeOutline, ellipseOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-admin-layout',
@@ -46,30 +45,15 @@ export class AdminLayoutComponent implements OnInit {
   userRole = 'Super Administrador';
   userInitials = 'AD';
   isSuperAdmin = true;
+  role = '';
+  isAdmin = false;
+  isRecepcion = false;
 
   pageTitle = 'Dashboard';
   pageSubtitle = 'Resumen general del hotel';
 
   constructor(private router: Router) {
-    addIcons({
-      gridOutline,
-      calendarOutline,
-      bedOutline,
-      peopleOutline,
-      analyticsOutline,
-      logOutOutline,
-      clipboardOutline,
-      shieldCheckmarkOutline,
-      personCircleOutline,
-      menuOutline,
-      businessOutline,
-      pricetagOutline,
-      restaurantOutline,
-      cardOutline,
-      settingsOutline,
-      swapHorizontalOutline,
-      closeOutline
-    });
+    addIcons({businessOutline,gridOutline,calendarOutline,clipboardOutline,swapHorizontalOutline,ellipseOutline,bedOutline,pricetagOutline,restaurantOutline,peopleOutline,cardOutline,analyticsOutline,shieldCheckmarkOutline,settingsOutline,logOutOutline,menuOutline,personCircleOutline,closeOutline});
 
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
@@ -94,6 +78,9 @@ export class AdminLayoutComponent implements OnInit {
         this.userRole = this.getRoleLabel(user.rol);
         this.userInitials = (user.nombre?.charAt(0) || 'A') + (user.apellido?.charAt(0) || 'D');
         this.isSuperAdmin = user.rol === 'super_admin';
+        this.isAdmin = user.rol === 'admin';
+        this.isRecepcion = user.rol === 'recepcion';
+        this.role = user.rol;
       } catch (e) {
         console.error('Error parsing user', e);
       }
@@ -110,6 +97,9 @@ export class AdminLayoutComponent implements OnInit {
     return roles[rol] || 'Usuario';
   }
 
+  canAccess(...roles: string[]): boolean {
+    return roles.includes(this.role);
+  }
   updatePageTitle(url: string) {
     const titles: Record<string, { title: string; subtitle: string }> = {
       '/admin/dashboard': { title: 'Dashboard', subtitle: 'Resumen general del hotel' },
