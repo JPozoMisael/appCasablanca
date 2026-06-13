@@ -181,6 +181,8 @@ export class LoginPage {
 
         const role =
           this.authService.getRole();
+          console.log('ROLE OBTENIDO:', role);
+          console.log('USER:', this.authService.getUser());
 
 
         // =================================

@@ -31,8 +31,7 @@ export const ROLES = {
 // =========================================
 
 export const ADMIN_ROLES: Role[] = [
-
   ROLES.SUPER_ADMIN,
-
   ROLES.ADMIN,
+  ROLES.RECEPCION,
 ];
