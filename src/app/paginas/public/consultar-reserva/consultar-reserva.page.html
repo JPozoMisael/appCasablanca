@@ -1,0 +1,66 @@
+<div class="container page">
+  <h1>Consulta tu reserva</h1>
+  <p class="lead">Ingresa el código que recibiste al reservar y el correo de contacto.</p>
+
+  <form class="form" (ngSubmit)="buscar()">
+    <label>Código de reserva
+      <input name="codigo" [(ngModel)]="codigo" placeholder="SB-XXXXXXXX" autocomplete="off" autocapitalize="characters" />
+    </label>
+    <label>Correo electrónico
+      <input type="email" name="email" [(ngModel)]="email" autocomplete="email" />
+    </label>
+    <button type="submit" class="btn" [disabled]="cargando">{{ cargando ? 'Buscando…' : 'Buscar reserva' }}</button>
+  </form>
+
+  @if (error) { <p class="err" role="alert">{{ error }}</p> }
+  @if (mensaje) { <p class="okmsg" role="status">{{ mensaje }}</p> }
+
+  @if (reserva; as r) {
+    <section class="card">
+      <div class="cab">
+        <div>
+          <span class="estado {{ estados[r.estado].color }}">{{ estados[r.estado].texto }}</span>
+          <h2>{{ r.hotel?.nombre }}</h2>
+          <p class="sub">{{ r.hotel?.direccion }}</p>
+        </div>
+        <div class="cod"><small>Código</small><b>{{ r.codigo_reserva }}</b></div>
+      </div>
+
+      <dl class="datos">
+        <div><dt>Entrada</dt><dd>{{ fechaLarga(r.fecha_entrada) }}</dd></div>
+        <div><dt>Salida</dt><dd>{{ fechaLarga(r.fecha_salida) }}</dd></div>
+        <div><dt>Huésped</dt><dd>{{ r.cliente?.nombres }} {{ r.cliente?.apellidos }}</dd></div>
+        <div><dt>Total</dt><dd>{{ r.precio_total | money }}</dd></div>
+      </dl>
+
+      <ul class="hab">
+        @for (d of r.detalles; track d.id) {
+          <li>{{ d.habitacion?.tipoHabitacion?.nombre }} · {{ d.noches }} {{ d.noches === 1 ? 'noche' : 'noches' }}</li>
+        }
+      </ul>
+
+      @if (puedeCancelar) {
+        @if (!confirmandoCancelacion) {
+          <button type="button" class="btn out danger" (click)="confirmandoCancelacion = true">Cancelar reserva</button>
+        } @else {
+          <div class="confirm">
+            <p [class.gratis]="r.cancelacion.gratis">
+              @if (r.cancelacion.gratis) {
+                La cancelación es <b>gratuita</b>.
+              } @else {
+                La cancelación gratuita ya venció: se cobrarían <b>{{ r.cancelacion.penalizacion | money }}</b>.
+              }
+            </p>
+            <label>Motivo (opcional) <input [(ngModel)]="motivo" name="motivo" maxlength="300" /></label>
+            <div class="acc">
+              <button type="button" class="btn out" (click)="confirmandoCancelacion = false">Volver</button>
+              <button type="button" class="btn danger" [disabled]="cargando" (click)="cancelar()">Sí, cancelar</button>
+            </div>
+          </div>
+        }
+      }
+    </section>
+
+    <p class="crear">¿Reservas seguido? <a routerLink="/registro">Crea tu cuenta</a> para guardar tus próximas reservas.</p>
+  }
+</div>

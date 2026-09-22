@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { IonApp, IonContent } from '@ionic/angular/standalone';
 
 import { AppHeaderComponent } from '@app/shared/components/app-header/app-header.component';
@@ -8,7 +8,7 @@ import { AppHeaderComponent } from '@app/shared/components/app-header/app-header
 @Component({
   selector: 'app-public-layout',
   standalone: true,
-  imports: [IonContent, CommonModule, RouterOutlet, IonApp, AppHeaderComponent],
+  imports: [IonContent, CommonModule, RouterOutlet, RouterLink, IonApp, AppHeaderComponent],
   templateUrl: './public-layout.component.html',
   styleUrls: ['./public-layout.component.scss'],
 })

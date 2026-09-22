@@ -1,836 +1,266 @@
-<div class="hotel-page" *ngIf="hotel">
+@if (cargando) {
+  <div class="container"><div class="sk" style="height: 420px; margin-top: 20px"></div></div>
+} @else if (noEncontrado || !hotel) {
+  <div class="container nf">
+    <ion-icon name="bed-outline"></ion-icon>
+    <h1>No encontramos este alojamiento</h1>
+    <p>Puede que ya no esté disponible.</p>
+    <a routerLink="/buscar" class="btn">Ver alojamientos en Salinas</a>
+  </div>
+} @else {
+  <div class="container page">
+    <nav class="crumbs" aria-label="Ruta">
+      <a routerLink="/inicio">Inicio</a> ›
+      @if (hotel.zona) {
+        <a [routerLink]="['/buscar']" [queryParams]="{ zona: hotel.zona.slug }">{{ hotel.zona.nombre }}</a> ›
+      }
+      <span>{{ hotel.nombre }}</span>
+    </nav>
 
-  <!-- ======================================================
-       HERO
-  ======================================================= -->
-
-  <section class="hotel-hero">
-
-    <div class="page-shell">
-
-      <div class="hotel-top">
-
-        <!-- LEFT -->
-
-        <div class="hotel-main-info">
-
-          <div class="hotel-label">
-            HOTEL CASA BLANCA
-          </div>
-
-          <h1>
-            {{ hotel.name }}
-          </h1>
-
-          <!-- META -->
-
-          <div class="hotel-meta">
-
-            <div class="hotel-location">
-
-              <ion-icon name="location-outline"></ion-icon>
-
-              <span>
-                {{ hotel.address }}
-              </span>
-
-            </div>
-
-            <button
-              class="map-link"
-              (click)="openGoogleMaps()">
-
-              <ion-icon name="map-outline"></ion-icon>
-
-              Ver mapa
-
-            </button>
-
-          </div>
-
-          <!-- PROPERTY HIGHLIGHTS -->
-
-          <div class="property-highlights">
-
-            <div class="property-pill blue">
-
-              <ion-icon name="wifi-outline"></ion-icon>
-
-              Wifi gratis
-
-            </div>
-
-            <div class="property-pill green">
-
-              <ion-icon name="sunny-outline"></ion-icon>
-
-              Frente al mar
-
-            </div>
-
-            <div class="property-pill dark">
-
-              <ion-icon name="water-outline"></ion-icon>
-
-              Piscina
-
-            </div>
-
-            <div class="property-pill success">
-
-              <ion-icon name="people-outline"></ion-icon>
-
-              Ideal para familias
-
-            </div>
-
-            <div class="property-pill orange">
-
-              <ion-icon name="restaurant-outline"></ion-icon>
-
-              Desayuno incluido
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- RIGHT -->
-
-        <div class="hotel-rating-box">
-
-          <div class="rating-text">
-
-            <strong>
-              Fantástico
-            </strong>
-
-            <span>
-              {{ hotel.reviews }} comentarios
+    <!-- CABECERA -->
+    <header class="head">
+      <div>
+        <div class="badges">
+          <span class="tipo">{{ tipoLabel[hotel.tipo_alojamiento] }}</span>
+          @if (hotel.estrellas) {
+            <span class="stars">
+              @for (n of [1, 2, 3, 4, 5].slice(0, hotel.estrellas); track n) {
+                <ion-icon name="star"></ion-icon>
+              }
             </span>
-
-          </div>
-
-          <div class="rating-score">
-
-            {{ hotel.score }}
-
-          </div>
-
+          }
         </div>
-
+        <h1>{{ hotel.nombre }}</h1>
+        <p class="dir">
+          <ion-icon name="location-outline"></ion-icon>
+          {{ hotel.direccion || hotel.ciudad }}@if (hotel.zona) { · {{ hotel.zona.nombre }} }
+          @if (mapaUrl) {
+            <a [href]="mapaUrl" target="_blank" rel="noopener">Ver en el mapa</a>
+          }
+        </p>
       </div>
+      <div class="head-r">
+        <app-rating-badge [rating]="promedio" [total]="hotel.total_valoraciones" />
+        <button type="button" class="icon-btn" (click)="alternarFavorito()" [attr.aria-pressed]="esFavorito" [attr.aria-label]="esFavorito ? 'Quitar de favoritos' : 'Guardar en favoritos'">
+          <ion-icon [name]="esFavorito ? 'heart' : 'heart-outline'" [class.on]="esFavorito"></ion-icon>
+        </button>
+        <button type="button" class="btn" (click)="irADisponibilidad()">Ver habitaciones</button>
+      </div>
+    </header>
 
-    </div>
-
-  </section>
-
-  <!-- ======================================================
-     GALLERY
-======================================================= -->
-
-<section class="gallery-section" *ngIf="hotel">
-
-  <div class="page-shell">
-
-    <div class="gallery-layout">
-
-      <!-- MAIN IMAGE -->
-
-      <div
-        class="gallery-main"
-        (click)="openGallery(0)">
-
-        <img
-
-          [src]="
-            hotel.gallery?.[0] ||
-            hotel.heroImage ||
-            'assets/img/default.jpg'
-          "
-
-          [alt]="hotel.name"
-
-          (error)="onImageError($event)"
-
-        />
-
-        <div class="gallery-overlay">
-
-          <button class="gallery-all-btn">
-
-            <ion-icon
-              name="images-outline">
-            </ion-icon>
-
-            <span>
-              Ver todas las fotos
-            </span>
-
+    <!-- GALERÍA -->
+    @if (galeria.length) {
+      <section class="galeria" [class.una]="galeria.length === 1">
+        @for (img of galeria.slice(0, 5); track img.id + '-' + $index) {
+          <button type="button" class="foto" [class.grande]="$index === 0" (click)="abrirLightbox($index)" [attr.aria-label]="'Ampliar foto ' + ($index + 1)">
+            <img [src]="url(img.url)" [alt]="img.alt || hotel.nombre" [attr.loading]="$index === 0 ? 'eager' : 'lazy'" />
+            @if ($index === 4 && galeria.length > 5) {
+              <span class="mas"><ion-icon name="images-outline"></ion-icon> +{{ galeria.length - 5 }} fotos</span>
+            }
           </button>
+        }
+      </section>
+    }
 
-        </div>
+    <div class="cols">
+      <div class="main">
+        <!-- DESCRIPCIÓN -->
+        <section class="bloque">
+          <h2>Acerca de este alojamiento</h2>
+          <p class="desc">{{ hotel.descripcion }}</p>
+          @if (hotel.zona?.descripcion) {
+            <p class="zona-desc"><b>{{ hotel.zona!.nombre }}:</b> {{ hotel.zona!.descripcion }}</p>
+          }
+        </section>
 
-      </div>
+        <!-- SERVICIOS -->
+        @if (hotel.amenidades.length) {
+          <section class="bloque">
+            <h2>Servicios más populares</h2>
+            <ul class="amen">
+              @for (a of hotel.amenidades; track a.id) {
+                <li>
+                  @if (a.icono) {
+                    <ion-icon [name]="a.icono"></ion-icon>
+                  }
+                  {{ a.nombre }}
+                </li>
+              }
+            </ul>
+          </section>
+        }
 
-      <!-- SIDE GRID -->
-
-      <div class="gallery-side">
-
-        <div
-
-          class="gallery-side-item"
-
-          *ngFor="
-            let img of hotel.gallery | slice:1:5;
-            let i = index
-          "
-
-          (click)="openGallery(i + 1)"
-
-        >
-
-          <img
-
-            [src]="
-              img ||
-              hotel.heroImage ||
-              'assets/img/default.jpg'
-            "
-
-            [alt]="hotel.name"
-
-            (error)="onImageError($event)"
-
+        <!-- DISPONIBILIDAD -->
+        <section class="bloque" id="disponibilidad">
+          <h2>Disponibilidad</h2>
+          <app-search-form
+            [valor]="{ checkIn: checkIn, checkOut: checkOut, adultos: adultos, ninos: ninos }"
+            [sinDestino]="true"
+            etiquetaBoton="Ver precios"
+            (buscar)="cambiarFechas($event)"
           />
 
-        </div>
+          @if (!tieneFechas) {
+            <p class="hint">Elige tus fechas para ver la disponibilidad real y el precio de tu estadía.</p>
+          }
+          @if (errorDisp) {
+            <p class="error" role="alert">{{ errorDisp }}</p>
+          }
 
+          <div class="tipos">
+            @if (cargandoDisp) {
+              <div class="sk" style="height: 150px"></div>
+            }
+
+            @for (t of disp ? disp.habitaciones : hotel.tiposHabitacion; track t.id) {
+              <article class="tipo-card" [class.agotado]="disp && !$any(t).reservable">
+                <img [src]="imagenDeTipo(t)" [alt]="t.nombre" loading="lazy" />
+                <div class="tipo-info">
+                  <h3>{{ t.nombre }}</h3>
+                  <ul class="datos">
+                    <li><ion-icon name="people-outline"></ion-icon> Hasta {{ t.capacidad_maxima }} personas</li>
+                    @if (t.camas_dobles || t.camas_sencillas) {
+                      <li>
+                        <ion-icon name="bed-outline"></ion-icon>
+                        @if (t.camas_dobles) { {{ t.camas_dobles }} cama doble }
+                        @if (t.camas_dobles && t.camas_sencillas) { + }
+                        @if (t.camas_sencillas) { {{ t.camas_sencillas }} sencilla(s) }
+                      </li>
+                    }
+                    @if (t.metros_cuadrados) {
+                      <li><ion-icon name="expand-outline"></ion-icon> {{ t.metros_cuadrados }} m²</li>
+                    }
+                    @if (t.tiene_vista) { <li><ion-icon name="sunny-outline"></ion-icon> Vista al mar</li> }
+                    @if (t.desayuno_incluido) { <li><ion-icon name="cafe-outline"></ion-icon> Desayuno incluido</li> }
+                  </ul>
+                  @if (t.descripcion) {
+                    <p class="tdesc">{{ t.descripcion }}</p>
+                  }
+                </div>
+
+                <div class="tipo-precio">
+                  @if (disp) {
+                    @let d = $any(t);
+                    @if (d.reservable) {
+                      @if (!d.cabe_el_grupo) {
+                        <small class="warn">Para {{ t.capacidad_maxima }} personas; combina habitaciones.</small>
+                      }
+                      @if (d.disponibles <= 3) {
+                        <small class="poco">¡Solo quedan {{ d.disponibles }}!</small>
+                      }
+                      <small>{{ disp.noches }} {{ disp.noches === 1 ? 'noche' : 'noches' }}</small>
+                      <strong>{{ d.precio_total | money }}</strong>
+                      <small>+ impuestos ({{ disp.iva_porcentaje }} % IVA)</small>
+                      <select [value]="seleccion[t.id] || 0" (change)="elegir(d, $any($event.target).value)" [attr.aria-label]="'Cantidad de ' + t.nombre">
+                        @for (n of opciones(d); track n) {
+                          <option [value]="n">{{ n === 0 ? 'Cantidad' : n + (n === 1 ? ' habitación' : ' habitaciones') }}</option>
+                        }
+                      </select>
+                    } @else {
+                      <strong class="ag">Sin disponibilidad</strong>
+                      <small>para esas fechas</small>
+                    }
+                  } @else {
+                    <small>Desde</small>
+                    <strong>{{ t.precio_base | money }}</strong>
+                    <small>por noche</small>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          @if (disp && totalHabitaciones > 0) {
+            <div class="resumen" role="region" aria-label="Resumen de tu selección">
+              <div>
+                <b>{{ totalHabitaciones }} {{ totalHabitaciones === 1 ? 'habitación' : 'habitaciones' }}</b> · {{ disp.noches }}
+                {{ disp.noches === 1 ? 'noche' : 'noches' }}
+                <div class="tot">{{ totalSeleccion | money }} <small>+ impuestos</small></div>
+                @if (faltaCapacidad) {
+                  <small class="warn">Tu selección aloja {{ capacidadSeleccion }} personas y son {{ adultos + ninos }}.</small>
+                }
+              </div>
+              <button type="button" class="btn" [disabled]="faltaCapacidad" (click)="reservar()">Reservar</button>
+            </div>
+          }
+        </section>
+
+        <!-- POLÍTICAS -->
+        <section class="bloque">
+          <h2>Reglas de la casa</h2>
+          <dl class="reglas">
+            <dt>Entrada</dt><dd>desde las {{ hotel.hora_checkin }}</dd>
+            <dt>Salida</dt><dd>hasta las {{ hotel.hora_checkout }}</dd>
+            <dt>Cancelación</dt><dd>{{ hotel.politica.descripcion }}</dd>
+          </dl>
+        </section>
+
+        <!-- RESEÑAS -->
+        <section class="bloque">
+          <h2>Opiniones de huéspedes</h2>
+          @if (!hotel.total_valoraciones) {
+            <p class="hint">Todavía no hay opiniones. Solo pueden opinar quienes completaron su estadía.</p>
+          } @else {
+            <div class="resumen-res">
+              <app-rating-badge [rating]="promedio" [total]="hotel.total_valoraciones" />
+              <div class="barras">
+                @for (p of [10, 9, 8, 7, 6]; track p) {
+                  <div class="barra"><span>{{ p }}</span><i><b [style.width.%]="barra(p)"></b></i></div>
+                }
+              </div>
+            </div>
+            <ul class="resenas">
+              @for (r of resenas; track r.id) {
+                <li>
+                  <div class="r-head">
+                    <span class="punt">{{ r.puntuacion }}</span>
+                    <div>
+                      <b>{{ r.autor }}</b>
+                      @if (r.verificada) { <em><ion-icon name="checkmark-circle"></ion-icon> Estadía verificada</em> }
+                    </div>
+                  </div>
+                  @if (r.titulo) { <h4>{{ r.titulo }}</h4> }
+                  @if (r.comentario) { <p>{{ r.comentario }}</p> }
+                  @if (r.respuesta_hotel) {
+                    <div class="resp"><b>Respuesta del alojamiento</b><p>{{ r.respuesta_hotel }}</p></div>
+                  }
+                </li>
+              }
+            </ul>
+            @if (resenasMeta.page < resenasMeta.pages) {
+              <button type="button" class="btn ghost" (click)="cargarResenas(resenasMeta.page + 1)">Ver más opiniones</button>
+            }
+          }
+        </section>
       </div>
 
+      <!-- LATERAL -->
+      <aside class="lateral">
+        <div class="card-l">
+          @if (hotel.precio_desde) {
+            <small>Precios desde</small>
+            <strong>{{ hotel.precio_desde | money }}</strong>
+            <small>por habitación y noche</small>
+          }
+          <button type="button" class="btn full" (click)="irADisponibilidad()">Ver disponibilidad</button>
+          <ul class="contacto">
+            @if (hotel.telefono) { <li><ion-icon name="call-outline"></ion-icon> {{ hotel.telefono }}</li> }
+            @if (whatsappUrl) { <li><ion-icon name="logo-whatsapp"></ion-icon> <a [href]="whatsappUrl" target="_blank" rel="noopener">Escribir por WhatsApp</a></li> }
+            @if (hotel.email) { <li><ion-icon name="mail-outline"></ion-icon> {{ hotel.email }}</li> }
+          </ul>
+        </div>
+      </aside>
     </div>
-
   </div>
 
-</section>
-
-  <!-- ======================================================
-       CONTENT
-  ======================================================= -->
-
-  <section class="hotel-content">
-
-    <div class="page-shell">
-
-      <div class="content-layout">
-
-        <!-- ======================================================
-             MAIN
-        ======================================================= -->
-
-        <div class="content-main">
-
-          <!-- ABOUT -->
-
-          <div class="content-card">
-
-            <h2>
-              Sobre el hotel
-            </h2>
-
-            <p>
-              {{ hotel.description }}
-            </p>
-
-          </div>
-
-          <!-- HIGHLIGHTS -->
-
-          <div class="content-card">
-
-            <h2>
-              Lo más destacado
-            </h2>
-
-            <div class="highlights-grid">
-
-              <div class="highlight-item">
-
-                <div class="highlight-icon">
-                  <ion-icon name="walk-outline"></ion-icon>
-                </div>
-
-                <div>
-
-                  <strong>
-                    Excelente ubicación
-                  </strong>
-
-                  <span>
-                    Cerca del mar y restaurantes
-                  </span>
-
-                </div>
-
-              </div>
-
-              <div class="highlight-item">
-
-                <div class="highlight-icon">
-                  <ion-icon name="shield-checkmark-outline"></ion-icon>
-                </div>
-
-                <div>
-
-                  <strong>
-                    Reserva segura
-                  </strong>
-
-                  <span>
-                    Confirmación inmediata
-                  </span>
-
-                </div>
-
-              </div>
-
-              <div class="highlight-item">
-
-                <div class="highlight-icon">
-                  <ion-icon name="bed-outline"></ion-icon>
-                </div>
-
-                <div>
-
-                  <strong>
-                    Habitaciones premium
-                  </strong>
-
-                  <span>
-                    Modernas y cómodas
-                  </span>
-
-                </div>
-
-              </div>
-
-              <div class="highlight-item">
-
-                <div class="highlight-icon">
-                  <ion-icon name="cafe-outline"></ion-icon>
-                </div>
-
-                <div>
-
-                  <strong>
-                    Desayuno disponible
-                  </strong>
-
-                  <span>
-                    Opciones incluidas
-                  </span>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          <!-- ROOMS -->
-
-          <div class="content-card rooms-card">
-
-            <div class="section-head-inline">
-
-              <div>
-
-                <h2>
-                  Habitaciones disponibles
-                </h2>
-
-                <p>
-                  Las mejores opciones disponibles para tu estadía.
-                </p>
-
-              </div>
-
-              <button
-                class="see-all-btn"
-                (click)="showAllRooms()">
-
-                Ver todas
-
-              </button>
-
-            </div>
-
-            <!-- ROOM -->
-
-            <div
-              class="booking-room"
-              *ngFor="let r of previewRooms">
-
-              <!-- IMAGE -->
-
-              <div class="booking-room-image">
-
-                <img
-                  [src]="r.image"
-                  [alt]="r.name"
-                />
-
-              </div>
-
-              <!-- INFO -->
-
-              <div class="booking-room-info">
-
-                <h3>
-                  {{ r.name }}
-                </h3>
-
-                <p>
-                  {{ r.desc }}
-                </p>
-
-                <div class="room-benefits">
-
-                  <span>
-                    Wifi gratis
-                  </span>
-
-                  <span>
-                    Aire acondicionado
-                  </span>
-
-                  <span>
-                    Cancelación flexible
-                  </span>
-
-                </div>
-
-                <div class="availability-warning">
-
-                  <ion-icon name="flash-outline"></ion-icon>
-
-                  Última habitación disponible
-
-                </div>
-
-              </div>
-
-              <!-- PRICE -->
-
-              <div class="booking-room-price">
-
-                <small>
-                  1 noche
-                </small>
-
-                <strong>
-                  ${{ r.price }}
-                </strong>
-
-                <span>
-                  impuestos incluidos
-                </span>
-
-                <button
-                  [routerLink]="['/hotel', slug, 'habitaciones']">
-
-                  Reservar
-
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          <!-- SERVICES -->
-
-          <div class="content-card">
-
-            <h2>
-              Servicios del hotel
-            </h2>
-
-            <div class="services-list">
-
-              <div
-                class="service-item"
-                *ngFor="let s of hotel.services">
-
-                <ion-icon [name]="s.icon"></ion-icon>
-
-                <span>
-                  {{ s.name }}
-                </span>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          <!-- MAP -->
-
-          <div class="content-card">
-
-            <div class="map-head">
-
-              <div>
-
-                <h2>
-                  Ubicación
-                </h2>
-
-                <p>
-                  Excelente zona cerca del mar y puntos turísticos.
-                </p>
-
-              </div>
-
-              <button
-                class="map-google-btn"
-                (click)="openGoogleMaps()">
-
-                <ion-icon name="map-outline"></ion-icon>
-
-                Google Maps
-
-              </button>
-
-            </div>
-
-            <div class="map-layout">
-
-              <!-- MAP -->
-
-              <div class="map-box">
-
-                <iframe [src]="mapUrl"></iframe>
-
-              </div>
-
-              <!-- INFO -->
-
-              <div class="map-info">
-
-                <div class="map-info-card">
-
-                  <ion-icon name="sunny-outline"></ion-icon>
-
-                  <div>
-
-                    <strong>
-                      Frente al mar
-                    </strong>
-
-                    <span>
-                      Acceso rápido a la playa
-                    </span>
-
-                  </div>
-
-                </div>
-
-                <div class="map-info-card">
-
-                  <ion-icon name="walk-outline"></ion-icon>
-
-                  <div>
-
-                    <strong>
-                      Excelente ubicación
-                    </strong>
-
-                    <span>
-                      Cerca de restaurantes y malecón
-                    </span>
-
-                  </div>
-
-                </div>
-
-                <div class="map-info-card">
-
-                  <ion-icon name="business-outline"></ion-icon>
-
-                  <div>
-
-                    <strong>
-                      Zona turística
-                    </strong>
-
-                    <span>
-                      Ideal para entretenimiento
-                    </span>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- ======================================================
-             SIDEBAR
-        ======================================================= -->
-
-        <aside class="content-sidebar">
-
-          <!-- BOOKING -->
-
-          <div class="booking-box">
-
-            <div class="booking-price">
-
-              <small>
-                Desde
-              </small>
-
-              <strong>
-                ${{ hotel.price }}
-              </strong>
-
-              <span>
-                / noche
-              </span>
-
-            </div>
-
-            <div class="booking-benefits">
-
-              <div>
-
-                <ion-icon name="checkmark-circle-outline"></ion-icon>
-
-                Mejor tarifa disponible
-
-              </div>
-
-              <div>
-
-                <ion-icon name="shield-checkmark-outline"></ion-icon>
-
-                Reserva segura
-
-              </div>
-
-              <div>
-
-                <ion-icon name="time-outline"></ion-icon>
-
-                Confirmación inmediata
-
-              </div>
-
-            </div>
-
-            <button
-              class="booking-btn"
-              (click)="goToAvailability()">
-
-              Ver disponibilidad
-
-            </button>
-
-          </div>
-
-          <!-- REVIEW CARD -->
-
-          <div class="sidebar-card">
-
-            <div class="sidebar-title">
-
-              <h3>
-                Valoración
-              </h3>
-
-            </div>
-
-            <div class="sidebar-score">
-
-              <div class="score-box">
-                {{ hotel.score }}
-              </div>
-
-              <div>
-
-                <strong>
-                  Fantástico
-                </strong>
-
-                <span>
-                  {{ hotel.reviews }} comentarios
-                </span>
-
-              </div>
-
-            </div>
-
-            <div class="review-mini-list">
-
-              <div
-                class="review-mini"
-                *ngFor="let r of hotelReviews | slice:0:2">
-
-                <strong>
-                  {{ r.name }}
-                </strong>
-
-                <p>
-                  {{ r.text }}
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          <!-- FACILITIES -->
-
-          <div class="sidebar-card">
-
-            <div class="sidebar-title">
-
-              <h3>
-                Servicios populares
-              </h3>
-
-            </div>
-
-            <div class="sidebar-services">
-
-              <div
-                class="sidebar-service"
-                *ngFor="let s of hotel.services | slice:0:6">
-
-                <ion-icon [name]="s.icon"></ion-icon>
-
-                <span>
-                  {{ s.name }}
-                </span>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          <!-- LOCATION -->
-
-          <div class="sidebar-card">
-
-            <div class="sidebar-title">
-
-              <h3>
-                Ubicación
-              </h3>
-
-            </div>
-
-            <div class="location-points">
-
-              <div class="location-point">
-
-                <ion-icon name="sunny-outline"></ion-icon>
-
-                <span>
-                  Frente al mar
-                </span>
-
-              </div>
-
-              <div class="location-point">
-
-                <ion-icon name="walk-outline"></ion-icon>
-
-                <span>
-                  Cerca del malecón
-                </span>
-
-              </div>
-
-              <div class="location-point">
-
-                <ion-icon name="restaurant-outline"></ion-icon>
-
-                <span>
-                  Restaurantes cercanos
-                </span>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          <!-- RULES -->
-
-          <div class="sidebar-card">
-
-            <div class="sidebar-title">
-
-              <h3>
-                Información importante
-              </h3>
-
-            </div>
-
-            <div class="rules-list">
-
-              <div class="rule-item">
-
-                <ion-icon name="calendar-outline"></ion-icon>
-
-                <span>
-                  Check-in: 14:00
-                </span>
-
-              </div>
-
-              <div class="rule-item">
-
-                <ion-icon name="calendar-outline"></ion-icon>
-
-                <span>
-                  Check-out: 12:00
-                </span>
-
-              </div>
-
-              <div class="rule-item">
-
-                <ion-icon name="shield-checkmark-outline"></ion-icon>
-
-                <span>
-                  Cancelación flexible
-                </span>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </aside>
-
-      </div>
-
+  <!-- LIGHTBOX -->
+  @if (lightbox >= 0 && galeria.length) {
+    <div class="lb" role="dialog" aria-modal="true" aria-label="Galería de fotos" (click)="lightbox = -1">
+      <button type="button" class="lb-x" (click)="lightbox = -1" aria-label="Cerrar"><ion-icon name="close-outline"></ion-icon></button>
+      <button type="button" class="lb-n prev" (click)="$event.stopPropagation(); moverLightbox(-1)" aria-label="Anterior"><ion-icon name="chevron-back-outline"></ion-icon></button>
+      <img [src]="url(galeria[lightbox].url)" [alt]="galeria[lightbox].alt || hotel.nombre" (click)="$event.stopPropagation()" />
+      <button type="button" class="lb-n next" (click)="$event.stopPropagation(); moverLightbox(1)" aria-label="Siguiente"><ion-icon name="chevron-forward-outline"></ion-icon></button>
+      <span class="lb-c">{{ lightbox + 1 }} / {{ galeria.length }}</span>
     </div>
-
-  </section>
-
-</div>
+  }
+}

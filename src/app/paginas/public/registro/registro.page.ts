@@ -1,104 +1,60 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import {
-  personOutline,
-  mailOutline,
-  callOutline,
-  lockClosedOutline,
-  eyeOutline,
-  eyeOffOutline,
-  checkmarkCircleOutline,
-} from 'ionicons/icons';
+import { AuthService } from '@app/core/services/auth.service';
 
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonButton, IonIcon, RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './registro.page.html',
-  styleUrls: ['./registro.page.scss'],
+  styleUrls: ['../login/login.page.scss'],
 })
 export class RegistroPage {
-  fullName = '';
+  private auth = inject(AuthService);
+  private router = inject(Router);
+
+  nombre = '';
+  apellido = '';
   email = '';
-  phone = '';
   password = '';
-  confirmPassword = '';
+  cargando = false;
+  error = '';
 
-  acceptTerms = false;
-  marketing = false;
-
-  showPass = false;
-  showConfirm = false;
-
-  loading = false;
-  errorMsg = '';
-  successMsg = '';
-
-  constructor(private router: Router) {
-    addIcons({
-      personOutline,
-      mailOutline,
-      callOutline,
-      lockClosedOutline,
-      eyeOutline,
-      eyeOffOutline,
-      checkmarkCircleOutline,
-    });
+  get passwordDebil(): boolean {
+    return this.password.length > 0 && this.password.length < 8;
   }
 
-  togglePass() {
-    this.showPass = !this.showPass;
-  }
-
-  toggleConfirm() {
-    this.showConfirm = !this.showConfirm;
-  }
-
-  private validate(): string | null {
-    const name = this.fullName.trim();
-    const email = this.email.trim();
-
-    if (!name) return 'Ingresa tu nombre completo.';
-    if (name.length < 3) return 'El nombre es muy corto.';
-    if (!email) return 'Ingresa tu correo.';
-    if (!/^\S+@\S+\.\S+$/.test(email)) return 'Correo inválido.';
-
-    // teléfono opcional pero si lo llena, validamos algo básico
-    if (this.phone.trim() && this.phone.trim().length < 7) return 'Teléfono inválido.';
-
-    if (!this.password || this.password.length < 6) return 'La contraseña debe tener al menos 6 caracteres.';
-    if (this.password !== this.confirmPassword) return 'Las contraseñas no coinciden.';
-    if (!this.acceptTerms) return 'Debes aceptar los términos y condiciones.';
-    return null;
-  }
-
-  async onSubmit() {
-    this.errorMsg = '';
-    this.successMsg = '';
-
-    const err = this.validate();
-    if (err) {
-      this.errorMsg = err;
+  crear(): void {
+    this.error = '';
+    if (this.nombre.trim().length < 2 || this.apellido.trim().length < 2) {
+      this.error = 'Ingresa tu nombre y apellido.';
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(this.email)) {
+      this.error = 'Ingresa un correo válido.';
+      return;
+    }
+    if (this.password.length < 8) {
+      this.error = 'La contraseña debe tener al menos 8 caracteres.';
       return;
     }
 
-    this.loading = true;
-
-    // Luego conectamos API (auth.service/register)
-    // Simulación de registro:
-    setTimeout(() => {
-      this.loading = false;
-      this.successMsg = 'Cuenta creada (simulado). Ahora puedes iniciar sesión.';
-
-      // opcional: redirigir al login
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 700);
-    }, 700);
+    this.cargando = true;
+    const credenciales = { email: this.email.trim(), password: this.password };
+    this.auth
+      .register({ nombre: this.nombre.trim(), apellido: this.apellido.trim(), ...credenciales })
+      .subscribe({
+        // Tras registrarse, entra directamente.
+        next: () =>
+          this.auth.login(credenciales).subscribe({
+            next: () => this.router.navigateByUrl('/mis-reservas'),
+            error: () => this.router.navigateByUrl('/login'),
+          }),
+        error: (e) => {
+          this.cargando = false;
+          this.error = e?.error?.message ?? 'No se pudo crear la cuenta.';
+        },
+      });
   }
 }

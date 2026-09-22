@@ -1,329 +1,63 @@
-import {
-  HttpClient,
-  HttpParams,
-  HttpHeaders
-} from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
-import { Injectable }
-  from '@angular/core';
+type Params = Record<string, unknown>;
 
-import { Observable }
-  from 'rxjs';
-
-import { environment }
-  from 'src/environments/environment';
-
-type Params =
-  Record<string, any>;
-
-@Injectable({
-  providedIn: 'root',
-})
-
+/**
+ * Cliente HTTP delgado sobre la API. El token lo agrega el interceptor de autenticación.
+ * Acepta rutas relativas ('/hotels') o URLs completas (los endpoints ya traen la base).
+ */
+@Injectable({ providedIn: 'root' })
 export class ApiService {
+  private readonly baseUrl = environment.apiUrl;
 
-  private baseUrl =
-    environment.apiUrl;
+  constructor(private http: HttpClient) {}
 
-  constructor(
-    private http: HttpClient
-  ) {}
+  get<T>(endpoint: string, params?: Params): Observable<T> {
+    return this.http.get<T>(this.buildUrl(endpoint), { params: this.buildParams(params) });
+  }
 
+  post<T>(endpoint: string, body?: unknown, options?: { params?: Params }): Observable<T> {
+    return this.http.post<T>(this.buildUrl(endpoint), body ?? {}, {
+      params: this.buildParams(options?.params),
+    });
+  }
 
-  /*
-  |--------------------------------------------------------------------------
-  | GET
-  |--------------------------------------------------------------------------
-  */
+  put<T>(endpoint: string, body?: unknown, options?: { params?: Params }): Observable<T> {
+    return this.http.put<T>(this.buildUrl(endpoint), body ?? {}, {
+      params: this.buildParams(options?.params),
+    });
+  }
 
-  get<T>(
-    endpoint: string,
-    params?: Params
-  ): Observable<T> {
+  patch<T>(endpoint: string, body?: unknown, options?: { params?: Params }): Observable<T> {
+    return this.http.patch<T>(this.buildUrl(endpoint), body ?? {}, {
+      params: this.buildParams(options?.params),
+    });
+  }
 
-    const url =
-      this.buildUrl(endpoint);
+  delete<T>(endpoint: string, params?: Params): Observable<T> {
+    return this.http.delete<T>(this.buildUrl(endpoint), { params: this.buildParams(params) });
+  }
 
-    const httpParams =
-      this.buildParams(params);
+  private buildUrl(endpoint: string): string {
+    if (/^https?:\/\//i.test(endpoint)) return endpoint;
+    return `${this.baseUrl}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  }
 
-
-    console.log(
-      '[API GET]',
-      url
-    );
-
-    console.log(
-      '[API PARAMS]',
-      httpParams?.toString()
-    );
-
-    console.log(
-      '[API TOKEN]',
-      localStorage.getItem('token')
-        ? 'EXISTE'
-        : 'NO EXISTE'
-    );
-
-
-    return this.http.get<T>(
-      url,
-      {
-
-        params: httpParams,
-
-        headers:
-          this.buildHeaders(),
+  // Omite null/undefined/'' y serializa arrays como valores separados por coma.
+  private buildParams(params?: Params): HttpParams | undefined {
+    if (!params) return undefined;
+    let httpParams = new HttpParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value === null || value === undefined || value === '') continue;
+      if (Array.isArray(value)) {
+        if (value.length) httpParams = httpParams.set(key, value.join(','));
+      } else {
+        httpParams = httpParams.set(key, String(value));
       }
-    );
-  }
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | POST
-  |--------------------------------------------------------------------------
-  */
-
-  post<T>(
-    endpoint: string,
-    body?: any,
-    options?: {
-      params?: Params
     }
-  ): Observable<T> {
-
-    const url =
-      this.buildUrl(endpoint);
-
-
-    console.log(
-      '[API POST]',
-      url
-    );
-
-    console.log(
-      '[API BODY]',
-      body
-    );
-
-
-    return this.http.post<T>(
-
-      url,
-
-      body ?? {},
-
-      {
-
-        params:
-          this.buildParams(
-            options?.params
-          ),
-
-        headers:
-          this.buildHeaders(),
-      }
-    );
-  }
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | PUT
-  |--------------------------------------------------------------------------
-  */
-
-  put<T>(
-    endpoint: string,
-    body?: any,
-    options?: {
-      params?: Params
-    }
-  ): Observable<T> {
-
-    const url =
-      this.buildUrl(endpoint);
-
-
-    console.log(
-      '[API PUT]',
-      url
-    );
-
-    console.log(
-      '[API BODY]',
-      body
-    );
-
-
-    return this.http.put<T>(
-
-      url,
-
-      body ?? {},
-
-      {
-
-        params:
-          this.buildParams(
-            options?.params
-          ),
-
-        headers:
-          this.buildHeaders(),
-      }
-    );
-  }
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | DELETE
-  |--------------------------------------------------------------------------
-  */
-
-  delete<T>(
-    endpoint: string,
-    options?: {
-      params?: Params
-    }
-  ): Observable<T> {
-
-    const url =
-      this.buildUrl(endpoint);
-
-
-    console.log(
-      '[API DELETE]',
-      url
-    );
-
-
-    return this.http.delete<T>(
-      url,
-      {
-
-        params:
-          this.buildParams(
-            options?.params
-          ),
-
-        headers:
-          this.buildHeaders(),
-      }
-    );
-  }
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | URL BUILDER
-  |--------------------------------------------------------------------------
-  */
-
-  private buildUrl(
-    endpoint: string
-  ): string {
-
-    if (
-      endpoint.startsWith('http')
-    ) {
-      return endpoint;
-    }
-
-    return `${this.baseUrl}${endpoint}`;
-  }
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | PARAMS BUILDER
-  |--------------------------------------------------------------------------
-  */
-
-  private buildParams(
-    params?: Params
-  ): HttpParams | undefined {
-
-    if (!params) {
-      return undefined;
-    }
-
-    let httpParams =
-      new HttpParams();
-
-    Object.entries(params)
-      .forEach(
-
-        ([key, value]) => {
-
-          if (
-
-            value === null ||
-
-            value === undefined ||
-
-            value === ''
-
-          ) {
-            return;
-          }
-
-          httpParams =
-            httpParams.set(
-              key,
-              String(value)
-            );
-        }
-      );
-
     return httpParams;
   }
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | HEADERS
-  |--------------------------------------------------------------------------
-  */
-
-  private buildHeaders():
-    HttpHeaders {
-
-    const token =
-      localStorage.getItem(
-        'token'
-      );
-
-
-    console.log(
-      '[API HEADERS TOKEN]',
-      token
-        ? 'EXISTE'
-        : 'NO EXISTE'
-    );
-
-
-    let headers =
-      new HttpHeaders({
-
-        'Content-Type':
-          'application/json',
-      });
-
-
-    if (token) {
-
-      headers =
-        headers.set(
-          'Authorization',
-          `Bearer ${token}`
-        );
-    }
-
-
-    return headers;
-  }
-
 }

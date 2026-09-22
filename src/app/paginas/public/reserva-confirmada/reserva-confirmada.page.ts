@@ -1,127 +1,58 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { checkmarkCircleOutline } from 'ionicons/icons';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { IonIcon } from '@ionic/angular/standalone';
+import { AuthService } from '@app/core/services/auth.service';
+import { Reserva } from '@app/shared/models/marketplace.model';
+import { MoneyPipe } from '@app/shared/pipes/money.pipe';
+import { ETIQUETA_ESTADO, fechaLarga } from '@app/shared/utils/format';
 
 @Component({
   selector: 'app-reserva-confirmada',
   standalone: true,
-  imports: [CommonModule, IonButton, IonIcon, RouterLink],
+  imports: [RouterLink, IonIcon, MoneyPipe],
   templateUrl: './reserva-confirmada.page.html',
   styleUrls: ['./reserva-confirmada.page.scss'],
 })
-export class ReservaConfirmadaPage {
+export class ReservaConfirmadaPage implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private auth = inject(AuthService);
 
-  reservationCode = '';
+  reserva: Reserva | null = null;
+  codigo = '';
+  copiado = false;
+  readonly fechaLarga = fechaLarga;
+  readonly estados = ETIQUETA_ESTADO;
 
-  checkIn = '';
-  checkOut = '';
+  get logueado(): boolean {
+    return this.auth.estaLogueado();
+  }
 
-  adults = 2;
-  children = 0;
+  ngOnInit(): void {
+    this.codigo = this.route.snapshot.queryParamMap.get('codigo') ?? '';
+    // La reserva llega por el estado de navegación; si se recarga la página se pide el código+email.
+    const estado = (this.router.getCurrentNavigation()?.extras.state ?? history.state) as { reserva?: Reserva };
+    if (estado?.reserva) {
+      this.reserva = estado.reserva;
+      this.codigo = estado.reserva.codigo_reserva;
+    } else {
+      this.router.navigate(['/consultar-reserva'], { queryParams: { codigo: this.codigo || null }, replaceUrl: true });
+    }
+  }
 
-  guestName = '';
-  guestEmail = '';
-  guestPhone = '';
+  get whatsapp(): string | null {
+    const n = this.reserva?.hotel?.whatsapp?.replace(/\D/g, '');
+    return n ? `https://wa.me/${n}` : null;
+  }
 
-  roomId = 0;
-  room: any = null;
-
-  total = 0;
-
-  loading = true;
-
-  constructor(private route: ActivatedRoute) {
-
-    addIcons({ checkmarkCircleOutline });
-
-    this.route.queryParamMap.subscribe((qp) => {
-
-      // ================= DATOS =================
-      this.roomId = Number(qp.get('roomId') ?? 0);
-
-      this.checkIn = qp.get('checkIn') ?? '';
-      this.checkOut = qp.get('checkOut') ?? '';
-
-      this.adults = Number(qp.get('adults') ?? 2);
-      this.children = Number(qp.get('children') ?? 0);
-
-      this.guestName = qp.get('guestName') ?? '';
-      this.guestEmail = qp.get('guestEmail') ?? '';
-      this.guestPhone = qp.get('guestPhone') ?? '';
-
-      this.total = Number(qp.get('total') ?? 0);
-
-      this.reservationCode =
-        qp.get('code') ?? this.generateCode();
-
-      // 🔥 MOCK CONTROLADO (solo visual)
-      this.room = this.getRoomFallback(this.roomId);
-
-      this.loading = false;
+  copiar(): void {
+    navigator.clipboard?.writeText(this.codigo).then(() => {
+      this.copiado = true;
+      setTimeout(() => (this.copiado = false), 2000);
     });
   }
 
-  // ================= NOCHES =================
-  get nights(): number {
-
-    if (!this.checkIn || !this.checkOut) return 0;
-
-    const a = new Date(this.checkIn).getTime();
-    const b = new Date(this.checkOut).getTime();
-
-    const diff = b - a;
-
-    return diff > 0
-      ? Math.ceil(diff / (1000 * 60 * 60 * 24))
-      : 1;
+  imprimir(): void {
+    window.print();
   }
-
-  // ================= LABEL =================
-  get guestsLabel(): string {
-
-    let t = `${this.adults} adulto${this.adults !== 1 ? 's' : ''}`;
-
-    if (this.children > 0) {
-      t += ` · ${this.children} niño${this.children !== 1 ? 's' : ''}`;
-    }
-
-    return t;
-  }
-
-  // ================= FALLBACK VISUAL =================
-  private getRoomFallback(id: number) {
-
-    const rooms = [
-      {
-        id: 1,
-        name: 'Habitación Deluxe',
-        location: 'Casa Blanca · Salinas',
-        image: 'assets/img/1.PNG'
-      },
-      {
-        id: 2,
-        name: 'Suite Vista al Mar',
-        location: 'Malecón · Frente al mar',
-        image: 'assets/img/4.PNG'
-      },
-      {
-        id: 3,
-        name: 'Habitación Familiar',
-        location: 'Zona céntrica',
-        image: 'assets/img/9.PNG'
-      }
-    ];
-
-    return rooms.find(r => r.id === id) || rooms[0];
-  }
-
-  // ================= CODIGO =================
-  private generateCode(): string {
-    return 'CB-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-  }
-
 }

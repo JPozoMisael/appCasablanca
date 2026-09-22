@@ -1,0 +1,142 @@
+<div class="adm-page">
+  @if (error) { <div class="adm-msg err" role="alert">{{ error }}</div> }
+
+  @if (cargando) {
+    <div class="adm-empty">Cargando…</div>
+  } @else if (creada; as r) {
+    <div class="adm-card" style="text-align: center; padding: 30px 16px">
+      <h2 style="margin: 0 0 6px">Reserva registrada</h2>
+      <p style="color: var(--muted); margin: 0 0 14px">{{ r.cliente?.nombres }} {{ r.cliente?.apellidos }} · {{ fechaLarga(r.fecha_entrada) }} → {{ fechaLarga(r.fecha_salida) }}</p>
+      <div style="font-size: 30px; font-weight: 800; letter-spacing: 2px; font-family: ui-monospace, Consolas, monospace; color: var(--brand-primary)">{{ r.codigo_reserva }}</div>
+      <p style="margin: 10px 0 18px">Total <b>{{ r.precio_total | money }}</b> · <span class="adm-badge {{ r.estado === 'confirmada' ? 'ok' : 'warn' }}">{{ r.estado }}</span></p>
+      <div class="adm-toolbar" style="justify-content: center">
+        <a class="adm-btn" routerLink="/admin/reservas" [queryParams]="{ texto: r.codigo_reserva }">Ver reserva y registrar cobro</a>
+        <a class="adm-btn out" routerLink="/admin/calendario">Ir al calendario</a>
+        <button type="button" class="adm-btn out" (click)="otra()">Registrar otra</button>
+      </div>
+    </div>
+  } @else if (hotel) {
+    <!-- 1. Fechas y huéspedes -->
+    <div class="adm-card">
+      <h3>1. Fechas y huéspedes</h3>
+      <div class="adm-grid">
+        <label class="adm-field">Entrada <input type="date" [min]="hoy" [(ngModel)]="checkIn" name="ci" (ngModelChange)="alCambiarEntrada()" /></label>
+        <label class="adm-field"><span>Salida @if (noches) { <small>· {{ noches }} {{ noches === 1 ? 'noche' : 'noches' }}</small> }</span>
+          <input type="date" [min]="checkIn || hoy" [(ngModel)]="checkOut" name="co" (ngModelChange)="limpiarBusqueda()" />
+        </label>
+        <label class="adm-field">Adultos <input type="number" min="1" max="30" [(ngModel)]="adultos" name="ad" (ngModelChange)="limpiarBusqueda()" /></label>
+        <label class="adm-field">Niños <input type="number" min="0" max="20" [(ngModel)]="ninos" name="ni" (ngModelChange)="limpiarBusqueda()" /></label>
+      </div>
+      <div class="adm-toolbar" style="margin-top: 12px">
+        <button type="button" class="adm-btn" [disabled]="buscando" (click)="buscar()">{{ buscando ? 'Buscando…' : 'Ver disponibilidad' }}</button>
+        @if (habitacionFija) {
+          <span class="adm-badge info">Habitación {{ habitacionFija.numero_habitacion }}
+            @if (habitacionFija.tipoHabitacion) { · {{ habitacionFija.tipoHabitacion.nombre }} }</span>
+          <button type="button" class="adm-btn sm out" (click)="quitarHabitacionFija()">Elegir por tipo</button>
+        }
+      </div>
+    </div>
+
+    <!-- 2. Habitaciones -->
+    @if (disp) {
+      <div class="adm-card">
+        <h3>2. Habitaciones disponibles</h3>
+        @if (habitacionFija) {
+          <p style="margin: 0 0 8px">Se reservará la <b>habitación {{ habitacionFija.numero_habitacion }}</b>. Si no está libre esas fechas, el sistema avisará.</p>
+        } @else {
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead><tr><th>Tipo</th><th>Capacidad</th><th>Libres</th><th class="num">Precio de la estadía</th><th class="num">Cantidad</th></tr></thead>
+              <tbody>
+                @for (t of disp.habitaciones; track t.id) {
+                  <tr [style.opacity]="t.reservable ? 1 : .5">
+                    <td><b>{{ t.nombre }}</b></td>
+                    <td>{{ t.capacidad_maxima }}</td>
+                    <td>{{ t.disponibles }}</td>
+                    <td class="num">@if (t.precio_total !== null) { {{ t.precio_total | money }} <small>sin IVA</small> } @else { — }</td>
+                    <td class="num">
+                      @if (t.reservable) {
+                        <select class="adm-select" [ngModel]="seleccion[t.id] || 0" (ngModelChange)="elegir(t, $event)" [name]="'q' + t.id" [attr.aria-label]="'Cantidad de ' + t.nombre">
+                          @for (n of opciones(t); track n) { <option [ngValue]="n">{{ n }}</option> }
+                        </select>
+                      } @else { <small>Sin disponibilidad</small> }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+        @if (totalHabitaciones > 0 && capacidad < adultos + ninos) {
+          <p class="adm-msg err" style="margin-top: 10px">La capacidad elegida ({{ capacidad }}) es menor al número de huéspedes ({{ adultos + ninos }}).</p>
+        }
+      </div>
+    }
+
+    <!-- 3. Huésped -->
+    @if (cotizacion) {
+      <div class="adm-card">
+        <h3>3. Huésped</h3>
+        <div class="adm-toolbar" style="margin-bottom: 12px">
+          <button type="button" class="adm-btn sm {{ modoHuesped === 'nuevo' ? '' : 'out' }}" (click)="modoHuesped = 'nuevo'">Huésped nuevo</button>
+          @if (puedeBuscarHuespedes) {
+            <button type="button" class="adm-btn sm {{ modoHuesped === 'existente' ? '' : 'out' }}" (click)="modoHuesped = 'existente'">Ya se ha alojado aquí</button>
+          }
+        </div>
+
+        @if (modoHuesped === 'nuevo') {
+          <div class="adm-grid">
+            <label class="adm-field">Nombres <input [(ngModel)]="contacto.nombres" name="hn" autocomplete="off" /></label>
+            <label class="adm-field">Apellidos <input [(ngModel)]="contacto.apellidos" name="ha" autocomplete="off" /></label>
+            <label class="adm-field">Teléfono / WhatsApp <input type="tel" [(ngModel)]="contacto.telefono" name="ht" autocomplete="off" /></label>
+            <label class="adm-field">Correo <span style="font-weight: 400">(opcional)</span> <input type="email" [(ngModel)]="contacto.email" name="he" autocomplete="off" /></label>
+          </div>
+          <p class="adm-empty" style="padding: 8px 0 0; text-align: left">Basta con el nombre y un teléfono o un correo.</p>
+        } @else {
+          @if (clienteElegido; as c) {
+            <div class="adm-msg ok">{{ c.nombres }} {{ c.apellidos }} · {{ c.telefono || c.email }}
+              <button type="button" class="adm-btn sm out" style="margin-left: 10px" (click)="clienteElegido = null">Cambiar</button></div>
+          } @else {
+            <input class="adm-input" [(ngModel)]="busqueda" name="bq" (ngModelChange)="buscarHuesped()" placeholder="Buscar por nombre, correo o documento" style="width: 100%; max-width: 420px" aria-label="Buscar huésped" />
+            @for (c of resultados; track c.id) {
+              <div class="adm-toolbar" style="padding: 6px 0; border-bottom: 1px solid var(--border-2)">
+                <span><b>{{ c.nombres }} {{ c.apellidos }}</b> <small>{{ c.telefono }} {{ c.email }}</small></span>
+                <button type="button" class="adm-btn sm" style="margin-left: auto" (click)="elegirCliente(c)">Elegir</button>
+              </div>
+            }
+          }
+        }
+      </div>
+
+      <!-- 4. Confirmación -->
+      <div class="adm-card">
+        <h3>4. Detalles y confirmación</h3>
+        <div class="adm-grid">
+          <label class="adm-field">Cómo llegó la reserva
+            <select [(ngModel)]="canal" name="cn"><option value="telefono">Teléfono</option><option value="whatsapp">WhatsApp</option><option value="recepcion">En recepción</option></select>
+          </label>
+          <label class="adm-field">Estado
+            <select [(ngModel)]="estadoInicial" name="es"><option value="confirmada">Confirmada</option><option value="pendiente">Pendiente (aún sin confirmar)</option></select>
+          </label>
+        </div>
+        <label class="adm-field" style="margin-top: 12px">Observaciones <textarea rows="2" [(ngModel)]="observaciones" name="ob" maxlength="500" placeholder="Hora de llegada, cuna, pedidos especiales…"></textarea></label>
+
+        <div class="adm-table-wrap" style="margin-top: 14px">
+          <table class="adm-table">
+            <tbody>
+              @for (h of cotizacion.habitaciones; track $index) {
+                <tr><td>{{ h.tipo }} · {{ cotizacion.noches }} {{ cotizacion.noches === 1 ? 'noche' : 'noches' }}</td><td class="num">{{ h.subtotal | money }}</td></tr>
+              }
+              <tr><td>IVA ({{ cotizacion.iva_porcentaje }} %)</td><td class="num">{{ cotizacion.impuestos | money }}</td></tr>
+              <tr><td><b>Total</b></td><td class="num"><b>{{ cotizacion.total | money }}</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="adm-actions" style="display: flex; justify-content: flex-end; margin-top: 14px">
+          <button type="button" class="adm-btn ok" [disabled]="!puedeConfirmar" (click)="confirmar()">{{ enviando ? 'Registrando…' : 'Registrar reserva' }}</button>
+        </div>
+      </div>
+    }
+  }
+</div>

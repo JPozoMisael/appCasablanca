@@ -1,166 +1,126 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router';
-import { IonApp, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd } from '@angular/router';
+import { IonApp, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  gridOutline,
-  calendarOutline,
-  bedOutline,
-  peopleOutline,
-  analyticsOutline,
-  logOutOutline,
-  clipboardOutline,
-  shieldCheckmarkOutline,
-  personCircleOutline,
-  menuOutline,
-  businessOutline,
-  pricetagOutline,
-  restaurantOutline,
-  cardOutline,
-  settingsOutline,
-  swapHorizontalOutline,
-  closeOutline, ellipseOutline } from 'ionicons/icons';
+  gridOutline, calendarOutline, bedOutline, peopleOutline, analyticsOutline, logOutOutline, clipboardOutline,
+  shieldCheckmarkOutline, personCircleOutline, menuOutline, businessOutline, pricetagOutline, restaurantOutline,
+  cardOutline, settingsOutline, swapHorizontalOutline, closeOutline, ellipseOutline, storefrontOutline, globeOutline, syncOutline, addCircleOutline,
+} from 'ionicons/icons';
+import { AuthService } from '@app/core/services/auth.service';
+import { GestionService, HotelPerfil } from '@app/core/services/gestion.service';
+import { HotelScopeService } from '@app/core/services/hotel-scope.service';
+import { MenuService } from '@app/core/services/menu.service';
+
+const TITULOS: Record<string, [string, string]> = {
+  '/admin/dashboard': ['Resumen', 'Lo que pasa hoy en tu alojamiento'],
+  '/admin/reservas': ['Reservas', 'Confirma, registra llegadas, salidas y cobros'],
+  '/admin/habitaciones': ['Habitaciones y precios', 'Tipos de habitación, unidades y tarifa base'],
+  '/admin/mi-hotel': ['Mi alojamiento', 'Ficha pública, fotos, servicios y políticas'],
+  '/admin/hoteles': ['Alojamientos de la plataforma', 'Registro, aprobación y comisiones'],
+  '/admin/checkin-out': ['Check-in / Check-out', 'Registro de huéspedes'],
+  '/admin/tarifas': ['Tarifas', 'Precios y temporadas'],
+  '/admin/servicios': ['Servicios', 'Servicios adicionales'],
+  '/admin/huespedes': ['Huéspedes', 'Historial de huéspedes'],
+  '/admin/pagos': ['Pagos', 'Cobros registrados'],
+  '/admin/reportes': ['Reportes', 'Estadísticas'],
+  '/admin/usuarios': ['Personal', 'Usuarios del alojamiento'],
+  '/admin/configuracion': ['Configuración', 'Ajustes'],
+  '/admin/calendario': ['Calendario', 'Ocupación por habitación y día'],
+  '/admin/nueva-reserva': ['Nueva reserva', 'Reservas por teléfono, WhatsApp o mostrador'],
+  '/admin/canales': ['Canales de venta', 'Conexión con SiteMinder / Little Hotelier'],
+  '/admin/roles': ['Roles y permisos', 'Quién puede hacer qué, y el menú de cada rol'],
+};
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    IonApp,
-    IonButton,
-    IonIcon,
-  ],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, IonApp, IonIcon],
   templateUrl: './admin-layout.component.html',
   styleUrls: ['./admin-layout.component.scss'],
 })
 export class AdminLayoutComponent implements OnInit {
+  private router = inject(Router);
+  private gestion = inject(GestionService);
+  readonly auth = inject(AuthService);
+  readonly scope = inject(HotelScopeService);
+  readonly menu = inject(MenuService);
+
   sidebarCollapsed = false;
   mobileMenuOpen = false;
-  userName = 'Administrador';
-  userEmail = 'admin@hotel.com';
-  userRole = 'Super Administrador';
-  userInitials = 'AD';
-  isSuperAdmin = true;
-  role = '';
-  isAdmin = false;
-  isRecepcion = false;
+  pageTitle = 'Resumen';
+  pageSubtitle = '';
+  hotelNombre = '';
+  hoteles: HotelPerfil[] = [];
 
-  pageTitle = 'Dashboard';
-  pageSubtitle = 'Resumen general del hotel';
-
-  constructor(private router: Router) {
-    addIcons({businessOutline,gridOutline,calendarOutline,clipboardOutline,swapHorizontalOutline,ellipseOutline,bedOutline,pricetagOutline,restaurantOutline,peopleOutline,cardOutline,analyticsOutline,shieldCheckmarkOutline,settingsOutline,logOutOutline,menuOutline,personCircleOutline,closeOutline});
-
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.updatePageTitle(event.urlAfterRedirects);
-        this.closeMobileMenu();
+  constructor() {
+    addIcons({
+      gridOutline, calendarOutline, bedOutline, peopleOutline, analyticsOutline, logOutOutline, clipboardOutline,
+      shieldCheckmarkOutline, personCircleOutline, menuOutline, businessOutline, pricetagOutline, restaurantOutline,
+      cardOutline, settingsOutline, swapHorizontalOutline, closeOutline, ellipseOutline, storefrontOutline, globeOutline, syncOutline, addCircleOutline,
+    });
+    this.router.events.subscribe((e) => {
+      if (e instanceof NavigationEnd) {
+        this.actualizarTitulo(e.urlAfterRedirects);
+        this.mobileMenuOpen = false;
       }
     });
   }
 
-  ngOnInit() {
-    this.loadUserData();
-    this.checkScreenSize();
+  get rol(): string {
+    return this.auth.usuario()?.rol ?? '';
   }
 
-  loadUserData() {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        this.userName = (user.nombre + ' ' + user.apellido) || 'Administrador';
-        this.userEmail = user.email || 'admin@hotel.com';
-        this.userRole = this.getRoleLabel(user.rol);
-        this.userInitials = (user.nombre?.charAt(0) || 'A') + (user.apellido?.charAt(0) || 'D');
-        this.isSuperAdmin = user.rol === 'super_admin';
-        this.isAdmin = user.rol === 'admin';
-        this.isRecepcion = user.rol === 'recepcion';
-        this.role = user.rol;
-      } catch (e) {
-        console.error('Error parsing user', e);
-      }
+  get etiquetaRol(): string {
+    return this.rol.replace(/_/g, ' ');
+  }
+
+  get nombreUsuario(): string {
+    const u = this.auth.usuario();
+    return `${u?.nombre ?? ''} ${u?.apellido ?? ''}`.trim() || 'Usuario';
+  }
+
+  ngOnInit(): void {
+    this.actualizarTitulo(this.router.url);
+    void this.menu.asegurarCargado();
+    if (this.auth.esSuperAdmin()) {
+      this.gestion.hoteles({ limit: 100 }).subscribe({
+        next: (r) => {
+          this.hoteles = r.data;
+          this.hotelNombre = this.hoteles.find((h) => h.id === this.scope.get())?.nombre ?? '';
+        },
+        error: () => undefined,
+      });
+    } else if (this.auth.usuario()?.hotel_id) {
+      this.gestion.perfil().subscribe({ next: (h) => (this.hotelNombre = h.nombre), error: () => undefined });
     }
   }
 
-  getRoleLabel(rol: string): string {
-    const roles: Record<string, string> = {
-      super_admin: 'Super Administrador',
-      admin: 'Administrador',
-      recepcion: 'Recepcionista',
-      cliente: 'Cliente'
-    };
-    return roles[rol] || 'Usuario';
+  private actualizarTitulo(url: string): void {
+    const clave = Object.keys(TITULOS).find((k) => url.startsWith(k)) ?? '/admin/dashboard';
+    [this.pageTitle, this.pageSubtitle] = TITULOS[clave];
   }
 
-  canAccess(...roles: string[]): boolean {
-    return roles.includes(this.role);
-  }
-  updatePageTitle(url: string) {
-    const titles: Record<string, { title: string; subtitle: string }> = {
-      '/admin/dashboard': { title: 'Dashboard', subtitle: 'Resumen general del hotel' },
-      '/admin/calendario': { title: 'Calendario', subtitle: 'Disponibilidad y ocupación' },
-      '/admin/reservas': { title: 'Reservas', subtitle: 'Gestión de reservas' },
-      '/admin/checkin-out': { title: 'Check-in / Check-out', subtitle: 'Registro de huéspedes' },
-      '/admin/habitaciones': { title: 'Habitaciones', subtitle: 'Gestión de habitaciones' },
-      '/admin/tarifas': { title: 'Tarifas', subtitle: 'Precios y temporadas' },
-      '/admin/servicios': { title: 'Servicios', subtitle: 'Servicios adicionales' },
-      '/admin/huespedes': { title: 'Huéspedes', subtitle: 'Historial de huéspedes' },
-      '/admin/pagos': { title: 'Pagos', subtitle: 'Facturación y pagos' },
-      '/admin/reportes': { title: 'Reportes', subtitle: 'Estadísticas y reportes' },
-      '/admin/usuarios': { title: 'Usuarios', subtitle: 'Gestión de usuarios' },
-      '/admin/configuracion': { title: 'Configuración', subtitle: 'Ajustes del sistema' }
-    };
-    const current = titles[url] || titles['/admin/dashboard'];
-    this.pageTitle = current.title;
-    this.pageSubtitle = current.subtitle;
+  /** super_admin: elige el alojamiento sobre el que trabaja; recarga para que todo el panel use el nuevo alcance. */
+  cambiarHotel(valor: string): void {
+    this.scope.set(valor ? Number(valor) : null);
+    window.location.reload();
   }
 
-  onRouteActivate(component: any) {
-    if (component?.title) {
-      this.pageTitle = component.title;
-      this.pageSubtitle = component.subtitle || '';
-    }
-  }
-
-  toggleSidebar() {
-    if (window.innerWidth <= 768) {
-      this.mobileMenuOpen = !this.mobileMenuOpen;
-    } else {
-      this.sidebarCollapsed = !this.sidebarCollapsed;
-    }
-  }
-
-  toggleMobileMenu() {
-    this.mobileMenuOpen = !this.mobileMenuOpen;
-  }
-
-  closeMobileMenu() {
-    this.mobileMenuOpen = false;
-  }
-
-  checkScreenSize() {
-    if (window.innerWidth <= 768) {
-      this.sidebarCollapsed = false;
-      this.mobileMenuOpen = false;
-    } else {
-      this.mobileMenuOpen = false;
-      this.sidebarCollapsed = false;
-    }
+  toggleSidebar(): void {
+    if (window.innerWidth <= 768) this.mobileMenuOpen = !this.mobileMenuOpen;
+    else this.sidebarCollapsed = !this.sidebarCollapsed;
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    this.auth.logout();
+    this.scope.set(null);
     this.router.navigate(['/login']);
   }
 
   @HostListener('window:resize')
-  onResize() {
-    this.checkScreenSize();
+  onResize(): void {
+    this.mobileMenuOpen = false;
   }
 }

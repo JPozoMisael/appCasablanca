@@ -1,239 +1,114 @@
-<div class="rv">
+<div class="adm-page">
+  @if (mensaje) { <div class="adm-msg ok" role="status">{{ mensaje }}</div> }
+  @if (error) { <div class="adm-msg err" role="alert">{{ error }} <button type="button" class="adm-btn sm out" (click)="error = ''">Cerrar</button></div> }
 
-  <!-- =====================================================
-       TOP BAR
-  ====================================================== -->
-  <div class="rv-top">
-    <div class="title">
-      <span class="eyebrow">HOTEL CASA BLANCA</span>
-      <h2>Gestión de reservas</h2>
-      <p>Crear, editar y controlar estados (pendiente, confirmada, check-in, check-out).</p>
-    </div>
+  <form class="adm-toolbar" (ngSubmit)="filtrar()">
+    <input class="adm-input" name="texto" [(ngModel)]="texto" placeholder="Código, nombre o correo" aria-label="Buscar" />
+    <select class="adm-select" name="estado" [(ngModel)]="estado" (ngModelChange)="filtrar()" aria-label="Estado">
+      <option value="">Todos los estados</option>
+      @for (o of opcionesEstado; track o.v) { <option [value]="o.v">{{ o.t }}</option> }
+    </select>
+    <label class="adm-check">Desde <input class="adm-input" type="date" name="desde" [(ngModel)]="desde" (ngModelChange)="filtrar()" /></label>
+    <label class="adm-check">Hasta <input class="adm-input" type="date" name="hasta" [(ngModel)]="hasta" (ngModelChange)="filtrar()" /></label>
+    <button type="submit" class="adm-btn">Buscar</button>
+  </form>
 
-    <div class="actions">
-      <button class="primary-btn" (click)="openCreate()">
-        <ion-icon name="add-circle-outline"></ion-icon>
-        Nueva reserva
-      </button>
-    </div>
-  </div>
-
-  <!-- =====================================================
-       KPIs
-  ====================================================== -->
-  <div class="kpis">
-    <div class="kpi-card today">
-      <div class="kpi-icon">
-        <ion-icon name="calendar-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Movimientos hoy</span>
-        <strong>{{ reservasHoy() }}</strong>
-        <small>Entradas y salidas</small>
-      </div>
-    </div>
-
-    <div class="kpi-card checkin">
-      <div class="kpi-icon">
-        <ion-icon name="log-in-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Check-in</span>
-        <strong>{{ checkinHoy() }}</strong>
-        <small>Entradas hoy</small>
-      </div>
-    </div>
-
-    <div class="kpi-card checkout">
-      <div class="kpi-icon">
-        <ion-icon name="log-out-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Check-out</span>
-        <strong>{{ checkoutHoy() }}</strong>
-        <small>Salidas hoy</small>
-      </div>
-    </div>
-
-    <div class="kpi-card upcoming">
-      <div class="kpi-icon">
-        <ion-icon name="time-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Próximas</span>
-        <strong>{{ proximas() }}</strong>
-        <small>Entradas futuras</small>
-      </div>
-    </div>
-  </div>
-
-  <!-- Loading State -->
-  <div *ngIf="loading()" class="loading-state">
-    <ion-icon name="refresh-outline" class="spinner"></ion-icon>
-    <p>Cargando reservas...</p>
-  </div>
-
-  <!-- =====================================================
-       FILTERS
-  ====================================================== -->
-  <div class="filters-card" *ngIf="!loading()">
-    <div class="search-box">
-      <ion-icon name="search-outline"></ion-icon>
-      <input type="text" placeholder="Buscar: código, huésped, documento, habitación…"
-             [value]="q()" (input)="q.set(($any($event.target).value || ''))">
-    </div>
-
-    <div class="filter-group">
-      <div class="select-box">
-        <label>Estado</label>
-        <select [value]="fEstado()" (change)="setEstadoFilter(($any($event.target).value))">
-          <option value="TODOS">Todos</option>
-          <option value="PENDIENTE">Pendiente</option>
-          <option value="CONFIRMADA">Confirmada</option>
-          <option value="CHECKIN">Check-in</option>
-          <option value="CHECKOUT">Check-out</option>
-          <option value="CANCELADA">Cancelada</option>
-        </select>
-      </div>
-
-      <div class="date-box">
-        <label>Desde</label>
-        <input type="date" [value]="fDesde()" (input)="fDesde.set(($any($event.target).value || ''))">
-      </div>
-
-      <div class="date-box">
-        <label>Hasta</label>
-        <input type="date" [value]="fHasta()" (input)="fHasta.set(($any($event.target).value || ''))">
-      </div>
-    </div>
-  </div>
-
-  <!-- =====================================================
-       TABLE CARD
-  ====================================================== -->
-  <div class="table-card" *ngIf="!loading()">
-    <div class="table-head">
-      <div>
-        <h3>Listado de reservas</h3>
-        <p>{{ filtradas().length }} resultado(s)</p>
-      </div>
-      <div class="table-head-actions">
-        <button class="mini-btn" (click)="exportData()">
-          <ion-icon name="download-outline"></ion-icon>
-          Exportar CSV
-        </button>
-      </div>
-    </div>
-
-    <div class="table-wrapper">
-      <table class="reservas-table">
+  @if (cargando) {
+    <div class="adm-empty">Cargando…</div>
+  } @else if (!reservas.length) {
+    <div class="adm-card adm-empty">No hay reservas con esos filtros.</div>
+  } @else {
+    <div class="adm-table-wrap">
+      <table class="adm-table">
         <thead>
-          <tr>
-            <th>Código</th>
-            <th>Huésped</th>
-            <th>Habitación</th>
-            <th>Fechas</th>
-            <th>Total</th>
-            <th>Estado</th>
-            <th class="actions-col">Acciones</th>
-          </tr>
+          <tr><th>Código</th><th>Huésped</th><th>Estadía</th><th>Habitaciones</th><th>Estado</th><th class="num">Total</th><th></th></tr>
         </thead>
         <tbody>
-          <tr *ngFor="let r of filtradas()">
-            <td class="mono">{{ r.codigo || ('#' + r.id) }}</td>
-            <td class="guest-cell">
-              <div class="guest-info">
-                <div class="guest-avatar">{{ getInitials(r.huesped) }}</div>
-                <div class="guest-details">
-                  <strong>{{ r.huesped }}</strong>
-                  <span>{{ r.documento || 'Sin documento' }}</span>
+          @for (r of reservas; track r.id) {
+            <tr>
+              <td><a href="javascript:void(0)" (click)="abrir(r)"><b>{{ r.codigo_reserva }}</b></a><br /><small>{{ r.canal }}</small></td>
+              <td>{{ r.cliente?.nombres }} {{ r.cliente?.apellidos }}<br /><small>{{ r.cliente?.email }}</small></td>
+              <td>{{ fechaCorta(r.fecha_entrada) }} → {{ fechaCorta(r.fecha_salida) }}</td>
+              <td>{{ habitaciones(r) }}</td>
+              <td><span class="adm-badge {{ estados[r.estado].color }}">{{ estados[r.estado].texto }}</span></td>
+              <td class="num">{{ r.precio_total | money }}</td>
+              <td>
+                <div class="acc">
+                  @for (a of acciones(r); track a.a) {
+                    <button type="button" class="adm-btn sm {{ a.cls }}" [disabled]="procesando" (click)="ejecutar(r, a.a)">{{ a.t }}</button>
+                  }
+                  <button type="button" class="adm-btn sm out" (click)="abrir(r)">Ver</button>
                 </div>
-              </div>
-            </td>
-            <td class="room-cell">
-              <ion-icon name="bed-outline"></ion-icon>
-              <span>{{ r.habitacion }}</span>
-            </td>
-            <td class="dates-cell">
-              <ion-icon name="calendar-outline"></ion-icon>
-              <span>{{ formatDate(r.fechaEntrada) }} → {{ formatDate(r.fechaSalida) }}</span>
-            </td>
-            <td class="money">${{ r.total | number }}</td>
-            <td>
-              <div class="status-badge" [class]="getEstadoClass(r.estado)">
-                {{ formatEstado(r.estado) }}
-              </div>
-            </td>
-            <td class="actions-col">
-              <div class="table-actions">
-                <button class="icon-btn" title="Ver detalles" (click)="openDetail(r)">
-                  <ion-icon name="eye-outline"></ion-icon>
-                </button>
-                <button class="icon-btn" title="Editar" (click)="openEdit(r)">
-                  <ion-icon name="create-outline"></ion-icon>
-                </button>
-                <button class="icon-btn" title="Cambiar estado" (click)="cycleEstado(r)">
-                  <ion-icon name="sync-outline"></ion-icon>
-                </button>
-                <button class="icon-btn danger" title="Cancelar reserva" (click)="confirmCancel(r)">
-                  <ion-icon name="close-circle-outline"></ion-icon>
-                </button>
-              </div>
-            </td>
-          </tr>
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>
-  </div>
 
-  <!-- =====================================================
-       MODAL
-  ====================================================== -->
-  <div class="modal-backdrop" *ngIf="modalOpen()" (click)="closeModal()"></div>
-  <div class="modal" *ngIf="modalOpen()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-head">
-        <div>
-          <span class="modal-tag">HOTEL CASA BLANCA</span>
-          <h3>{{ modalMode() === 'create' ? 'Nueva reserva' : 'Editar reserva' }}</h3>
-          <p>Datos principales de la reserva</p>
-        </div>
-        <button class="close-btn" (click)="closeModal()">
-          <ion-icon name="close-outline"></ion-icon>
-        </button>
+    @if (paginas.length > 1) {
+      <div class="adm-toolbar">
+        @for (p of paginas; track p) {
+          <button type="button" class="adm-btn sm" [class.out]="p !== meta?.page" (click)="irA(p)">{{ p }}</button>
+        }
+        <span>{{ meta?.total }} reservas</span>
+      </div>
+    }
+  }
+</div>
+
+@if (detalle; as d) {
+  <div class="adm-modal" role="dialog" aria-modal="true" aria-label="Detalle de reserva" (click)="detalle = null">
+    <div class="adm-dialog" (click)="$event.stopPropagation()">
+      <h3>Reserva {{ d.codigo_reserva }} <span class="adm-badge {{ estados[d.estado].color }}">{{ estados[d.estado].texto }}</span></h3>
+
+      <div class="adm-grid">
+        <div><small>Huésped</small><br /><b>{{ d.cliente?.nombres }} {{ d.cliente?.apellidos }}</b><br />{{ d.cliente?.email }}<br />{{ d.cliente?.telefono }}</div>
+        <div><small>Entrada</small><br /><b>{{ fechaLarga(d.fecha_entrada) }}</b><br /><small>Salida</small><br /><b>{{ fechaLarga(d.fecha_salida) }}</b></div>
+        <div><small>Huéspedes</small><br /><b>{{ d.num_huespedes }}</b><br /><small>Canal</small><br /><b>{{ d.canal }}</b></div>
       </div>
 
-      <div class="modal-body">
-        <div class="form-grid">
-          <div class="field"><label>Huésped *</label><input type="text" placeholder="Nombre completo" [value]="form().huesped" (input)="patch('huesped', ($any($event.target).value || ''))"></div>
-          <div class="field"><label>Documento</label><input type="text" placeholder="Cédula / pasaporte" [value]="form().documento || ''" (input)="patch('documento', ($any($event.target).value || ''))"></div>
-          <div class="field"><label>Habitación *</label>
-            <select [value]="form().habitacion" (change)="onHabitacionChange($event)">
-              <option *ngFor="let h of habitaciones()" [value]="h.nombre">{{ h.nombre }}</option>
-            </select>
-          </div>
-          <div class="field"><label>Estado</label>
-            <select [value]="form().estado" (change)="patch('estado', $any($event.target).value)">
-              <option value="PENDIENTE">Pendiente</option>
-              <option value="CONFIRMADA">Confirmada</option>
-              <option value="CHECKIN">Check-in</option>
-              <option value="CHECKOUT">Check-out</option>
-              <option value="CANCELADA">Cancelada</option>
-            </select>
-          </div>
-          <div class="field"><label>Fecha entrada *</label><input type="date" [value]="form().fechaEntrada" (input)="patch('fechaEntrada', ($any($event.target).value || ''))"></div>
-          <div class="field"><label>Fecha salida *</label><input type="date" [value]="form().fechaSalida" (input)="patch('fechaSalida', ($any($event.target).value || ''))"></div>
-          <div class="field"><label>Total ($)</label><input type="number" min="0" step="0.01" [value]="form().total" (input)="patch('total', +($any($event.target).value || 0))"></div>
-          <div class="field"><label>Anticipo ($)</label><input type="number" min="0" step="0.01" [value]="form().anticipo || 0" (input)="patch('anticipo', +($any($event.target).value || 0))"></div>
-          <div class="field full"><label>Notas</label><textarea rows="3" placeholder="Observaciones..." [value]="form().notas || ''" (input)="patch('notas', ($any($event.target).value || ''))"></textarea></div>
-        </div>
+      @if (d.observaciones) { <p><small>Observaciones:</small> {{ d.observaciones }}</p> }
+
+      <div class="adm-table-wrap" style="margin-top: 12px">
+        <table class="adm-table">
+          <thead><tr><th>Concepto</th><th class="num">Importe</th></tr></thead>
+          <tbody>
+            @for (x of d.detalles; track x.id) {
+              <tr><td>Hab. {{ x.habitacion?.numero_habitacion }} · {{ x.habitacion?.tipoHabitacion?.nombre }} · {{ x.noches }} noche(s)</td><td class="num">{{ x.subtotal | money }}</td></tr>
+            }
+            @for (s of d.servicios; track s.id) {
+              <tr><td>{{ s.servicio?.nombre }} × {{ s.cantidad }}</td><td class="num">{{ s.subtotal | money }}</td></tr>
+            }
+            <tr><td>Impuestos</td><td class="num">{{ d.impuestos | money }}</td></tr>
+            <tr><td><b>Total</b></td><td class="num"><b>{{ d.precio_total | money }}</b></td></tr>
+            <tr><td>Pagado</td><td class="num">{{ d.pagado | money }}</td></tr>
+            <tr><td><b>Saldo</b></td><td class="num"><b>{{ d.saldo | money }}</b></td></tr>
+          </tbody>
+        </table>
       </div>
 
-      <div class="modal-foot">
-        <button class="cancel-btn" (click)="closeModal()">Cancelar</button>
-        <button class="save-btn" (click)="save()">{{ modalMode() === 'create' ? 'Crear reserva' : 'Guardar cambios' }}</button>
+      @if (puedeCobrar && d.saldo > 0 && d.estado !== 'cancelada' && d.estado !== 'no_show') {
+        <h3 style="margin-top: 16px">Registrar cobro</h3>
+        <div class="adm-toolbar">
+          <input class="adm-input" type="number" min="0.01" step="0.01" [(ngModel)]="monto" name="monto" placeholder="Monto" aria-label="Monto" style="width: 120px" />
+          <select class="adm-select" [(ngModel)]="metodo" name="metodo" aria-label="Método de pago">
+            <option value="efectivo">Efectivo</option>
+            <option value="transferencia">Transferencia</option>
+            <option value="tarjeta">Tarjeta</option>
+            <option value="deposito">Depósito</option>
+          </select>
+          <input class="adm-input" [(ngModel)]="referencia" name="ref" placeholder="Referencia (opcional)" aria-label="Referencia" />
+          <button type="button" class="adm-btn ok" [disabled]="!monto || procesando" (click)="cobrar()">Cobrar</button>
+        </div>
+      }
+
+      <div class="adm-actions">
+        @for (a of acciones(d); track a.a) {
+          <button type="button" class="adm-btn {{ a.cls }}" [disabled]="procesando" (click)="ejecutar(d, a.a)">{{ a.t }}</button>
+        }
+        <button type="button" class="adm-btn out" (click)="detalle = null">Cerrar</button>
       </div>
     </div>
   </div>
-
-</div>
+}

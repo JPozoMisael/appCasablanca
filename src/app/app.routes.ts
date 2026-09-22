@@ -1,626 +1,163 @@
 import { Routes } from '@angular/router';
-
-import { authGuard }
-  from './core/guards/auth.guard';
-
-import { adminGuard }
-  from './core/guards/admin.guard';
-
-import { roleGuard }
-  from './core/guards/role.guard';
+import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
+import { menuGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-
+  /* =====================================================
+     SITIO PÚBLICO (marketplace)
+  ===================================================== */
   {
     path: '',
-
-    loadComponent: async () => {
-
-      console.log(
-        '[ROUTE] Public Layout'
-      );
-
-      return import(
-        './layouts/public-layout/public-layout.component'
-      ).then(
-        m => m.PublicLayoutComponent
-      );
-    },
-
+    loadComponent: () =>
+      import('./layouts/public-layout/public-layout.component').then((m) => m.PublicLayoutComponent),
     children: [
-
-      {
-        path: '',
-        redirectTo: 'inicio',
-        pathMatch: 'full'
-      },
+      { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       {
         path: 'inicio',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Inicio'
-          );
-
-          return import(
-            './paginas/public/inicio/inicio.page'
-          ).then(
-            m => m.InicioPage
-          );
-        },
+        title: 'Salinas Booking · Hoteles y alojamientos en Salinas',
+        loadComponent: () => import('./paginas/public/inicio/inicio.page').then((m) => m.InicioPage),
       },
-
-
-      // ===============================================
-      // HOTEL
-      // ===============================================
-
+      {
+        path: 'buscar',
+        title: 'Alojamientos en Salinas · Salinas Booking',
+        loadComponent: () => import('./paginas/public/buscar/buscar.page').then((m) => m.BuscarPage),
+      },
       {
         path: 'hotel/:slug',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Hotel'
-          );
-
-          return import(
-            './paginas/public/hotel/hotel.page'
-          ).then(
-            m => m.HotelPage
-          );
-        },
+        title: 'Alojamiento · Salinas Booking',
+        loadComponent: () => import('./paginas/public/hotel/hotel.page').then((m) => m.HotelPage),
       },
-
-
-      // ===============================================
-      // HABITACIONES
-      // ===============================================
-
-      {
-        path: 'hotel/:slug/habitaciones',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Habitaciones Public'
-          );
-
-          return import(
-            './paginas/public/habitaciones/habitaciones.page'
-          ).then(
-            m => m.HabitacionesPage
-          );
-        },
-      },
-
-
-      // ===============================================
-      // DETALLE HABITACION
-      // ===============================================
-
-      {
-        path: 'hotel/:slug/habitacion/:id',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Habitacion Detalle'
-          );
-
-          return import(
-            './paginas/public/habitacion-detalle/habitacion-detalle.page'
-          ).then(
-            m => m.HabitacionDetallePage
-          );
-        },
-      },
-
-
-      // ===============================================
-      // RESERVAR
-      // ===============================================
-
+      // Rutas antiguas del sistema de un solo hotel
+      { path: 'hotel/:slug/habitaciones', redirectTo: 'hotel/:slug' },
+      { path: 'hotel/:slug/habitacion/:id', redirectTo: 'hotel/:slug' },
       {
         path: 'reservar',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Reservar'
-          );
-
-          return import(
-            './paginas/public/reservar/reservar.page'
-          ).then(
-            m => m.ReservarPage
-          );
-        },
+        title: 'Confirmar reserva · Salinas Booking',
+        loadComponent: () => import('./paginas/public/reservar/reservar.page').then((m) => m.ReservarPage),
       },
-
-
-      // ===============================================
-      // LOGIN
-      // ===============================================
-
+      {
+        path: 'reserva-confirmada',
+        title: 'Reserva confirmada · Salinas Booking',
+        loadComponent: () =>
+          import('./paginas/public/reserva-confirmada/reserva-confirmada.page').then((m) => m.ReservaConfirmadaPage),
+      },
+      {
+        path: 'consultar-reserva',
+        title: 'Consultar reserva · Salinas Booking',
+        loadComponent: () =>
+          import('./paginas/public/consultar-reserva/consultar-reserva.page').then((m) => m.ConsultarReservaPage),
+      },
       {
         path: 'login',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Login'
-          );
-
-          return import(
-            './paginas/public/login/login.page'
-          ).then(
-            m => m.LoginPage
-          );
-        },
+        title: 'Iniciar sesión · Salinas Booking',
+        loadComponent: () => import('./paginas/public/login/login.page').then((m) => m.LoginPage),
       },
-
-
-      // ===============================================
-      // REGISTRO
-      // ===============================================
-
       {
         path: 'registro',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Registro'
-          );
-
-          return import(
-            './paginas/public/registro/registro.page'
-          ).then(
-            m => m.RegistroPage
-          );
-        },
+        title: 'Crear cuenta · Salinas Booking',
+        loadComponent: () => import('./paginas/public/registro/registro.page').then((m) => m.RegistroPage),
       },
-
-
-      // ===============================================
-      // MIS RESERVAS
-      // ===============================================
-
       {
         path: 'mis-reservas',
-
-        canActivate: [
-          authGuard
-        ],
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Mis Reservas'
-          );
-
-          return import(
-            './paginas/public/mis-reservas/mis-reservas.page'
-          ).then(
-            m => m.MisReservasPage
-          );
-        },
+        title: 'Mis reservas · Salinas Booking',
+        canActivate: [authGuard],
+        loadComponent: () => import('./paginas/public/mis-reservas/mis-reservas.page').then((m) => m.MisReservasPage),
       },
-
-
-      // ===============================================
-      // PERFIL
-      // ===============================================
-
       {
         path: 'perfil',
-
-        canActivate: [
-          authGuard
-        ],
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Perfil'
-          );
-
-          return import(
-            './paginas/public/perfil/perfil.page'
-          ).then(
-            m => m.PerfilPage
-          );
-        },
+        title: 'Mi perfil · Salinas Booking',
+        canActivate: [authGuard],
+        loadComponent: () => import('./paginas/public/perfil/perfil.page').then((m) => m.PerfilPage),
       },
     ],
   },
 
-
-  // =====================================================
-  // ADMIN
-  // =====================================================
-
+  /* =====================================================
+     PANEL DE GESTIÓN (personal del hotel y plataforma)
+  ===================================================== */
   {
     path: 'admin',
-
-    canActivate: [
-      authGuard,
-      adminGuard
-    ],
-
-    loadComponent: async () => {
-
-      console.log(
-        '[ROUTE] Admin Layout'
-      );
-
-      return import(
-        './layouts/admin-layout/admin-layout.component'
-      ).then(
-        m => m.AdminLayoutComponent
-      );
-    },
-
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () =>
+      import('./layouts/admin-layout/admin-layout.component').then((m) => m.AdminLayoutComponent),
     children: [
-
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      },
-
-
-      // ===============================================
-      // DASHBOARD
-      // ===============================================
-
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      // Cada página exige que su ruta esté en el menú del usuario (definido en la base de datos).
       {
         path: 'dashboard',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Dashboard'
-          );
-
-          return import(
-            './paginas/admin/dashboard/dashboard.page'
-          ).then(
-            m => m.DashboardPage
-          );
-        },
+        title: 'Resumen · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/dashboard/dashboard.page').then((m) => m.DashboardPage),
       },
-
-
-      // ===============================================
-      // CALENDARIO
-      // ===============================================
-
       {
         path: 'calendario',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Calendario'
-          );
-
-          return import(
-            './paginas/admin/calendario/calendario.page'
-          ).then(
-            m => m.CalendarioPage
-          );
-        },
+        title: 'Calendario · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/calendario/calendario.page').then((m) => m.CalendarioPage),
       },
-
-
-      // ===============================================
-      // RESERVAS ADMIN
-      // ===============================================
-
+      {
+        path: 'nueva-reserva',
+        title: 'Nueva reserva · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/nueva-reserva/nueva-reserva.page').then((m) => m.NuevaReservaPage),
+      },
       {
         path: 'reservas',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Reservas Admin'
-          );
-
-          return import(
-            './paginas/admin/reservas/reservas.page'
-          ).then(
-            m => m.AdminReservasPage
-          );
-        },
+        title: 'Reservas · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/reservas/reservas.page').then((m) => m.AdminReservasPage),
       },
-
-
-      // ===============================================
-      // CHECK-IN / CHECK-OUT (NUEVO)
-      // ===============================================
-
-      {
-        path: 'checkin-out',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Check-in / Check-out'
-          );
-
-          return import(
-            './paginas/admin/checkin-out/checkin-out.page'
-          ).then(
-            m => m.CheckinOutPage
-          );
-        },
-      },
-
-
-      // ===============================================
-      // HABITACIONES ADMIN
-      // ===============================================
-
       {
         path: 'habitaciones',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Habitaciones Admin'
-          );
-
-          return import(
-            './paginas/admin/habitaciones/habitaciones.page'
-          ).then(
-            m => m.AdminHabitacionesPage
-          );
-        },
+        title: 'Habitaciones · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/habitaciones/habitaciones.page').then((m) => m.AdminHabitacionesPage),
       },
-
-
-      // ===============================================
-      // TARIFAS (NUEVO)
-      // ===============================================
-
       {
         path: 'tarifas',
-
-        canActivate: [
-          roleGuard
-        ],
-
-        data: {
-          roles: [
-            'super_admin',
-            'admin'
-          ]
-        },
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Tarifas'
-          );
-
-          return import(
-            './paginas/admin/tarifas/tarifas.page'
-          ).then(
-            m => m.TarifasPage
-          );
-        },
+        title: 'Tarifas · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/tarifas/tarifas.page').then((m) => m.TarifasPage),
       },
-
-
-      // ===============================================
-      // SERVICIOS (NUEVO)
-      // ===============================================
-
       {
         path: 'servicios',
-
-        canActivate: [
-          roleGuard
-        ],
-
-        data: {
-          roles: [
-            'super_admin',
-            'admin'
-          ]
-        },
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Servicios'
-          );
-
-          return import(
-            './paginas/admin/servicios/servicios.page'
-          ).then(
-            m => m.ServiciosPage
-          );
-        },
+        title: 'Servicios · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/servicios/servicios.page').then((m) => m.ServiciosPage),
       },
-
-
-      // ===============================================
-      // HUESPEDES
-      // ===============================================
-
-      {
-        path: 'huespedes',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Huespedes'
-          );
-
-          return import(
-            './paginas/admin/huespedes/huespedes.page'
-          ).then(
-            m => m.AdminHuespedesPage
-          );
-        },
-      },
-
-
-      // ===============================================
-      // PAGOS (NUEVO)
-      // ===============================================
-
-      {
-        path: 'pagos',
-
-        canActivate: [
-          roleGuard
-        ],
-
-        data: {
-          roles: [
-            'super_admin',
-            'admin'
-          ]
-        },
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Pagos'
-          );
-
-          return import(
-            './paginas/admin/pagos/pagos.page'
-          ).then(
-            m => m.PagosPage
-          );
-        },
-      },
-
-
-      // ===============================================
-      // REPORTES
-      // ===============================================
-
-      {
-        path: 'reportes',
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Reportes'
-          );
-
-          return import(
-            './paginas/admin/reportes/reportes.page'
-          ).then(
-            m => m.ReportesPage
-          );
-        },
-      },
-
-
-      // ===============================================
-      // USUARIOS
-      // ===============================================
-
       {
         path: 'usuarios',
-
-        canActivate: [
-          roleGuard
-        ],
-
-        data: {
-          roles: [
-            'super_admin',
-            'admin'
-          ]
-        },
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Usuarios'
-          );
-
-          return import(
-            './paginas/admin/usuarios/usuarios.page'
-          ).then(
-            m => m.AdminUsuariosPage
-          );
-        },
+        title: 'Personal · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/usuarios/usuarios.page').then((m) => m.AdminUsuariosPage),
       },
-
-
-      // ===============================================
-      // CONFIGURACIÓN (NUEVO - solo super_admin)
-      // ===============================================
-
       {
-        path: 'configuracion',
-
-        canActivate: [
-          roleGuard
-        ],
-
-        data: {
-          roles: [
-            'super_admin'
-          ]
-        },
-
-        loadComponent: async () => {
-
-          console.log(
-            '[ROUTE] Configuración'
-          );
-
-          return import(
-            './paginas/admin/configuracion/configuracion.page'
-          ).then(
-            m => m.ConfiguracionPage
-          );
-        },
+        path: 'canales',
+        title: 'Canales de venta · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/canales/canales.page').then((m) => m.CanalesPage),
+      },
+      {
+        path: 'mi-hotel',
+        title: 'Mi alojamiento · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/mi-hotel/mi-hotel.page').then((m) => m.MiHotelPage),
+      },
+      {
+        path: 'hoteles',
+        title: 'Alojamientos · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/hoteles/hoteles.page').then((m) => m.HotelesPage),
+      },
+      {
+        path: 'roles',
+        title: 'Roles y permisos · Panel',
+        canActivate: [menuGuard],
+        loadComponent: () => import('./paginas/admin/roles/roles.page').then((m) => m.RolesPage),
       },
     ],
   },
 
-
-  // =====================================================
-  // RESERVA CONFIRMADA
-  // =====================================================
-
-  {
-    path: 'reserva-confirmada',
-
-    loadComponent: async () => {
-
-      console.log(
-        '[ROUTE] Reserva Confirmada'
-      );
-
-      return import(
-        './paginas/public/reserva-confirmada/reserva-confirmada.page'
-      ).then(
-        m => m.ReservaConfirmadaPage
-      );
-    },
-  },
-
-
-  // =====================================================
-  // FALLBACK
-  // =====================================================
-
-  {
-    path: '**',
-    redirectTo: 'inicio',
-  },
-
+  { path: '**', redirectTo: 'inicio' },
 ];

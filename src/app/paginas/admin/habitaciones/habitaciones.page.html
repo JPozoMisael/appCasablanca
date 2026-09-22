@@ -1,204 +1,110 @@
-<div class="hb">
+<div class="adm-page">
+  @if (mensaje) { <div class="adm-msg ok" role="status">{{ mensaje }}</div> }
+  @if (error) { <div class="adm-msg err" role="alert">{{ error }} <button type="button" class="adm-btn sm out" (click)="error = ''">Cerrar</button></div> }
 
-  <!-- =====================================================
-       TOP BAR
-  ====================================================== -->
-  <div class="hb-top">
-    <div class="title">
-      <span class="eyebrow">HOTEL CASA BLANCA</span>
-      <h2>Gestión de habitaciones</h2>
-      <p>Controla disponibilidad, tarifas, ocupación, mantenimiento y estado operativo del hotel.</p>
+  <div class="adm-head">
+    <div>
+      <h2>Tipos de habitación</h2>
+      <p>El precio base se usa cuando no hay una tarifa por temporada configurada. Los huéspedes reservan por tipo.</p>
     </div>
-
-    <div class="actions">
-      <button class="ghost-btn" type="button" (click)="exportData()">
-        <ion-icon name="download-outline"></ion-icon>
-        Exportar
-      </button>
-      <button class="primary-btn" type="button" (click)="openCreate()">
-        <ion-icon name="add-circle-outline"></ion-icon>
-        Nueva habitación
-      </button>
-    </div>
+    @if (puedeEditarCatalogo) {
+      <button type="button" class="adm-btn" (click)="nuevoTipo()">Nuevo tipo</button>
+    }
   </div>
 
-  <!-- =====================================================
-       KPIs
-  ====================================================== -->
-  <div class="kpis">
-    <div class="kpi-card total">
-      <div class="kpi-icon">
-        <ion-icon name="bed-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Total habitaciones</span>
-        <strong>{{ total() }}</strong>
-        <small>Registradas en el sistema</small>
-      </div>
-    </div>
-
-    <div class="kpi-card available">
-      <div class="kpi-icon">
-        <ion-icon name="checkmark-circle-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Disponibles</span>
-        <strong>{{ disponibles() }}</strong>
-        <small>Listas para reservar</small>
-      </div>
-    </div>
-
-    <div class="kpi-card occupied">
-      <div class="kpi-icon">
-        <ion-icon name="pause-circle-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Ocupadas</span>
-        <strong>{{ ocupadas() }}</strong>
-        <small>Actualmente en uso</small>
-      </div>
-    </div>
-
-    <div class="kpi-card maintenance">
-      <div class="kpi-icon">
-        <ion-icon name="construct-outline"></ion-icon>
-      </div>
-      <div class="kpi-info">
-        <span>Mantenimiento</span>
-        <strong>{{ mantenimiento() }}</strong>
-        <small>Limpieza / revisión</small>
-      </div>
-    </div>
-  </div>
-
-  <!-- =====================================================
-       FILTERS
-  ====================================================== -->
-  <div class="filters-card">
-    <div class="search-box">
-      <ion-icon name="search-outline"></ion-icon>
-      <input type="text" placeholder="Buscar habitación, código, tipo o piso..."
-             [value]="q()" (input)="q.set(($any($event.target).value || ''))">
-    </div>
-
-    <div class="filter-group">
-      <div class="select-box">
-        <label>Estado</label>
-        <select [value]="fEstado()" (change)="setEstadoFilter(($any($event.target).value))">
-          <option value="TODOS">Todos</option>
-          <option value="DISPONIBLE">Disponible</option>
-          <option value="OCUPADA">Ocupada</option>
-          <option value="LIMPIEZA">Limpieza</option>
-          <option value="MANTENIMIENTO">Mantenimiento</option>
-        </select>
-      </div>
-
-      <div class="select-box">
-        <label>Tipo</label>
-        <select [value]="fTipo()" (change)="setTipoFilter(($any($event.target).value))">
-          <option value="TODOS">Todos</option>
-          <option value="SIMPLE">Simple</option>
-          <option value="DOBLE">Doble</option>
-          <option value="TRIPLE">Triple</option>
-          <option value="SUITE">Suite</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- =====================================================
-       TABLE CARD
-  ====================================================== -->
-  <div class="table-card">
-    <div class="table-head">
-      <div>
-        <h3>Habitaciones registradas</h3>
-        <p>{{ filtradas().length }} resultado(s)</p>
-      </div>
-      <div class="table-head-actions">
-        <button class="mini-btn" [class.active]="quickFilter() === 'TODAS'" (click)="setQuickFilter('TODAS')">Todas</button>
-        <button class="mini-btn" [class.active]="quickFilter() === 'DISPONIBLE'" (click)="setQuickFilter('DISPONIBLE')">Disponibles</button>
-        <button class="mini-btn" [class.active]="quickFilter() === 'OCUPADA'" (click)="setQuickFilter('OCUPADA')">Ocupadas</button>
-      </div>
-    </div>
-
-    <div class="table-wrapper">
-      <table class="room-table">
-        <thead>
-          <tr>
-            <th>Habitación</th>
-            <th>Tipo</th>
-            <th>Piso</th>
-            <th>Capacidad</th>
-            <th>Tarifa</th>
-            <th>Estado</th>
-            <th class="actions-col">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let h of filtradas()">
-            <td>
-              <div class="room-cell">
-                <div class="room-image">
-                  <img [src]="h.imagenUrl || 'assets/img/default-room.jpg'" [alt]="'Habitación ' + h.codigo">
-                </div>
-                <div class="room-meta">
-                  <strong>Habitación {{ h.codigo }}</strong>
-                  <span>{{ getAmenitiesPreview(h) }}</span>
-                </div>
-              </div>
-            </td>
-            <td><span class="type-pill">{{ formatTipo(h.tipo) }}</span></td>
-            <td>Piso {{ h.piso }}</td>
-            <td><div class="capacity"><ion-icon name="people-outline"></ion-icon>{{ h.capacidad }}</div></td>
-            <td><div class="price"><strong>${{ h.tarifa }}</strong><small>/ noche</small></div></td>
-            <td><div class="status" [class]="getEstadoClass(h.estado)">{{ formatEstado(h.estado) }}</div></td>
-            <td class="actions-col">
-              <div class="table-actions">
-                <button class="icon-btn" type="button" title="Ver" (click)="openDetail(h)"><ion-icon name="eye-outline"></ion-icon></button>
-                <button class="icon-btn" type="button" title="Editar" (click)="openEdit(h)"><ion-icon name="create-outline"></ion-icon></button>
-                <button class="icon-btn" type="button" title="Cambiar estado" (click)="cycleEstado(h)"><ion-icon name="sync-outline"></ion-icon></button>
-                <button class="icon-btn danger" type="button" title="Eliminar" (click)="confirmDelete(h)"><ion-icon name="trash-outline"></ion-icon></button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- =====================================================
-       MODAL
-  ====================================================== -->
-  <div class="modal-backdrop" *ngIf="modalOpen()" (click)="closeModal()"></div>
-  <div class="modal" *ngIf="modalOpen()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-head">
-        <div>
-          <span class="modal-tag">HOTEL CASA BLANCA</span>
-          <h3>{{ modalMode() === 'create' ? 'Nueva habitación' : 'Editar habitación' }}</h3>
-          <p>Configura información principal, capacidad, tarifa y estado operativo.</p>
+  @if (cargando) {
+    <div class="adm-empty">Cargando…</div>
+  } @else if (!tipos.length) {
+    <div class="adm-card adm-empty">Aún no hay tipos de habitación. Crea el primero para poder recibir reservas.</div>
+  } @else {
+    @for (t of tipos; track t.id) {
+      <div class="adm-card">
+        <div class="adm-head">
+          <div>
+            <h3 style="margin: 0">{{ t.nombre }} <span class="adm-badge {{ t.estado === 'activo' ? 'ok' : 'muted' }}">{{ t.estado }}</span></h3>
+            <p>
+              Hasta {{ t.capacidad_maxima }} personas · {{ t.camas_dobles }} doble(s), {{ t.camas_sencillas }} sencilla(s) ·
+              <b>{{ t.precio_base | money }}</b> / noche (base) · {{ delTipo(t.id).length }} habitaciones
+            </p>
+          </div>
+          @if (puedeEditarCatalogo) {
+            <div class="acc">
+              <button type="button" class="adm-btn sm out" (click)="editar(t)">Editar</button>
+              <button type="button" class="adm-btn sm danger out" (click)="borrarTipo(t)">Eliminar</button>
+            </div>
+          }
         </div>
-        <button class="close-btn" type="button" (click)="closeModal()"><ion-icon name="close-outline"></ion-icon></button>
-      </div>
 
-      <div class="modal-body">
-        <div class="form-grid">
-          <div class="field"><label>Código *</label><input type="text" placeholder="Ej: 204" [value]="form().codigo" (input)="patch('codigo', ($any($event.target).value || ''))"></div>
-          <div class="field"><label>Piso</label><input type="number" min="1" [value]="form().piso" (input)="patch('piso', +($any($event.target).value || 1))"></div>
-          <div class="field"><label>Tipo</label><select [value]="form().tipo" (change)="patch('tipo', $any($event.target).value)"><option value="SIMPLE">Simple</option><option value="DOBLE">Doble</option><option value="TRIPLE">Triple</option><option value="SUITE">Suite</option></select></div>
-          <div class="field"><label>Capacidad</label><input type="number" min="1" [value]="form().capacidad" (input)="patch('capacidad', +($any($event.target).value || 1))"></div>
-          <div class="field"><label>Tarifa por noche ($)</label><input type="number" min="0" step="0.01" [value]="form().tarifa" (input)="patch('tarifa', +($any($event.target).value || 0))"></div>
-          <div class="field"><label>Estado</label><select [value]="form().estado" (change)="patch('estado', $any($event.target).value)"><option value="DISPONIBLE">Disponible</option><option value="OCUPADA">Ocupada</option><option value="LIMPIEZA">Limpieza</option><option value="MANTENIMIENTO">Mantenimiento</option></select></div>
-          <div class="field full"><label>Notas / Servicios</label><textarea rows="4" placeholder="Ej: Habitación con vista al mar, WiFi incluido..." [value]="form().notas || ''" (input)="patch('notas', ($any($event.target).value || ''))"></textarea></div>
+        <div class="adm-table-wrap" style="margin-top: 10px">
+          <table class="adm-table">
+            <thead><tr><th>N.º</th><th>Piso</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+              @for (h of delTipo(t.id); track h.id) {
+                <tr>
+                  <td><b>{{ h.numero_habitacion }}</b></td>
+                  <td>{{ h.piso ?? '—' }}</td>
+                  <td>
+                    <select class="adm-select" [value]="h.estado" (change)="cambiarEstado(h, $any($event.target).value)" [disabled]="!puedeCambiarEstado" [attr.aria-label]="'Estado de la habitación ' + h.numero_habitacion">
+                      @for (e of estadosHab; track e) { <option [value]="e">{{ e }}</option> }
+                    </select>
+                  </td>
+                  <td class="num">
+                    @if (puedeEditarCatalogo) {
+                      <button type="button" class="adm-btn sm danger out" (click)="quitarHab(h)">Eliminar</button>
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td colspan="4" class="adm-empty">Sin habitaciones de este tipo.</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
       </div>
+    }
 
-      <div class="modal-foot">
-        <button class="cancel-btn" type="button" (click)="closeModal()">Cancelar</button>
-        <button class="save-btn" type="button" (click)="save()">{{ modalMode() === 'create' ? 'Crear habitación' : 'Guardar cambios' }}</button>
+    @if (puedeEditarCatalogo) {
+      <div class="adm-card">
+        <h3>Agregar habitación</h3>
+        <div class="adm-toolbar">
+          <select class="adm-select" [(ngModel)]="nuevaHab.tipo_habitacion_id" name="tipoNueva" aria-label="Tipo">
+            @for (t of tipos; track t.id) { <option [ngValue]="t.id">{{ t.nombre }}</option> }
+          </select>
+          <input class="adm-input" [(ngModel)]="nuevaHab.numero_habitacion" name="numNueva" placeholder="Número (ej. 101)" style="width: 160px" aria-label="Número" />
+          <input class="adm-input" type="number" min="0" [(ngModel)]="nuevaHab.piso" name="pisoNueva" placeholder="Piso" style="width: 90px" aria-label="Piso" />
+          <button type="button" class="adm-btn" (click)="agregarHab()">Agregar</button>
+        </div>
       </div>
-    </div>
-  </div>
-
+    }
+  }
 </div>
+
+@if (edicion; as e) {
+  <div class="adm-modal" role="dialog" aria-modal="true" aria-label="Tipo de habitación" (click)="edicion = null">
+    <div class="adm-dialog" (click)="$event.stopPropagation()">
+      <h3>{{ e.id ? 'Editar' : 'Nuevo' }} tipo de habitación</h3>
+      <div class="adm-grid">
+        <label class="adm-field">Nombre <input [(ngModel)]="e.nombre" name="n" maxlength="100" placeholder="Doble con balcón" /></label>
+        <label class="adm-field">Precio base por noche (US$) <input type="number" min="0" step="0.5" [(ngModel)]="e.precio_base" name="p" /><small>Sin impuestos.</small></label>
+        <label class="adm-field">Capacidad máxima <input type="number" min="1" max="20" [(ngModel)]="e.capacidad_maxima" name="c" /></label>
+        <label class="adm-field">Camas dobles <input type="number" min="0" max="10" [(ngModel)]="e.camas_dobles" name="cd" /></label>
+        <label class="adm-field">Camas sencillas <input type="number" min="0" max="10" [(ngModel)]="e.camas_sencillas" name="cs" /></label>
+        @if (e.id) {
+          <label class="adm-field">Estado
+            <select [(ngModel)]="e.estado" name="es"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select>
+          </label>
+        }
+      </div>
+      <label class="adm-field" style="margin-top: 12px">Descripción <textarea rows="3" [(ngModel)]="e.descripcion" name="d"></textarea></label>
+      <div class="adm-checks" style="margin-top: 12px">
+        <label class="adm-check"><input type="checkbox" [(ngModel)]="e.tiene_vista" name="v" /> Vista al mar</label>
+        <label class="adm-check"><input type="checkbox" [(ngModel)]="e.tiene_balcon" name="b" /> Balcón</label>
+        <label class="adm-check"><input type="checkbox" [(ngModel)]="e.desayuno_incluido" name="di" /> Desayuno incluido</label>
+      </div>
+      <div class="adm-actions">
+        <button type="button" class="adm-btn out" (click)="edicion = null">Cancelar</button>
+        <button type="button" class="adm-btn" (click)="guardarTipo()">Guardar</button>
+      </div>
+    </div>
+  </div>
+}

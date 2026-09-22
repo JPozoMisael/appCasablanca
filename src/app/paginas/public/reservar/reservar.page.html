@@ -1,143 +1,146 @@
-  <div class="rb-container">
-    <header class="rb-top">
-      <div class="rb-title">
-        <ion-icon name="card-outline"></ion-icon>
-        <div>
-          <div class="h1">Confirmar reserva</div>
-          <div class="sub">
-            <span *ngIf="checkIn && checkOut">{{ checkIn }} — {{ checkOut }}</span>
-            <span class="dot">·</span>
-            <span>{{ guestsLabel }}</span>
-            <span class="dot">·</span>
-            <span>{{ nights }} noche(s)</span>
+@if (cargando) {
+  <div class="container"><div class="sk" style="height: 380px; margin-top: 24px"></div></div>
+} @else if (!hotel) {
+  <div class="container vacio">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <h1>{{ error || 'No pudimos cargar la reserva' }}</h1>
+    <a routerLink="/buscar" class="btn">Buscar alojamientos</a>
+  </div>
+} @else {
+  <div class="container page">
+    <button type="button" class="volver" (click)="volver()"><ion-icon name="arrow-back-outline"></ion-icon> Cambiar selección</button>
+    <h1>Confirma tu reserva</h1>
+
+    <div class="cols">
+      <!-- FORMULARIO -->
+      <form class="form" (ngSubmit)="confirmar()" novalidate>
+        <section class="card">
+          <h2>Datos del huésped principal</h2>
+          @if (!logueado) {
+            <p class="aviso">
+              ¿Ya tienes cuenta? <a routerLink="/login" [queryParams]="{ returnUrl: urlActual }">Inicia sesión</a> para guardar tu reserva en tu perfil.
+            </p>
+          }
+          <div class="grid2">
+            <label>Nombres
+              <input name="nombres" [(ngModel)]="contacto.nombres" autocomplete="given-name" required [class.inv]="intentado && contacto.nombres.trim().length < 2" />
+            </label>
+            <label>Apellidos
+              <input name="apellidos" [(ngModel)]="contacto.apellidos" autocomplete="family-name" required [class.inv]="intentado && !contacto.apellidos.trim()" />
+            </label>
+            <label>Correo electrónico
+              <input type="email" name="email" [(ngModel)]="contacto.email" autocomplete="email" required [class.inv]="intentado && !contactoValido && !contacto.email" />
+              <small>Aquí enviaremos la confirmación.</small>
+            </label>
+            <label>Teléfono / WhatsApp
+              <input type="tel" name="telefono" [(ngModel)]="contacto.telefono" autocomplete="tel" required [class.inv]="intentado && !telefonoOk" />
+            </label>
           </div>
-        </div>
-      </div>
+          <label>Peticiones especiales <em>(opcional)</em>
+            <textarea name="obs" rows="3" [(ngModel)]="observaciones" maxlength="500" placeholder="Hora estimada de llegada, cuna, cama extra…"></textarea>
+          </label>
+          @if (intentado && !contactoValido) {
+            <p class="err" role="alert">Completa nombres, apellidos, un correo válido y un teléfono.</p>
+          }
+        </section>
 
-      <div class="rb-actions">
-        <ion-button fill="outline" class="btn" (click)="backToRooms()">
-          Volver a habitaciones
-        </ion-button>
-      </div>
-    </header>
-
-    <section class="rb-grid">
-      <!-- LEFT: Form -->
-      <main class="rb-main">
-        <div class="box">
-          <div class="box-title">
-            <ion-icon name="people-outline"></ion-icon>
-            Datos del huésped
-          </div>
-
-          <div class="form">
-            <div class="row">
-              <div class="field">
-                <label>Nombres</label>
-                <input [(ngModel)]="guest.nombres" placeholder="Ej: Juan" />
+        @if (hotel.servicios.length) {
+          <section class="card">
+            <h2>Extras para tu estadía</h2>
+            @for (s of hotel.servicios; track s.id) {
+              <div class="extra">
+                <div><b>{{ s.nombre }}</b>@if (s.descripcion) { <small>{{ s.descripcion }}</small> }</div>
+                <div class="extra-r">
+                  <span>{{ s.precio | money }}</span>
+                  <div class="stepper">
+                    <button type="button" (click)="cambiarExtra(s.id, -1)" [attr.aria-label]="'Quitar ' + s.nombre"><ion-icon name="remove-outline"></ion-icon></button>
+                    <b>{{ extras[s.id] || 0 }}</b>
+                    <button type="button" (click)="cambiarExtra(s.id, 1)" [attr.aria-label]="'Agregar ' + s.nombre"><ion-icon name="add-outline"></ion-icon></button>
+                  </div>
+                </div>
               </div>
-              <div class="field">
-                <label>Apellidos</label>
-                <input [(ngModel)]="guest.apellidos" placeholder="Ej: Pérez" />
-              </div>
-            </div>
+            }
+          </section>
+        }
 
-            <div class="row">
-              <div class="field">
-                <label>Email</label>
-                <input [(ngModel)]="guest.email" type="email" placeholder="correo@ejemplo.com" />
-              </div>
-              <div class="field">
-                <label>Teléfono</label>
-                <input [(ngModel)]="guest.telefono" placeholder="Ej: 0999999999" />
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="field">
-                <label>Cédula / Pasaporte</label>
-                <input [(ngModel)]="guest.cedulaPasaporte" placeholder="Opcional" />
-              </div>
-              <div class="field">
-                <label>Notas (opcional)</label>
-                <input [(ngModel)]="guest.notas" placeholder="Hora de llegada, solicitudes..." />
-              </div>
-            </div>
-
-            <div class="terms">
-              <label class="check">
-                <input type="checkbox" [(ngModel)]="acceptingTerms" />
-                <span>Acepto términos y condiciones</span>
-              </label>
-              <div class="hint">
-                <ion-icon name="alert-circle-outline"></ion-icon>
-                Tus datos se usarán únicamente para gestionar tu reserva.
-              </div>
-            </div>
-
-            <ion-button class="confirm" (click)="confirmBooking()" [disabled]="submitting">
-              <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon>
-              {{ submitting ? 'Enviando...' : 'Confirmar reserva' }}
-            </ion-button>
-          </div>
-        </div>
-      </main>
-
-      <!-- RIGHT: Summary -->
-      <aside class="rb-side" *ngIf="room as r">
-        <div class="summary">
-          <div class="sum-head">
-            <div class="sum-title">
-              <ion-icon name="bed-outline"></ion-icon>
-              Resumen
+        <section class="card">
+          <h2>Pago</h2>
+          <div class="pago">
+            <ion-icon name="cash-outline"></ion-icon>
+            <div>
+              <b>Pagas en el alojamiento</b>
+              <p>No se te cobra nada ahora. Paga directamente al llegar; el hotel aceptará los medios que tenga habilitados.</p>
             </div>
           </div>
+        </section>
 
-          <div class="sum-room">
-            <div class="img">
-              <img [src]="r.image" [alt]="r.name" />
-            </div>
-            <div class="info">
-              <div class="name">{{ r.name }}</div>
-              <div class="loc">
-                <ion-icon name="location-outline"></ion-icon>
-                {{ r.location }}
-              </div>
-              <div class="meta">
-                <ion-icon name="calendar-outline"></ion-icon>
-                {{ checkIn }} — {{ checkOut }}
-              </div>
-              <div class="meta">
-                <ion-icon name="people-outline"></ion-icon>
-                {{ guestsLabel }}
-              </div>
+        <section class="card">
+          <label class="terminos">
+            <input type="checkbox" name="terminos" [(ngModel)]="aceptaTerminos" />
+            <span>Acepto la política de cancelación del alojamiento y el uso de mis datos para gestionar esta reserva.</span>
+          </label>
+          @if (intentado && !aceptaTerminos) {
+            <p class="err" role="alert">Debes aceptar para continuar.</p>
+          }
+          @if (error) {
+            <p class="err" role="alert">{{ error }}</p>
+          }
+          <button type="submit" class="btn full" [disabled]="enviando || !cotizacion">
+            {{ enviando ? 'Confirmando…' : 'Confirmar reserva' }}
+          </button>
+        </section>
+      </form>
+
+      <!-- RESUMEN -->
+      <aside class="resumen">
+        <div class="card">
+          <div class="hcab">
+            <img [src]="imagen" [alt]="hotel.nombre" />
+            <div>
+              <h3>{{ hotel.nombre }}</h3>
+              <small>{{ hotel.direccion || hotel.ciudad }}</small>
             </div>
           </div>
 
-          <div class="sum-breakdown">
-            <div class="line">
-              <span>Precio por noche</span>
-              <strong>${{ r.pricePerNight }}</strong>
-            </div>
-            <div class="line">
-              <span>Noches</span>
-              <strong>{{ nights }}</strong>
-            </div>
-            <div class="line">
-              <span>Subtotal</span>
-              <strong>${{ subtotal }}</strong>
-            </div>
-            <div class="line">
-              <span>Impuestos (12%)</span>
-              <strong>${{ taxes }}</strong>
-            </div>
+          <dl class="fechas">
+            <div><dt>Entrada</dt><dd>{{ fechaLarga(checkIn) }}<small>desde {{ hotel.hora_checkin }}</small></dd></div>
+            <div><dt>Salida</dt><dd>{{ fechaLarga(checkOut) }}<small>hasta {{ hotel.hora_checkout }}</small></dd></div>
+          </dl>
 
-            <div class="total">
-              <span>Total</span>
-              <strong>${{ total }}</strong>
+          @if (cotizando && !cotizacion) {
+            <div class="sk" style="height: 120px"></div>
+          }
+          @if (errorCotizacion) {
+            <p class="err" role="alert">{{ errorCotizacion }}</p>
+          }
+
+          @if (cotizacion; as c) {
+            <p class="huesp">{{ c.noches }} {{ c.noches === 1 ? 'noche' : 'noches' }} · {{ c.adultos }} adulto(s)@if (c.ninos) { , {{ c.ninos }} niño(s) }</p>
+            <ul class="lineas">
+              @for (h of c.habitaciones; track $index) {
+                <li><span>{{ h.tipo }}</span><b>{{ h.subtotal | money }}</b></li>
+              }
+              @for (s of c.servicios; track s.servicio_id) {
+                <li><span>{{ s.nombre }} × {{ s.cantidad }}</span><b>{{ s.subtotal | money }}</b></li>
+              }
+              <li class="sub"><span>Subtotal</span><b>{{ c.subtotal | money }}</b></li>
+              <li class="sub"><span>IVA ({{ c.iva_porcentaje }} %)</span><b>{{ c.impuestos | money }}</b></li>
+            </ul>
+            <div class="total"><span>Total</span><strong>{{ c.total | money }}</strong></div>
+
+            <div class="canc" [class.gratis]="c.cancelacion.gratis">
+              <ion-icon [name]="c.cancelacion.gratis ? 'checkmark-circle-outline' : 'information-circle-outline'"></ion-icon>
+              <span>
+                @if (c.cancelacion.gratis) {
+                  <b>Cancelación gratis</b> hasta el {{ fechaLarga(c.cancelacion.limite_cancelacion_gratis) }}.
+                } @else {
+                  {{ c.politica.descripcion }}
+                }
+              </span>
             </div>
-          </div>
+          }
         </div>
       </aside>
-    </section>
+    </div>
   </div>
+}

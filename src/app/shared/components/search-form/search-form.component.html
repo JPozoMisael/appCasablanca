@@ -1,0 +1,63 @@
+<form class="sf" (ngSubmit)="enviar()" novalidate>
+  @if (!sinDestino) {
+    <label class="field">
+      <ion-icon name="location-outline"></ion-icon>
+      <span class="lbl">Destino</span>
+      <select name="zona" [(ngModel)]="zona" aria-label="Destino">
+        <option value="">Todo Salinas</option>
+        @for (z of zonas; track z.id) {
+          <option [value]="z.slug">{{ z.nombre }}</option>
+        }
+      </select>
+    </label>
+  }
+
+  <label class="field">
+    <ion-icon name="calendar-outline"></ion-icon>
+    <span class="lbl">Entrada</span>
+    <input type="date" name="checkIn" [(ngModel)]="checkIn" [min]="hoy" (ngModelChange)="alCambiarEntrada()" />
+  </label>
+
+  <label class="field">
+    <ion-icon name="calendar-outline"></ion-icon>
+    <span class="lbl">Salida <em>{{ noches ? '· ' + noches + (noches === 1 ? ' noche' : ' noches') : '' }}</em></span>
+    <input type="date" name="checkOut" [(ngModel)]="checkOut" [min]="checkIn || hoy" (ngModelChange)="error = ''" />
+  </label>
+
+  <div class="field guests">
+    <ion-icon name="people-outline"></ion-icon>
+    <span class="lbl">Huéspedes</span>
+    <button type="button" class="gbtn" (click)="huespedesAbierto = !huespedesAbierto" [attr.aria-expanded]="huespedesAbierto">
+      {{ resumenHuespedes }}
+    </button>
+
+    @if (huespedesAbierto) {
+      <div class="pop" role="dialog" aria-label="Huéspedes y habitaciones">
+        @for (fila of filas; track fila.k) {
+          <div class="row">
+            <span>{{ fila.t }}</span>
+            <div class="stepper">
+              <button type="button" (click)="cambiar(fila.k, -1)" [attr.aria-label]="'Menos ' + fila.t">
+                <ion-icon name="remove-outline"></ion-icon>
+              </button>
+              <b>{{ valorDe(fila.k) }}</b>
+              <button type="button" (click)="cambiar(fila.k, 1)" [attr.aria-label]="'Más ' + fila.t">
+                <ion-icon name="add-outline"></ion-icon>
+              </button>
+            </div>
+          </div>
+        }
+        <button type="button" class="ok" (click)="huespedesAbierto = false">Listo</button>
+      </div>
+    }
+  </div>
+
+  <button type="submit" class="go">
+    <ion-icon name="search-outline"></ion-icon>
+    {{ etiquetaBoton }}
+  </button>
+
+  @if (error) {
+    <p class="err" role="alert">{{ error }}</p>
+  }
+</form>

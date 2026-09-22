@@ -1,109 +1,42 @@
-<ion-content class="ion-padding">
+<div class="adm-page">
+  @if (mensaje) { <div class="adm-msg ok" role="status">{{ mensaje }}</div> }
+  @if (error) { <div class="adm-msg err" role="alert">{{ error }}</div> }
 
-  <!-- HEADER -->
-  <div class="servicios-header">
-    <div>
-      <h1>Servicios adicionales</h1>
-      <p>Desayuno, spa, traslados, etc.</p>
-    </div>
-    <button class="btn-primary" (click)="abrirModal()">
-      <ion-icon name="add-circle-outline"></ion-icon>
-      Nuevo servicio
-    </button>
-  </div>
-
-  <!-- LOADING STATE -->
-  <div *ngIf="loading()" class="loading-state">
-    <ion-icon name="refresh-outline" class="spinner"></ion-icon>
-    <p>Cargando servicios...</p>
-  </div>
-
-  <!-- CONTENIDO PRINCIPAL -->
-  <ng-container *ngIf="!loading()">
-
-    <!-- FILTROS -->
-    <div class="search-box">
-      <ion-icon name="search-outline"></ion-icon>
-      <input type="text" placeholder="Buscar servicio..." [(ngModel)]="searchTerm">
-    </div>
-
-    <!-- EMPTY STATE -->
-    <div *ngIf="serviciosFiltrados().length === 0" class="empty-state">
-      <ion-icon name="restaurant-outline"></ion-icon>
-      <p>No hay servicios registrados</p>
-    </div>
-
-    <!-- GRID DE SERVICIOS -->
-    <div class="servicios-grid" *ngIf="serviciosFiltrados().length > 0">
-      <div class="servicio-card" *ngFor="let s of serviciosFiltrados()">
-        <div class="servicio-icon">
-          <ion-icon [name]="s.icono"></ion-icon>
-        </div>
-        <div class="servicio-info">
-          <h3>{{ s.nombre }}</h3>
-          <p>{{ s.descripcion }}</p>
-          <span class="precio">${{ s.precio }}</span>
-        </div>
-        <div class="servicio-actions">
-          <button class="icon-btn" (click)="editar(s)" title="Editar">
-            <ion-icon name="create-outline"></ion-icon>
-          </button>
-          <button class="icon-btn danger" (click)="eliminar(s)" title="Eliminar">
-            <ion-icon name="trash-outline"></ion-icon>
-          </button>
-        </div>
-      </div>
-    </div>
-
-  </ng-container>
-
-  <!-- MODAL -->
-  <div class="modal" *ngIf="modalAbierto" (click)="cerrarModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>{{ editando ? 'Editar servicio' : 'Nuevo servicio' }}</h3>
-        <button class="close-btn" (click)="cerrarModal()">
-          <ion-icon name="close-outline"></ion-icon>
-        </button>
-      </div>
-
-      <div class="modal-body">
-        <div class="field">
-          <label>Nombre</label>
-          <input type="text" [(ngModel)]="formData.nombre" placeholder="Ej: Desayuno Buffet">
-        </div>
-
-        <div class="field">
-          <label>Descripción</label>
-          <textarea rows="2" [(ngModel)]="formData.descripcion" placeholder="Descripción del servicio"></textarea>
-        </div>
-
-        <div class="field">
-          <label>Precio ($)</label>
-          <input type="number" [(ngModel)]="formData.precio" placeholder="0.00" step="0.01">
-        </div>
-
-        <div class="field">
-          <label>Icono</label>
-          <select [(ngModel)]="formData.icono">
-            <option value="restaurant-outline">🍽️ Restaurante</option>
-            <option value="wifi-outline">📡 WiFi</option>
-            <option value="water-outline">🏊 Piscina</option>
-            <option value="car-outline">🚗 Transporte</option>
-            <option value="snow-outline">❄️ Aire acondicionado</option>
-            <option value="beer-outline">🍺 Bar</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
-        <button class="btn-save" (click)="guardar()">Guardar</button>
-      </div>
+  <div class="adm-card">
+    <h3>Nuevo servicio</h3>
+    <div class="adm-toolbar">
+      <input class="adm-input" [(ngModel)]="nuevo.nombre" name="sn" placeholder="Nombre (ej. Desayuno)" aria-label="Nombre" />
+      <input class="adm-input" [(ngModel)]="nuevo.descripcion" name="sd" placeholder="Descripción (ej. por persona)" style="flex: 1; min-width: 200px" aria-label="Descripción" />
+      <input class="adm-input" type="number" min="0" step="0.5" [(ngModel)]="nuevo.precio" name="sp" placeholder="Precio" style="width: 110px" aria-label="Precio" />
+      <button type="button" class="adm-btn" (click)="crear()">Agregar</button>
     </div>
   </div>
 
-  <!-- BACKDROP DEL MODAL -->
-  <div class="modal-backdrop" *ngIf="modalAbierto" (click)="cerrarModal()"></div>
-
-</ion-content>  
+  @if (cargando) {
+    <div class="adm-empty">Cargando…</div>
+  } @else if (!servicios.length) {
+    <div class="adm-card adm-empty">Todavía no tienes servicios adicionales.</div>
+  } @else {
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead><tr><th>Servicio</th><th>Descripción</th><th class="num">Precio</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+          @for (s of servicios; track s.id) {
+            <tr>
+              <td><b>{{ s.nombre }}</b></td>
+              <td>{{ s.descripcion }}</td>
+              <td class="num"><input class="adm-input" type="number" min="0" step="0.5" style="width: 90px" [value]="s.precio" (change)="cambiarPrecio(s, $any($event.target).value)" [attr.aria-label]="'Precio de ' + s.nombre" /></td>
+              <td><span class="adm-badge {{ s.estado === 'activo' ? 'ok' : 'muted' }}">{{ s.estado }}</span></td>
+              <td class="num">
+                <div class="acc" style="justify-content: flex-end">
+                  <button type="button" class="adm-btn sm out" (click)="alternar(s)">{{ s.estado === 'activo' ? 'Desactivar' : 'Activar' }}</button>
+                  <button type="button" class="adm-btn sm danger out" (click)="borrar(s)">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

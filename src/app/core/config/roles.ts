@@ -1,37 +1,8 @@
-export type Role =
+/**
+ * Los roles y permisos viven en la base de datos (tablas roles / permisos). En el cliente el rol es
+ * solo una etiqueta: lo que decide qué se puede ver es el `alcance` y el menú que devuelve el servidor.
+ */
+export type Role = string;
 
-  | 'super_admin'
-  | 'admin'
-  | 'recepcion'
-  | 'cliente';
-
-
-// =========================================
-// ROLES
-// =========================================
-
-export const ROLES = {
-
-  SUPER_ADMIN:
-    'super_admin' as Role,
-
-  ADMIN:
-    'admin' as Role,
-
-  RECEPCION:
-    'recepcion' as Role,
-
-  CLIENTE:
-    'cliente' as Role,
-};
-
-
-// =========================================
-// ADMIN ROLES
-// =========================================
-
-export const ADMIN_ROLES: Role[] = [
-  ROLES.SUPER_ADMIN,
-  ROLES.ADMIN,
-  ROLES.RECEPCION,
-];
+/** plataforma = equipo de la plataforma · hotel = personal de un alojamiento · cliente = huésped */
+export type Alcance = 'plataforma' | 'hotel' | 'cliente';

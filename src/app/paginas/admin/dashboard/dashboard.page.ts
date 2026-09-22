@@ -1,302 +1,105 @@
-import {
-  Component,
-  computed,
-  signal,
-  OnInit,
-} from '@angular/core';
-
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-
-import {
-  DashboardService,
-  DashboardStats,
-  ReservaHoy,
-} from '../../../core/services/dashboard.service';
-
-import {
-  IonIcon,
-  IonButton,
-  IonChip,
-  IonHeader,
-  IonCard,
-  IonToolbar,
-} from '@ionic/angular/standalone';
-
-import { addIcons } from 'ionicons';
-import {
-  bedOutline,
-  calendarOutline,
-  peopleOutline,
-  cashOutline,
-  addCircleOutline,
-  chevronForwardOutline,
-  timeOutline,
-  clipboardOutline,
-  trendingUpOutline,
-  trendingDownOutline,
-  logInOutline,
-  logOutOutline,
-  alertCircleOutline,
-  pricetagOutline,
-  restaurantOutline,
-  cardOutline,
-  analyticsOutline,
-} from 'ionicons/icons';
-
-type EstadoReserva =
-  | 'CONFIRMADA'
-  | 'PENDIENTE'
-  | 'CHECKIN'
-  | 'CHECKOUT'
-  | 'CANCELADA';
+import { Component, OnInit, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { AuthService } from '@app/core/services/auth.service';
+import { DashboardData, GestionService, PlataformaStats } from '@app/core/services/gestion.service';
+import { HotelScopeService } from '@app/core/services/hotel-scope.service';
+import { MenuService } from '@app/core/services/menu.service';
+import { Reserva } from '@app/shared/models/marketplace.model';
+import { MoneyPipe } from '@app/shared/pipes/money.pipe';
+import { fechaCorta } from '@app/shared/utils/format';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    IonToolbar,
-    IonCard,
-    IonHeader,
-    CommonModule,
-    RouterModule,
-    IonIcon,
-    IonButton,
-    IonChip,
-  ],
+  imports: [RouterLink, MoneyPipe],
   templateUrl: './dashboard.page.html',
-  styleUrls: ['./dashboard.page.scss'],
 })
 export class DashboardPage implements OnInit {
+  private gestion = inject(GestionService);
+  private auth = inject(AuthService);
+  private scope = inject(HotelScopeService);
+  private menu = inject(MenuService);
 
-  // ======================================================
-  // NUEVAS PROPIEDADES PARA EL HEADER
-  // ======================================================
-  todayDate: string = '';
-  userName: string = 'Administrador';
-  userRole: string = 'Super Administrador';
-  userInitials: string = 'AD';
+  data: DashboardData | null = null;
+  llegadas: Reserva[] = [];
+  salidas: Reserva[] = [];
+  enCasa: Reserva[] = [];
+  plataforma: PlataformaStats | null = null;
+  cargando = true;
+  error = '';
+  mensaje = '';
+  ocupado = 0;
+  readonly fechaCorta = fechaCorta;
 
-  // ======================================================
-  // SIGNALS — estado principal
-  // ======================================================
-  totalHabitaciones   = signal(0);
-  habitacionesOcupadas = signal(0);
-  ingresosMes          = signal(0);
-  reservasHoy          = signal<ReservaHoy[]>([]);
+  get puedeOperar(): boolean {
+    return this.menu.tiene('reservas.gestionar');
+  }
 
-  ingresosMesAnterior  = signal(0);
-  reservasAyer         = signal(0);
-  disponiblesAyer      = signal(0);
+  get esPlataforma(): boolean {
+    return this.auth.esSuperAdmin() && !this.scope.get();
+  }
 
-  loadingStats    = signal(true);
-  loadingReservas = signal(true);
-
-  // ======================================================
-  // COMPUTED — derivados automáticos
-  // ======================================================
-  reservasHoyCount = computed(() => this.reservasHoy().length);
-  habitacionesDisponibles = computed(() => this.totalHabitaciones() - this.habitacionesOcupadas());
-
-  ocupacionPorcentaje = computed(() =>
-    this.totalHabitaciones() === 0
-      ? 0
-      : Math.round((this.habitacionesOcupadas() / this.totalHabitaciones()) * 100)
-  );
-
-  tendenciaIngresos = computed(() => {
-    const ant = this.ingresosMesAnterior();
-    const act = this.ingresosMes();
-    if (ant === 0) return null;
-    return Math.round(((act - ant) / ant) * 100);
-  });
-
-  tendenciaReservas = computed(() => {
-    const ayer = this.reservasAyer();
-    if (ayer === 0) return null;
-    return this.reservasHoyCount() - ayer;
-  });
-
-  tendenciaDisponibles = computed(() => {
-    const ayer = this.disponiblesAyer();
-    if (ayer === 0) return null;
-    return this.habitacionesDisponibles() - ayer;
-  });
-
-  checkins = computed(() =>
-    this.reservasHoy().filter((r) => r.estado === 'CHECKIN')
-  );
-
-  checkouts = computed(() =>
-    this.reservasHoy().filter((r) => r.estado === 'CHECKOUT')
-  );
-
-  pendientes = computed(() =>
-    this.reservasHoy().filter(
-      (r) => r.estado === 'PENDIENTE' || r.estado === 'CONFIRMADA'
-    )
-  );
-
-  canceladas = computed(() =>
-    this.reservasHoy().filter((r) => r.estado === 'CANCELADA')
-  );
-
-  hayReservas = computed(
-    () =>
-      this.checkins().length > 0 ||
-      this.checkouts().length > 0 ||
-      this.pendientes().length > 0 ||
-      this.canceladas().length > 0
-  );
-
-  ingresosMesFormateado = computed(() =>
-    this.ingresosMes().toLocaleString('es-EC', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    })
-  );
-
-  constructor(private dashboardService: DashboardService) {
-    addIcons({
-      bedOutline,
-      calendarOutline,
-      peopleOutline,
-      cashOutline,
-      addCircleOutline,
-      chevronForwardOutline,
-      timeOutline,
-      clipboardOutline,
-      trendingUpOutline,
-      trendingDownOutline,
-      logInOutline,
-      logOutOutline,
-      alertCircleOutline,
-      pricetagOutline,
-      restaurantOutline,
-      cardOutline,
-      analyticsOutline,
-    });
+  get puedeVerFinanzas(): boolean {
+    return this.menu.tiene('pagos.ver');
   }
 
   ngOnInit(): void {
-    this.loadStats();
-    this.loadReservasHoy();
-    this.setTodayDate();
-    this.loadUserData();
+    this.cargar();
   }
 
-  // ======================================================
-  // HEADER METHODS
-  // ======================================================
-  setTodayDate() {
-    const today = new Date();
-    const options: Intl.DateTimeFormatOptions = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    };
-    this.todayDate = today.toLocaleDateString('es-EC', options);
-  }
+  cargar(): void {
+    this.cargando = true;
+    this.error = '';
+    if (this.esPlataforma) {
+      this.gestion.statsPlataforma().subscribe({
+        next: (s) => {
+          this.plataforma = s;
+          this.cargando = false;
+        },
+        error: (e) => this.fallo(e),
+      });
+      return;
+    }
 
-  loadUserData() {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        this.userName = (user.nombre + ' ' + user.apellido) || 'Administrador';
-        this.userRole = this.getRoleLabel(user.rol);
-        this.userInitials = (user.nombre?.charAt(0) || 'A') + (user.apellido?.charAt(0) || 'D');
-      } catch (e) {
-        console.error('Error parsing user', e);
-      }
+    if (this.menu.tiene('reservas.ver')) {
+      this.gestion.hoy().subscribe({
+        next: (h) => {
+          this.llegadas = h.llegadas;
+          this.salidas = h.salidas;
+          this.enCasa = h.en_casa;
+        },
+        error: (e) => this.fallo(e),
+      });
+    }
+    if (this.menu.tiene('dashboard.ver')) {
+      this.gestion.dashboard().subscribe({
+        next: (d) => {
+          this.data = d;
+          this.cargando = false;
+        },
+        error: (e) => this.fallo(e),
+      });
+    } else {
+      this.cargando = false;
     }
   }
 
-  getRoleLabel(rol: string): string {
-    const roles: Record<string, string> = {
-      super_admin: 'Super Administrador',
-      admin: 'Administrador',
-      recepcion: 'Recepcionista',
-      cliente: 'Cliente'
-    };
-    return roles[rol] || 'Usuario';
+  private fallo(e: { error?: { message?: string } }): void {
+    this.error = e?.error?.message ?? 'No pudimos cargar el resumen.';
+    this.cargando = false;
   }
 
-  // ======================================================
-  // LOAD STATS & RESERVAS
-  // ======================================================
-  loadStats(): void {
-    this.loadingStats.set(true);
-    this.dashboardService.getStats().subscribe({
-      next: (data: DashboardStats) => {
-        this.totalHabitaciones.set(data?.totalHabitaciones ?? 0);
-        this.habitacionesOcupadas.set(data?.habitacionesOcupadas ?? 0);
-        this.ingresosMes.set(Number(data?.ingresosMes ?? 0));
-        this.ingresosMesAnterior.set(Number(data?.ingresosMesAnterior ?? 0));
-        this.reservasAyer.set(Number(data?.reservasAyer ?? 0));
-        this.disponiblesAyer.set(Number(data?.disponiblesAyer ?? 0));
-        this.loadingStats.set(false);
+  accion(r: Reserva, tipo: 'checkin' | 'checkout'): void {
+    this.gestion.transicion(r.id, tipo).subscribe({
+      next: () => {
+        this.mensaje = tipo === 'checkin' ? 'Llegada registrada.' : 'Salida registrada.';
+        this.cargar();
       },
-      error: (err) => {
-        console.error('Error dashboard stats:', err);
-        this.totalHabitaciones.set(0);
-        this.habitacionesOcupadas.set(0);
-        this.ingresosMes.set(0);
-        this.loadingStats.set(false);
-      },
+      error: (e) => (this.error = e?.error?.message ?? 'No se pudo completar la acción.'),
     });
   }
 
-  loadReservasHoy(): void {
-    this.loadingReservas.set(true);
-    this.dashboardService.getReservasHoy().subscribe({
-      next: (reservas: ReservaHoy[]) => {
-        this.reservasHoy.set(Array.isArray(reservas) ? reservas : []);
-        this.loadingReservas.set(false);
-      },
-      error: (err) => {
-        console.error('Error reservas hoy:', err);
-        this.reservasHoy.set([]);
-        this.loadingReservas.set(false);
-      },
-    });
-  }
-
-  // ======================================================
-  // HELPERS
-  // ======================================================
-  colorEstado(estado: string): string {
-    const colores: Record<string, string> = {
-      CHECKIN:    'success',
-      CONFIRMADA: 'primary',
-      PENDIENTE:  'warning',
-      CANCELADA:  'danger',
-      CHECKOUT:   'medium',
-    };
-    return colores[estado] ?? 'medium';
-  }
-
-  iniciales(nombre: string): string {
-    if (!nombre) return '?';
-    return nombre
-      .split(' ')
-      .slice(0, 2)
-      .map((p) => p[0])
-      .join('')
-      .toUpperCase();
-  }
-
-  formatoFechaCorta(iso: string): string {
-    if (!iso) return '-';
-    const parts = iso.split('-');
-    if (parts.length !== 3) return iso;
-    return `${parts[2]}/${parts[1]}`;
-  }
-
-  labelTendencia(delta: number | null, unidad = ''): string {
-    if (delta === null) return '';
-    const signo = delta >= 0 ? '+' : '';
-    return `${signo}${delta}${unidad}`;
+  habitaciones(r: Reserva): string {
+    return (r.detalles ?? []).map((d) => d.habitacion?.numero_habitacion).filter(Boolean).join(', ');
   }
 }

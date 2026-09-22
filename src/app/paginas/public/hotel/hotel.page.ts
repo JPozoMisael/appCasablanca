@@ -1,1077 +1,269 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
+import { Component, HostListener, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { IonIcon } from '@ionic/angular/standalone';
+import { switchMap, tap, combineLatest } from 'rxjs';
+import { AuthService } from '@app/core/services/auth.service';
+import { BookingService } from '@app/core/services/booking.service';
+import { CatalogoService } from '@app/core/services/catalogo.service';
 import {
-  ActivatedRoute,
-  Router,
-  RouterModule
-} from '@angular/router';
-
-import {
-  DomSanitizer,
-  SafeResourceUrl
-} from '@angular/platform-browser';
-
-import {
-  IonButton,
-  IonIcon
-} from '@ionic/angular/standalone';
-
-import { addIcons } from 'ionicons';
-
-import {
-
-  locationOutline,
-  searchOutline,
-  calendarOutline,
-  peopleOutline,
-  wifiOutline,
-  waterOutline,
-  restaurantOutline,
-  sunnyOutline,
-  thermometerOutline,
-  bedOutline,
-  shieldCheckmarkOutline,
-  checkmarkCircleOutline,
-  closeCircleOutline,
-  walkOutline,
-  cafeOutline,
-  carOutline,
-  businessOutline,
-  tvOutline,
- snowOutline,
-  starOutline,
-  heartOutline,
-  timeOutline,
-  mapOutline,
-  heart,
-  imagesOutline,
-  chevronForwardOutline,
-  navigateOutline
-
-} from 'ionicons/icons';
-
-import { HabitacionesService } from '@app/core/services/habitaciones.service';
-import { HotelesService } from '@app/core/services/hotel.service';
-
-/* ======================================================
-   INTERFACES
-====================================================== */
-
-interface HotelServiceItem {
-
-  name: string;
-
-  icon: string;
-
-}
-
-interface NearbyPlace {
-
-  name: string;
-
-  distance: string;
-
-  icon: string;
-
-}
-
-interface HotelReview {
-
-  name: string;
-
-  country: string;
-
-  text: string;
-
-  score: number;
-
-}
-
-interface HotelData {
-
-  slug: string;
-
-  name: string;
-
-  location: string;
-
-  address: string;
-
-  description: string;
-
-  heroImage: string;
-
-  gallery: string[];
-
-  lat: number;
-
-  lng: number;
-
-  score: number;
-
-  reviews: number;
-
-  price: number;
-
-  oldPrice?: number;
-
-  stars?: number;
-
-  features: string[];
-
-  services: HotelServiceItem[];
-
-  nearbyPlaces: NearbyPlace[];
-
-}
-
-interface RoomData {
-
-  id: number;
-
-  numero: number;
-
-  name: string;
-
-  desc: string;
-
-  price: number;
-
-  oldPrice?: number;
-
-  discount?: number;
-
-  image: string;
-
-  available: boolean;
-
-  capacity?: number;
-
-  size?: number;
-
-  benefits?: string[];
-
-}
-
-/* ======================================================
-   COMPONENT
-====================================================== */
+  Disponibilidad,
+  HotelFicha,
+  Imagen,
+  TipoDisponible,
+  TipoHabitacion,
+  Valoracion,
+} from '@app/shared/models/marketplace.model';
+import { RatingBadgeComponent } from '@app/shared/components/rating-badge/rating-badge.component';
+import { BusquedaFormValue, SearchFormComponent } from '@app/shared/components/search-form/search-form.component';
+import { MoneyPipe } from '@app/shared/pipes/money.pipe';
+import { ETIQUETA_TIPO, fechaLarga, imagenUrl, nochesEntre } from '@app/shared/utils/format';
 
 @Component({
   selector: 'app-hotel',
   standalone: true,
+  imports: [RouterLink, IonIcon, SearchFormComponent, RatingBadgeComponent, MoneyPipe],
   templateUrl: './hotel.page.html',
   styleUrls: ['./hotel.page.scss'],
-  imports: [
-    CommonModule,
-    RouterModule,
-    IonButton,
-    IonIcon
-  ]
 })
-
 export class HotelPage implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private catalogo = inject(CatalogoService);
+  private booking = inject(BookingService);
+  private auth = inject(AuthService);
 
-  /* ======================================================
-     STATE
-  ====================================================== */
+  hotel: HotelFicha | null = null;
+  disp: Disponibilidad | null = null;
+  resenas: Valoracion[] = [];
+  resenasMeta = { total: 0, page: 1, pages: 1 };
 
-  slug = '';
+  cargando = true;
+  noEncontrado = false;
+  cargandoDisp = false;
+  errorDisp = '';
+  esFavorito = false;
 
-  hotel: HotelData | null = null;
-
-  featuredRooms: RoomData[] = [];
-
-  loading = true;
-
-  mapUrl!: SafeResourceUrl;
-
-  roomsPreviewCount = 3;
-
-  isFavorite = false;
-
-  galleryOpen = false;
-
-  selectedImageIndex = 0;
-
-  /* ======================================================
-     SEARCH
-  ====================================================== */
-
+  // búsqueda vigente (de la URL)
   checkIn = '';
-
   checkOut = '';
+  adultos = 2;
+  ninos = 0;
 
-  adults = 2;
+  /** tipo_habitacion_id → cantidad elegida */
+  seleccion: Record<number, number> = {};
 
-  children = 0;
-
-  rooms = 1;
-
-  /* ======================================================
-     REVIEWS
-  ====================================================== */
-
-  reviewCategories = [
-
-    {
-      name: 'Ubicación',
-      value: 9.4
-    },
-
-    {
-      name: 'Limpieza',
-      value: 9.0
-    },
-
-    {
-      name: 'Confort',
-      value: 8.9
-    },
-
-    {
-      name: 'Servicio',
-      value: 9.2
-    },
-
-    {
-      name: 'Relación calidad-precio',
-      value: 8.8
-    }
-
-  ];
-
-  hotelReviews: HotelReview[] = [
-
-    {
-
-      name: 'Carlos',
-      country: 'Ecuador',
-      text:
-        'Excelente ubicación y habitaciones muy cómodas frente al mar.',
-
-      score: 9
-
-    },
-
-    {
-
-      name: 'Andrea',
-      country: 'Colombia',
-      text:
-        'Muy buena atención y piscina espectacular.',
-
-      score: 10
-
-    },
-
-    {
-
-      name: 'John',
-      country: 'Estados Unidos',
-      text:
-        'Muy limpio y tranquilo. Perfecto para descansar.',
-
-      score: 9
-
-    }
-
-  ];
-
-  /* ======================================================
-     HOTELS
-  ====================================================== */
-
-  hotelList = [
-
-    {
-      id: 'chipipe',
-      name: 'Chipipe'
-    },
-
-    {
-      id: 'palmeras',
-      name: 'Palmeras'
-    },
-
-    {
-      id: 'ballenita',
-      name: 'Ballenita'
-    }
-
-  ];
-
-  /* ======================================================
-     CONSTRUCTOR
-  ====================================================== */
-
-  constructor(
-
-    private route: ActivatedRoute,
-
-    private router: Router,
-
-    private habitacionesService: HabitacionesService,
-
-    private hotelesService: HotelesService,
-
-    private sanitizer: DomSanitizer
-
-  ) {
-
-    addIcons({
-
-      locationOutline,
-      searchOutline,
-      calendarOutline,
-      peopleOutline,
-      bedOutline,
-      sunnyOutline,
-      waterOutline,
-      shieldCheckmarkOutline,
-      checkmarkCircleOutline,
-      closeCircleOutline,
-      restaurantOutline,
-      thermometerOutline,
-      wifiOutline,
-      walkOutline,
-      cafeOutline,
-      carOutline,
-      businessOutline,
-      tvOutline,
-      snowOutline,
-      starOutline,
-      heartOutline,
-      timeOutline,
-      mapOutline,
-      heart,
-      imagesOutline,
-      chevronForwardOutline,
-      navigateOutline
-
-    });
-
-  }
-
-  /* ======================================================
-     INIT
-  ====================================================== */
+  lightbox = -1;
+  readonly tipoLabel = ETIQUETA_TIPO;
+  readonly fechaLarga = fechaLarga;
 
   ngOnInit(): void {
-
-    this.route.queryParamMap.subscribe(query => {
-
-      this.checkIn =
-        query.get('checkIn') || '';
-
-      this.checkOut =
-        query.get('checkOut') || '';
-
-      this.adults =
-        Number(query.get('adults')) || 2;
-
-      this.children =
-        Number(query.get('children')) || 0;
-
-      this.rooms =
-        Number(query.get('rooms')) || 1;
-
-    });
-
-    this.route.paramMap.subscribe(params => {
-
-      this.slug =
-        params.get('slug') || '';
-
-      if (!this.slug) {
-
-        console.error('Slug vacío');
-
-        return;
-
-      }
-
-      this.loadHotel();
-
-    });
-
-  }
-
-  /* ======================================================
-     IMAGE FALLBACK
-  ====================================================== */
-
-  onImageError(event: any): void {
-
-    event.target.src =
-      'assets/img/default-room.jpg';
-
-  }
-
-  /* ======================================================
-     GALLERY HELPERS
-  ====================================================== */
-
-  get validGallery(): string[] {
-
-    if (
-      !this.hotel?.gallery ||
-      !this.hotel.gallery.length
-    ) {
-
-      return [
-
-        'assets/img/1.PNG',
-        'assets/img/2.PNG',
-        'assets/img/3.PNG',
-        'assets/img/4.PNG',
-        'assets/img/5.PNG'
-
-      ];
-
-    }
-
-    return this.hotel.gallery.filter(
-
-      (img: string) =>
-
-        !!img &&
-        img !== 'null' &&
-        img !== 'undefined'
-
-    );
-
-  }
-
-  get coverImage(): string {
-
-    return (
-
-      this.validGallery[0] ||
-
-      this.hotel?.heroImage ||
-
-      'assets/img/default-room.jpg'
-
-    );
-
-  }
-
-  /* ======================================================
-     HOTEL
-  ====================================================== */
-
-  loadHotel(): void {
-
-    this.hotelesService
-      .getAll()
-      .subscribe({
-
-        next: (res: any) => {
-
-          const hoteles =
-            res.data || [];
-
-          const found =
-            hoteles.find((h: any) =>
-
-              h.slug === this.slug ||
-
-              h.nombre
-                ?.toLowerCase()
-                ?.includes(this.slug)
-
-            );
-
-          if (found) {
-
-            this.hotel = {
-
-              slug:
-                found.slug,
-
-              name:
-                found.nombre,
-
-              location:
-                found.ciudad || 'Salinas',
-
-              address:
-                found.direccion ||
-                'Salinas, Santa Elena',
-
-              description:
-                found.descripcion,
-
-              heroImage:
-                found.imagen ||
-                'assets/img/1.PNG',
-
-              gallery:
-
-                Array.isArray(found.galeria) &&
-                found.galeria.length
-
-                  ? found.galeria
-
-                  : [
-
-                    found.imagen ||
-                    'assets/img/1.PNG',
-
-                    'assets/img/2.PNG',
-                    'assets/img/3.PNG',
-                    'assets/img/4.PNG',
-                    'assets/img/5.PNG'
-
-                  ],
-
-              lat:
-                found.lat || -2.2147,
-
-              lng:
-                found.lng || -80.9515,
-
-              score:
-                found.rating || 9.1,
-
-              reviews:
-                found.totalReviews || 324,
-
-              price:
-                found.precio_desde || 85,
-
-              oldPrice:
-                (found.precio_desde || 85) + 20,
-
-              stars:
-                4,
-
-              features: [
-
-                'Excelente ubicación',
-                'Frente al mar',
-                'Alta valoración'
-
-              ],
-
-              services: [
-
-                {
-                  name: 'WiFi gratis',
-                  icon: 'wifi-outline'
-                },
-
-                {
-                  name: 'Piscina',
-                  icon: 'water-outline'
-                },
-
-                {
-                  name: 'Restaurante',
-                  icon: 'restaurant-outline'
-                },
-
-                {
-                  name: 'Parqueadero',
-                  icon: 'car-outline'
-                },
-
-                {
-                  name: 'TV Smart',
-                  icon: 'tv-outline'
-                },
-
-                {
-                  name: 'Aire acondicionado',
-                  icon: 'snow-outline'
-                }
-
-              ],
-
-              nearbyPlaces: [
-
-                {
-                  name: 'Playa principal',
-                  distance: '120 m',
-                  icon: 'walk-outline'
-                },
-
-                {
-                  name: 'Malecón Salinas',
-                  distance: '450 m',
-                  icon: 'navigate-outline'
-                },
-
-                {
-                  name: 'Zona gastronómica',
-                  distance: '300 m',
-                  icon: 'restaurant-outline'
-                }
-
-              ]
-
-            };
-
-            this.buildMap();
-
-            this.loadRooms();
-
-          }
-
-          else {
-
-            this.loadHotelFallback();
-
-          }
-
-        },
-
-        error: () => {
-
-          this.loadHotelFallback();
-
-        }
-
-      });
-
-  }
-
-  /* ======================================================
-     FALLBACK
-  ====================================================== */
-
-  loadHotelFallback(): void {
-
-    this.hotel = {
-
-      slug: this.slug,
-
-      name:
-        `Casa Blanca ${this.slug}`,
-
-      location:
-        'Salinas',
-
-      address:
-        'Salinas, Ecuador',
-
-      description:
-        'Disfruta una experiencia premium frente al mar.',
-
-      heroImage:
-        'assets/img/1.PNG',
-
-      gallery: [
-
-        'assets/img/1.PNG',
-        'assets/img/2.PNG',
-        'assets/img/3.PNG',
-        'assets/img/4.PNG',
-        'assets/img/5.PNG'
-
-      ],
-
-      lat:
-        -2.2147,
-
-      lng:
-        -80.9515,
-
-      score:
-        9.1,
-
-      reviews:
-        324,
-
-      price:
-        85,
-
-      oldPrice:
-        105,
-
-      stars:
-        4,
-
-      features: [
-
-        'Frente al mar',
-        'Piscina',
-        'Ideal para familias'
-
-      ],
-
-      services: [
-
-        {
-          name: 'WiFi',
-          icon: 'wifi-outline'
-        },
-
-        {
-          name: 'Piscina',
-          icon: 'water-outline'
-        }
-
-      ],
-
-      nearbyPlaces: [
-
-        {
-          name: 'Playa',
-          distance: '120 m',
-          icon: 'walk-outline'
-        }
-
-      ]
-
-    };
-
-    this.buildMap();
-
-    this.loadRooms();
-
-  }
-
-  /* ======================================================
-     MAP
-  ====================================================== */
-
-  buildMap(): void {
-
-    if (
-      !this.hotel?.lat ||
-      !this.hotel?.lng
-    ) {
-      return;
-    }
-
-    this.mapUrl =
-      this.sanitizer
-        .bypassSecurityTrustResourceUrl(
-
-          `https://www.google.com/maps?q=${this.hotel.lat},${this.hotel.lng}&z=15&output=embed`
-
-        );
-
-  }
-
-  openGoogleMaps(): void {
-
-    if (
-      !this.hotel?.lat ||
-      !this.hotel?.lng
-    ) {
-      return;
-    }
-
-    window.open(
-
-      `https://www.google.com/maps?q=${this.hotel.lat},${this.hotel.lng}`,
-
-      '_blank'
-
-    );
-
-  }
-
-  /* ======================================================
-     ROOMS
-  ====================================================== */
-
-  loadRooms(): void {
-
-    this.loading = true;
-
-    this.habitacionesService
-
-      .getDisponiblesByHotel(
-
-        this.slug,
-
-        {
-
-          checkIn:
-            this.checkIn,
-
-          checkOut:
-            this.checkOut,
-
-          adults:
-            this.adults,
-
-          children:
-            this.children,
-
-          rooms:
-            this.rooms,
-
-          limit:
-            this.roomsPreviewCount
-
-        }
-
+    combineLatest([this.route.paramMap, this.route.queryParamMap])
+      .pipe(
+        tap(([, q]) => {
+          this.checkIn = q.get('checkIn') ?? '';
+          this.checkOut = q.get('checkOut') ?? '';
+          this.adultos = Number(q.get('adultos')) || 2;
+          this.ninos = Number(q.get('ninos')) || 0;
+        }),
+        switchMap(([p]) => {
+          const slug = p.get('slug') ?? '';
+          if (this.hotel?.slug === slug) return [this.hotel];
+          this.cargando = true;
+          return this.catalogo.hotel(slug);
+        })
       )
-
       .subscribe({
-
-        next: (res: any) => {
-
-          const rooms =
-            res?.data || [];
-
-          this.featuredRooms =
-
-            rooms
-
-            .map((r: any) => ({
-
-              id:
-                r.id,
-
-              numero:
-                Number(r.numero),
-
-              name:
-
-                r.tipo ||
-
-                `Habitación ${r.numero}`,
-
-              desc:
-
-                r.descripcion ||
-
-                'Habitación premium',
-
-              price:
-                r.precioNoche || 85,
-
-              oldPrice:
-                (r.precioNoche || 85) + 20,
-
-              discount:
-                20,
-
-              image:
-
-                r.imagenUrl ||
-
-                this.coverImage ||
-
-                'assets/img/default-room.jpg',
-
-              available:
-                r.estado === 'disponible',
-
-              capacity:
-                r.capacidad || 2,
-
-              size:
-                32,
-
-              benefits: [
-
-                'Cancelación flexible',
-                'WiFi gratis',
-                'Aire acondicionado'
-
-              ]
-
-            }))
-
-            .sort(
-
-              (a: RoomData, b: RoomData) =>
-
-                a.numero - b.numero
-
-            );
-
-          this.loading = false;
-
+        next: (h) => {
+          const primera = this.hotel?.slug !== h.slug;
+          this.hotel = h;
+          this.cargando = false;
+          if (primera) {
+            this.cargarResenas(1);
+            this.cargarFavorito();
+          }
+          this.cargarDisponibilidad();
         },
-
-        error: (err: any) => {
-
-          console.error(
-            'Error habitaciones:',
-            err
-          );
-
-          this.loading = false;
-
-        }
-
+        error: () => {
+          this.cargando = false;
+          this.noEncontrado = true;
+        },
       });
-
   }
 
-  /* ======================================================
-     GALLERY
-  ====================================================== */
-
-  openGallery(index = 0): void {
-
-    this.selectedImageIndex =
-      index;
-
-    this.galleryOpen = true;
-
+  // ---------- disponibilidad ----------
+  get tieneFechas(): boolean {
+    return !!this.checkIn && !!this.checkOut;
   }
 
-  closeGallery(): void {
-
-    this.galleryOpen = false;
-
+  get noches(): number {
+    return nochesEntre(this.checkIn, this.checkOut);
   }
 
-  nextImage(): void {
-
-    if (!this.hotel) {
-      return;
-    }
-
-    this.selectedImageIndex =
-
-      (this.selectedImageIndex + 1) %
-
-      this.hotel.gallery.length;
-
+  private cargarDisponibilidad(): void {
+    this.disp = null;
+    this.errorDisp = '';
+    this.seleccion = {};
+    if (!this.hotel || !this.tieneFechas) return;
+    this.cargandoDisp = true;
+    this.catalogo
+      .disponibilidad(this.hotel.slug, { checkIn: this.checkIn, checkOut: this.checkOut, adultos: this.adultos, ninos: this.ninos })
+      .subscribe({
+        next: (d) => {
+          this.disp = d;
+          this.cargandoDisp = false;
+        },
+        error: (e) => {
+          this.errorDisp = e?.error?.message ?? 'No pudimos consultar la disponibilidad.';
+          this.cargandoDisp = false;
+        },
+      });
   }
 
-  prevImage(): void {
-
-    if (!this.hotel) {
-      return;
-    }
-
-    this.selectedImageIndex =
-
-      (
-        this.selectedImageIndex - 1 +
-        this.hotel.gallery.length
-      ) %
-
-      this.hotel.gallery.length;
-
-  }
-
-  /* ======================================================
-     FAVORITES
-  ====================================================== */
-
-  toggleFavorite(): void {
-
-    this.isFavorite =
-      !this.isFavorite;
-
-  }
-
-  /* ======================================================
-     SCROLL
-  ====================================================== */
-
-  scrollToRooms(): void {
-
-    const el =
-      document.getElementById('rooms-section');
-
-    el?.scrollIntoView({
-
-      behavior: 'smooth'
-
-    });
-
-  }
-
-  /* ======================================================
-     NAVIGATION
-  ====================================================== */
-
-  goToAvailability(): void {
-
-    this.router.navigate([
-
-      '/hotel',
-      this.slug,
-      'habitaciones'
-
-    ], {
-
+  cambiarFechas(v: BusquedaFormValue): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
       queryParams: {
-
-        checkIn:
-          this.checkIn,
-
-        checkOut:
-          this.checkOut,
-
-        adults:
-          this.adults,
-
-        children:
-          this.children,
-
-        rooms:
-          this.rooms
-
-      }
-
+        checkIn: v.checkIn || null,
+        checkOut: v.checkOut || null,
+        adultos: v.adultos,
+        ninos: v.ninos || null,
+      },
+      queryParamsHandling: 'merge',
     });
-
   }
 
-  showAllRooms(): void {
-
-    this.goToAvailability();
-
+  // ---------- selección ----------
+  opciones(t: TipoDisponible): number[] {
+    return Array.from({ length: Math.min(t.disponibles, 6) + 1 }, (_, i) => i);
   }
 
-  changeHotel(newSlug: string): void {
+  elegir(t: TipoDisponible, valor: string): void {
+    this.seleccion = { ...this.seleccion, [t.id]: Number(valor) };
+  }
 
-    if (newSlug === this.slug) {
+  get totalHabitaciones(): number {
+    return Object.values(this.seleccion).reduce((s, n) => s + n, 0);
+  }
+
+  get totalSeleccion(): number {
+    if (!this.disp) return 0;
+    return this.disp.habitaciones.reduce((s, t) => s + (this.seleccion[t.id] ?? 0) * (t.precio_total ?? 0), 0);
+  }
+
+  get capacidadSeleccion(): number {
+    if (!this.disp) return 0;
+    return this.disp.habitaciones.reduce((s, t) => s + (this.seleccion[t.id] ?? 0) * t.capacidad_maxima, 0);
+  }
+
+  get faltaCapacidad(): boolean {
+    return this.totalHabitaciones > 0 && this.capacidadSeleccion < this.adultos + this.ninos;
+  }
+
+  reservar(): void {
+    if (!this.hotel || !this.totalHabitaciones || this.faltaCapacidad) return;
+    const items = Object.entries(this.seleccion)
+      .filter(([, n]) => n > 0)
+      .map(([id, n]) => `${id}:${n}`)
+      .join(',');
+    this.router.navigate(['/reservar'], {
+      queryParams: {
+        hotel: this.hotel.slug,
+        checkIn: this.checkIn,
+        checkOut: this.checkOut,
+        adultos: this.adultos,
+        ninos: this.ninos || null,
+        items,
+      },
+    });
+  }
+
+  // ---------- galería ----------
+  get galeria(): Imagen[] {
+    const generales = (this.hotel?.imagenes ?? []).filter((i) => !i.tipo_habitacion_id);
+    if (generales.length) return generales;
+    return this.hotel?.imagen_principal ? [{ id: 0, url: this.hotel.imagen_principal, orden: 0 }] : [];
+  }
+
+  url(u?: string | null): string {
+    return imagenUrl(u);
+  }
+
+  imagenDeTipo(t: TipoHabitacion): string {
+    return imagenUrl(t.imagenes?.[0]?.url ?? this.galeria[0]?.url);
+  }
+
+  abrirLightbox(i: number): void {
+    this.lightbox = i;
+  }
+
+  moverLightbox(delta: number): void {
+    const n = this.galeria.length;
+    if (n) this.lightbox = (this.lightbox + delta + n) % n;
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  teclas(ev: KeyboardEvent): void {
+    if (this.lightbox < 0) return;
+    if (ev.key === 'Escape') this.lightbox = -1;
+    if (ev.key === 'ArrowRight') this.moverLightbox(1);
+    if (ev.key === 'ArrowLeft') this.moverLightbox(-1);
+  }
+
+  // ---------- reseñas ----------
+  cargarResenas(page: number): void {
+    if (!this.hotel) return;
+    this.catalogo.valoraciones(this.hotel.slug, page, 5).subscribe({
+      next: (r) => {
+        this.resenas = page === 1 ? r.data : [...this.resenas, ...r.data];
+        this.resenasMeta = r.meta;
+      },
+      error: () => undefined,
+    });
+  }
+
+  get promedio(): number {
+    return Number(this.hotel?.rating_promedio ?? 0);
+  }
+
+  barra(p: number): number {
+    const total = this.hotel?.total_valoraciones || 0;
+    if (!total) return 0;
+    const n = (this.hotel?.distribucion_puntuacion ?? []).filter((d) => d.puntuacion === p).reduce((s, d) => s + d.total, 0);
+    return Math.round((n / total) * 100);
+  }
+
+  // ---------- favoritos ----------
+  private cargarFavorito(): void {
+    if (!this.auth.estaLogueado() || !this.hotel) return;
+    const id = this.hotel.id;
+    this.booking.favoritos().subscribe({ next: (f) => (this.esFavorito = f.some((x) => x.hotel.id === id)), error: () => undefined });
+  }
+
+  alternarFavorito(): void {
+    if (!this.hotel) return;
+    if (!this.auth.estaLogueado()) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
       return;
     }
-
-    this.router.navigate([
-
-      '/hotel',
-      newSlug
-
-    ], {
-
-      queryParamsHandling:
-        'merge'
-
+    const era = this.esFavorito;
+    this.esFavorito = !era;
+    (era ? this.booking.quitarFavorito(this.hotel.id) : this.booking.agregarFavorito(this.hotel.id)).subscribe({
+      error: () => (this.esFavorito = era),
     });
-
   }
 
-  /* ======================================================
-     GETTERS
-  ====================================================== */
-
-  get availableRooms(): RoomData[] {
-
-    return this.featuredRooms
-      .filter(r => r.available);
-
+  irADisponibilidad(): void {
+    document.getElementById('disponibilidad')?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  get previewRooms(): RoomData[] {
-
-    return this.availableRooms
-      .slice(0, this.roomsPreviewCount);
-
+  get whatsappUrl(): string | null {
+    const n = this.hotel?.whatsapp?.replace(/\D/g, '');
+    return n ? `https://wa.me/${n}` : null;
   }
 
-  get hasMoreRooms(): boolean {
-
-    return this.availableRooms.length >
-      this.roomsPreviewCount;
-
+  get mapaUrl(): string | null {
+    const h = this.hotel;
+    if (!h?.latitud || !h?.longitud) return null;
+    return `https://www.google.com/maps/search/?api=1&query=${h.latitud},${h.longitud}`;
   }
-
 }

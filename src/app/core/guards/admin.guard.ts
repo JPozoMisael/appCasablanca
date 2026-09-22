@@ -1,94 +1,17 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
+import { MenuService } from '../services/menu.service';
+import { StorageService } from '../services/storage.service';
 
-import { ADMIN_ROLES }
-  from '../config/roles';
+/**
+ * Acceso al panel: solo personal (alcance plataforma u hotel). El alcance lo confirma el servidor
+ * al cargar el menú; lo guardado en el navegador no se usa para decidir.
+ */
+export const adminGuard: CanActivateFn = async () => {
+  const router = inject(Router);
+  const menu = inject(MenuService);
 
-import { StorageService }
-  from '../services/storage.service';
-
-export const adminGuard: CanActivateFn = () => {
-
-  console.log(
-    '[ADMIN GUARD] Ejecutando...'
-  );
-
-  const router =
-    inject(Router);
-
-  const storage =
-    inject(StorageService);
-
-
-  // =====================================
-  // TOKEN
-  // =====================================
-
-  const token =
-    storage.getToken();
-
-  console.log(
-    '[ADMIN GUARD] Token:',
-    token ? 'EXISTE' : 'NO EXISTE'
-  );
-
-
-  if (!token) {
-
-    console.warn(
-      '[ADMIN GUARD] Sin token. Redirigiendo a /login'
-    );
-
-    router.navigate([
-      '/login'
-    ]);
-
-    return false;
-  }
-
-
-  // =====================================
-  // ROLE
-  // =====================================
-
-  const role =
-    storage.getRole();
-
-  console.log(
-    '[ADMIN GUARD] Role:',
-    role
-  );
-
-  console.log(
-    '[ADMIN GUARD] ADMIN_ROLES:',
-    ADMIN_ROLES
-  );
-
-
-  // =====================================
-  // VALIDACIÓN
-  // =====================================
-
-  if (
-    role &&
-    ADMIN_ROLES.includes(role)
-  ) {
-
-    console.log(
-      '[ADMIN GUARD] Acceso permitido'
-    );
-
-    return true;
-  }
-
-
-  console.warn(
-    '[ADMIN GUARD] Acceso denegado. Redirigiendo a /inicio'
-  );
-
-  router.navigate([
-    '/inicio'
-  ]);
-
-  return false;
+  if (!inject(StorageService).getToken()) return router.createUrlTree(['/login']);
+  await menu.asegurarCargado();
+  return menu.alcance() === 'cliente' ? router.createUrlTree(['/inicio']) : true;
 };

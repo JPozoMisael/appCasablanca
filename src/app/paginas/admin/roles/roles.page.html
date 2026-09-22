@@ -1,0 +1,115 @@
+<div class="adm-page">
+  @if (mensaje) { <div class="adm-msg ok" role="status">{{ mensaje }}</div> }
+  @if (error) { <div class="adm-msg err" role="alert">{{ error }} <button type="button" class="adm-btn sm out" (click)="error = ''">Cerrar</button></div> }
+
+  <div class="adm-head">
+    <div>
+      <h2>Roles y permisos</h2>
+      <p>El servidor exige estos permisos en cada acción; el menú lateral de cada persona se arma con ellos. Los cambios se aplican en segundos.</p>
+    </div>
+    <button type="button" class="adm-btn" (click)="abrirNuevo()">Nuevo rol</button>
+  </div>
+
+  @if (cargando) {
+    <div class="adm-empty">Cargando…</div>
+  } @else {
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th>Permiso</th>
+            @for (r of roles; track r.id) {
+              <th class="num">
+                {{ r.nombre }}<br />
+                <small style="text-transform: none; font-weight: 500">{{ r.usuarios }} usuario(s) · {{ r.alcance }}</small>
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of modulos; track m.nombre) {
+            <tr><td colspan="99" style="background: #f6f8fb"><b>{{ m.nombre }}</b></td></tr>
+            @for (p of m.permisos; track p.id) {
+              <tr>
+                <td>{{ p.descripcion }}<br /><small style="color: var(--muted-2)">{{ p.clave }}</small></td>
+                @for (r of roles; track r.id) {
+                  <td class="num">
+                    <input type="checkbox" [checked]="tiene(r, p.clave)" [disabled]="!editable(r, p)" (change)="alternar(r, p.clave)"
+                      [attr.aria-label]="r.nombre + ': ' + p.clave" />
+                  </td>
+                }
+              </tr>
+            }
+          }
+          <tr>
+            <td><b>Acciones</b></td>
+            @for (r of roles; track r.id) {
+              <td class="num">
+                <div class="acc" style="justify-content: flex-end">
+                  @if (sucio(r)) { <button type="button" class="adm-btn sm ok" (click)="guardar(r)">Guardar</button> }
+                  @if (r.alcance === 'hotel') {
+                    <label class="adm-check" style="font-size: 12px" title="Si está activo, el administrador de cada alojamiento puede asignar este rol a su personal">
+                      <input type="checkbox" [checked]="r.asignable_por_hotel" (change)="alternarAsignable(r)" /> Lo asigna el hotel
+                    </label>
+                  }
+                  @if (!r.es_sistema) { <button type="button" class="adm-btn sm danger out" (click)="borrar(r)">Eliminar</button> }
+                </div>
+              </td>
+            }
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="adm-card">
+      <h3>Menú lateral</h3>
+      <p class="adm-empty" style="padding: 0 0 10px; text-align: left">
+        Cada opción se muestra solo a quien tenga el permiso indicado. Las opciones de plataforma no se pueden desactivar para que nadie se quede sin acceso.
+      </p>
+      <div class="adm-table-wrap">
+        <table class="adm-table">
+          <thead><tr><th>Opción</th><th>Ruta</th><th>Sección</th><th>Permiso requerido</th><th class="num">Orden</th><th>Visible</th></tr></thead>
+          <tbody>
+            @for (i of items; track i.id) {
+              <tr>
+                <td><b>{{ i.texto }}</b></td>
+                <td><small>{{ i.ruta }}</small></td>
+                <td>{{ i.seccion }}</td>
+                <td>
+                  <select class="adm-select" [value]="i.permiso ?? ''" [disabled]="(i.permiso ?? '').startsWith('plataforma.')"
+                    (change)="guardarItem(i, { permiso: $any($event.target).value || null })" [attr.aria-label]="'Permiso de ' + i.texto">
+                    <option value="">Todo el personal</option>
+                    @for (p of permisos; track p.id) { <option [value]="p.clave">{{ p.clave }}</option> }
+                  </select>
+                </td>
+                <td class="num"><input class="adm-input" type="number" min="0" style="width: 72px" [value]="i.orden" (change)="cambiarOrden(i, $any($event.target).value)" [attr.aria-label]="'Orden de ' + i.texto" /></td>
+                <td>
+                  <input type="checkbox" [checked]="i.activo" [disabled]="(i.permiso ?? '').startsWith('plataforma.')"
+                    (change)="guardarItem(i, { activo: !i.activo })" [attr.aria-label]="'Mostrar ' + i.texto" />
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>
+
+@if (nuevo; as n) {
+  <div class="adm-modal" role="dialog" aria-modal="true" aria-label="Nuevo rol" (click)="nuevo = null">
+    <div class="adm-dialog" style="max-width: 460px" (click)="$event.stopPropagation()">
+      <h3>Nuevo rol de personal</h3>
+      <div class="adm-grid" style="grid-template-columns: 1fr">
+        <label class="adm-field">Nombre <input [(ngModel)]="n.nombre" name="rn" maxlength="60" placeholder="Ej. Jefe de cocina" /></label>
+        <label class="adm-field">Clave interna <input [(ngModel)]="n.clave" name="rc" maxlength="30" placeholder="jefe_cocina" /><small>Minúsculas y guion bajo. No se puede cambiar después.</small></label>
+        <label class="adm-field">Descripción <input [(ngModel)]="n.descripcion" name="rd" maxlength="255" /></label>
+        <label class="adm-check"><input type="checkbox" [(ngModel)]="n.asignable_por_hotel" name="ra" /> Los administradores de cada alojamiento pueden asignarlo</label>
+      </div>
+      <div class="adm-actions">
+        <button type="button" class="adm-btn out" (click)="nuevo = null">Cancelar</button>
+        <button type="button" class="adm-btn" [disabled]="!n.nombre.trim() || !n.clave.trim()" (click)="crear()">Crear rol</button>
+      </div>
+    </div>
+  </div>
+}

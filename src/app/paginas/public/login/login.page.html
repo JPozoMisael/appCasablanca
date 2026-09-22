@@ -1,89 +1,32 @@
-<div class="lg-shell">
-  <div class="lg-grid">
-    <!-- Izquierda: branding -->
-    <section class="lg-brand">
-      <div class="brand-card">
-        <div class="logo">CB</div>
+<div class="auth">
+  <form class="box" (ngSubmit)="entrar()" novalidate>
+    <h1>Inicia sesión</h1>
+    <p class="sub">Gestiona tus reservas o accede al panel de tu alojamiento.</p>
 
-        <div class="brand-text">
-          <h1>Hotel Casa Blanca</h1>
-          <p>Accede para administrar reservas, habitaciones y reportes.</p>
-        </div>
+    @if (sesionExpirada) {
+      <p class="aviso" role="status">Tu sesión expiró. Vuelve a iniciar sesión.</p>
+    }
 
-        <div class="brand-bullets">
-          <div class="b">✔ Gestión de reservas</div>
-          <div class="b">✔ Control de habitaciones</div>
-          <div class="b">✔ Reportes y estadísticas</div>
-        </div>
+    <label>Correo electrónico
+      <input type="email" name="email" [(ngModel)]="email" autocomplete="email" required />
+    </label>
 
-        <a class="back" routerLink="/inicio">← Volver al inicio</a>
-      </div>
-    </section>
+    <label>Contraseña
+      <span class="pw">
+        <input [type]="verPassword ? 'text' : 'password'" name="password" [(ngModel)]="password" autocomplete="current-password" required />
+        <button type="button" (click)="verPassword = !verPassword" [attr.aria-label]="verPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+          {{ verPassword ? 'Ocultar' : 'Ver' }}
+        </button>
+      </span>
+    </label>
 
-    <!-- Derecha: formulario -->
-    <section class="lg-form">
-      <div class="form-card">
-        <div class="form-head">
-          <h2>Iniciar sesión</h2>
-          <p>Usa tu cuenta para continuar</p>
-        </div>
+    @if (error) {
+      <p class="err" role="alert">{{ error }}</p>
+    }
 
-        <div class="alert" *ngIf="errorMsg">
-          <ion-icon name="lock-closed-outline"></ion-icon>
-          <span>{{ errorMsg }}</span>
-        </div>
+    <button type="submit" class="btn" [disabled]="cargando">{{ cargando ? 'Entrando…' : 'Iniciar sesión' }}</button>
 
-        <form (ngSubmit)="onSubmit()" autocomplete="on">
-          <div class="field">
-            <label>Correo</label>
-            <div class="input">
-              <ion-icon name="mail-outline"></ion-icon>
-              <input
-                type="email"
-                [(ngModel)]="email"
-                name="email"
-                placeholder="correo@hotel.com"
-                autocomplete="email"
-              />
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Contraseña</label>
-            <div class="input">
-              <ion-icon name="lock-closed-outline"></ion-icon>
-              <input
-                [type]="showPass ? 'text' : 'password'"
-                [(ngModel)]="password"
-                name="password"
-                placeholder="••••••••"
-                autocomplete="current-password"
-              />
-              <button type="button" class="eye" (click)="toggleShowPass()">
-                <ion-icon [name]="showPass ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
-              </button>
-            </div>
-          </div>
-
-          <div class="row">
-            <label class="check">
-              <input type="checkbox" [(ngModel)]="remember" name="remember" />
-              <span>Recordarme</span>
-            </label>
-
-            <a class="link" routerLink="/recuperar">¿Olvidaste tu contraseña?</a>
-          </div>
-
-          <ion-button class="submit" type="submit" expand="block" [disabled]="loading">
-            {{ loading ? 'Ingresando...' : 'Entrar' }}
-          </ion-button>
-
-          <div class="foot">
-            <span>¿No tienes cuenta?</span>
-            <a routerLink="/registro">Crear cuenta</a>
-          </div>
-        </form>
-      </div>
-    </section>
-  </div>
+    <p class="alt">¿No tienes cuenta? <a routerLink="/registro">Créala gratis</a></p>
+    <p class="alt">¿Reservaste sin cuenta? <a routerLink="/consultar-reserva">Consulta tu reserva</a></p>
+  </form>
 </div>

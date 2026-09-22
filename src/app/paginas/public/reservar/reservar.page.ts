@@ -1,483 +1,195 @@
-import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-import { Router, ActivatedRoute } from '@angular/router';
-
-import { ReservasService } from '@app/core/services/reservas.service';
-import { HuespedesService } from '@app/core/services/huespedes.service';
-import { HabitacionesService } from '@app/core/services/habitaciones.service';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { IonIcon } from '@ionic/angular/standalone';
+import { AuthService } from '@app/core/services/auth.service';
+import { BookingService } from '@app/core/services/booking.service';
+import { CatalogoService } from '@app/core/services/catalogo.service';
+import { Cotizacion, HotelFicha, ItemReserva } from '@app/shared/models/marketplace.model';
+import { MoneyPipe } from '@app/shared/pipes/money.pipe';
+import { fechaLarga, imagenUrl } from '@app/shared/utils/format';
 
 @Component({
   selector: 'app-reservar',
+  standalone: true,
+  imports: [FormsModule, RouterLink, IonIcon, MoneyPipe],
   templateUrl: './reservar.page.html',
   styleUrls: ['./reservar.page.scss'],
-  standalone: true,
-  imports: [
-    IonicModule,
-    CommonModule,
-    FormsModule
-  ]
 })
 export class ReservarPage implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private catalogo = inject(CatalogoService);
+  private booking = inject(BookingService);
+  private auth = inject(AuthService);
 
-  // ================= ROOM =================
-  room: any = null;
+  hotel: HotelFicha | null = null;
+  cotizacion: Cotizacion | null = null;
 
-  // ================= HOTEL =================
-  hotelId = 0;
-
-  // ================= GUEST =================
-  guest = {
-
-    nombres: '',
-
-    apellidos: '',
-
-    email: '',
-
-    telefono: '',
-
-    cedulaPasaporte: '',
-
-    notas: ''
-  };
-
-  // ================= STATE =================
-  acceptingTerms = false;
-  submitting = false;
-
-  // ================= SEARCH =================
+  slug = '';
   checkIn = '';
   checkOut = '';
+  adultos = 2;
+  ninos = 0;
+  items: ItemReserva[] = [];
+  extras: Record<number, number> = {};
 
-  adults = 2;
-  children = 0;
+  contacto = { nombres: '', apellidos: '', email: '', telefono: '' };
+  observaciones = '';
+  aceptaTerminos = false;
 
-  // ================= TOTALS =================
-  nights = 0;
-  guestsLabel = '';
+  cargando = true;
+  cotizando = false;
+  enviando = false;
+  error = '';
+  errorCotizacion = '';
+  intentado = false;
 
-  subtotal = 0;
-  taxes = 0;
-  total = 0;
+  readonly fechaLarga = fechaLarga;
 
-  constructor(
-    private reservasService: ReservasService,
-    private huespedesService: HuespedesService,
-    private habitacionesService: HabitacionesService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
+  get logueado(): boolean {
+    return this.auth.estaLogueado();
+  }
 
-  // ================= INIT =================
-  ngOnInit() {
+  ngOnInit(): void {
+    const q = this.route.snapshot.queryParamMap;
+    this.slug = q.get('hotel') ?? '';
+    this.checkIn = q.get('checkIn') ?? '';
+    this.checkOut = q.get('checkOut') ?? '';
+    this.adultos = Number(q.get('adultos')) || 2;
+    this.ninos = Number(q.get('ninos')) || 0;
+    this.items = (q.get('items') ?? '')
+      .split(',')
+      .map((p) => p.split(':').map(Number))
+      .filter(([id, n]) => id > 0 && n > 0)
+      .map(([id, n]) => ({ tipo_habitacion_id: id, cantidad: n }));
 
-    this.route.queryParamMap.subscribe(params => {
+    if (!this.slug || !this.checkIn || !this.checkOut || !this.items.length) {
+      this.router.navigate(['/buscar']);
+      return;
+    }
 
-      const roomId = Number(
-        params.get('roomId')
-      );
+    const u = this.auth.usuario();
+    if (u) {
+      this.contacto.nombres = u.nombre ?? '';
+      this.contacto.apellidos = u.apellido ?? '';
+      this.contacto.email = u.email ?? '';
+    }
 
-      this.checkIn =
-        params.get('checkIn') || '';
-
-      this.checkOut =
-        params.get('checkOut') || '';
-
-      this.adults =
-        Number(params.get('adults') || 2);
-
-      this.children =
-        Number(params.get('children') || 0);
-
-      if (!roomId) {
-
-        console.error('roomId inválido');
-
-        return;
-      }
-
-      // ================= ROOM =================
-
-      this.habitacionesService
-        .getById(roomId)
-        .subscribe({
-
-          next: (h: any) => {
-
-            if (!h) {
-              return;
-            }
-
-            // 🔥 HOTEL ID
-            this.hotelId =
-              h.hotel_id ||
-              h.hotelId ||
-              0;
-
-            this.room = {
-
-              id: h.id,
-
-              name:
-                h.tipo ||
-                `Habitación ${h.numero}`,
-
-              image:
-                h.imagenUrl ||
-                h.imagen ||
-                'assets/default-room.jpg',
-
-              location:
-                h.hotel?.nombre ||
-                'Casa Blanca',
-
-              pricePerNight:
-                h.precioNoche ||
-                h.precio ||
-                0
-            };
-
-            this.updateGuestsLabel();
-
-            this.calculateTotals();
-          },
-
-          error: (err: any) => {
-
-            console.error(
-              'ERROR ROOM:',
-              err
-            );
-          }
-
-        });
-
+    this.catalogo.hotel(this.slug).subscribe({
+      next: (h) => {
+        this.hotel = h;
+        this.cargando = false;
+        this.cotizar();
+      },
+      error: () => {
+        this.cargando = false;
+        this.error = 'No encontramos el alojamiento.';
+      },
     });
-
   }
 
-  // ================= LABEL =================
-  updateGuestsLabel() {
-
-    let t =
-      `${this.adults} adulto${this.adults !== 1 ? 's' : ''}`;
-
-    if (this.children > 0) {
-
-      t +=
-        ` · ${this.children} niño${this.children !== 1 ? 's' : ''}`;
-    }
-
-    this.guestsLabel = t;
+  get imagen(): string {
+    return imagenUrl(this.hotel?.imagen_principal);
   }
 
-  // ================= CALCULOS =================
-  calculateTotals() {
+  cotizar(): void {
+    if (!this.hotel) return;
+    this.cotizando = true;
+    this.errorCotizacion = '';
+    const servicios = Object.entries(this.extras)
+      .filter(([, n]) => n > 0)
+      .map(([id, n]) => ({ servicio_id: Number(id), cantidad: n }));
 
-    if (
-      !this.checkIn ||
-      !this.checkOut ||
-      !this.room
-    ) {
-      return;
-    }
-
-    const a =
-      new Date(this.checkIn).getTime();
-
-    const b =
-      new Date(this.checkOut).getTime();
-
-    const diff = b - a;
-
-    this.nights =
-      diff > 0
-        ? Math.ceil(
-            diff / (
-              1000 *
-              60 *
-              60 *
-              24
-            )
-          )
-        : 1;
-
-    this.subtotal =
-      this.room.pricePerNight *
-      this.nights;
-
-    this.taxes =
-      this.subtotal * 0.12;
-
-    this.total =
-      this.subtotal + this.taxes;
-  }
-
-  // ================= CONFIRM =================
-  confirmBooking() {
-
-    if (this.submitting) {
-      return;
-    }
-
-    // ================= VALIDACIONES =================
-
-    if (!this.acceptingTerms) {
-
-      alert(
-        'Debes aceptar los términos'
-      );
-
-      return;
-    }
-
-    if (
-      !this.guest.nombres.trim() ||
-      !this.guest.email.trim()
-    ) {
-
-      alert(
-        'Completa los datos obligatorios'
-      );
-
-      return;
-    }
-
-    if (!this.room) {
-
-      alert('Habitación inválida');
-
-      return;
-    }
-
-    if (
-      !this.checkIn ||
-      !this.checkOut
-    ) {
-
-      alert('Fechas inválidas');
-
-      return;
-    }
-
-    if (!this.hotelId) {
-
-      alert(
-        'Hotel inválido'
-      );
-
-      return;
-    }
-
-    // ================= EMAIL =================
-
-    const emailOk =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        .test(this.guest.email);
-
-    if (!emailOk) {
-
-      alert('Correo inválido');
-
-      return;
-    }
-
-    this.submitting = true;
-
-    // ================= CLIENTE =================
-
-    const clientePayload = {
-
-      nombres:
-        this.guest.nombres.trim(),
-
-      apellidos:
-        this.guest.apellidos.trim(),
-
-      email:
-        this.guest.email.trim(),
-
-      telefono:
-        this.guest.telefono.trim(),
-
-      documento:
-        this.guest.cedulaPasaporte.trim()
-    };
-
-    this.huespedesService
-      .create(clientePayload)
+    this.booking
+      .cotizar({
+        hotel_id: this.hotel.id,
+        fecha_entrada: this.checkIn,
+        fecha_salida: this.checkOut,
+        adultos: this.adultos,
+        ninos: this.ninos,
+        habitaciones: this.items,
+        servicios,
+      })
       .subscribe({
-
-        next: (cliente: any) => {
-
-          const clienteData =
-            cliente?.data || cliente;
-
-          if (!clienteData?.id) {
-
-            console.error(
-              'Cliente inválido'
-            );
-
-            this.submitting = false;
-
-            alert(
-              'Error al crear huésped'
-            );
-
-            return;
-          }
-
-          // ================= RESERVA =================
-
-          const reservaPayload = {
-
-            cliente_id:
-              clienteData.id,
-
-            hotel_id:
-              this.hotelId,
-
-            fecha_entrada:
-              this.checkIn,
-
-            fecha_salida:
-              this.checkOut,
-
-            num_huespedes:
-              this.adults +
-              this.children,
-
-            habitaciones: [
-              {
-                habitacion_id:
-                  this.room.id
-              }
-            ],
-
-            observaciones:
-              this.guest.notas
-          };
-
-          this.reservasService
-            .create(reservaPayload)
-            .subscribe({
-
-              next: (reserva: any) => {
-
-                const reservaData =
-                  reserva?.data ||
-                  reserva?.reserva ||
-                  reserva;
-
-                if (!reservaData) {
-
-                  this.submitting = false;
-
-                  alert(
-                    'Error al crear reserva'
-                  );
-
-                  return;
-                }
-
-                this.submitting = false;
-
-                // ================= REDIRECT =================
-
-                this.router.navigate(
-                  ['/reserva-confirmada'],
-                  {
-                    queryParams: {
-
-                      roomId:
-                        this.room.id,
-
-                      checkIn:
-                        this.checkIn,
-
-                      checkOut:
-                        this.checkOut,
-
-                      adults:
-                        this.adults,
-
-                      children:
-                        this.children,
-
-                      guestName:
-                        this.guest.nombres,
-
-                      guestEmail:
-                        this.guest.email,
-
-                      guestPhone:
-                        this.guest.telefono,
-
-                      total:
-                        reservaData.precio_total ||
-                        this.total,
-
-                      code:
-                        reservaData.codigo_reserva ||
-                        (
-                          'CB-' +
-                          Math.random()
-                            .toString(36)
-                            .substring(2, 8)
-                            .toUpperCase()
-                        )
-                    }
-                  }
-                );
-
-              },
-
-              error: (err: any) => {
-
-                console.error(
-                  'ERROR RESERVA:',
-                  err
-                );
-
-                this.submitting = false;
-
-                alert(
-                  err?.error?.message ||
-                  'Error al crear la reserva'
-                );
-              }
-
-            });
-
+        next: (c) => {
+          this.cotizacion = c;
+          this.cotizando = false;
         },
-
-        error: (err: any) => {
-
-          console.error(
-            'ERROR HUESPED:',
-            err
-          );
-
-          this.submitting = false;
-
-          alert(
-            err?.error?.message ||
-            'Error al crear huésped'
-          );
-        }
-
+        error: (e) => {
+          this.cotizacion = null;
+          this.cotizando = false;
+          this.errorCotizacion =
+            e?.error?.message ?? 'No pudimos calcular el precio. Vuelve al alojamiento y elige de nuevo.';
+        },
       });
-
   }
 
-  // ================= NAV =================
-  backToRooms() {
-
-    window.history.back();
+  cambiarExtra(id: number, delta: number): void {
+    this.extras = { ...this.extras, [id]: Math.max(0, Math.min(20, (this.extras[id] ?? 0) + delta)) };
+    this.cotizar();
   }
 
+  get urlActual(): string {
+    return this.router.url;
+  }
+
+  get telefonoOk(): boolean {
+    return this.contacto.telefono.replace(/\D/g, '').length >= 7;
+  }
+
+  get contactoValido(): boolean {
+    const c = this.contacto;
+    const emailOk = /^\S+@\S+\.\S+$/.test(c.email);
+    return c.nombres.trim().length >= 2 && c.apellidos.trim().length >= 1 && emailOk && this.telefonoOk;
+  }
+
+  get puedeConfirmar(): boolean {
+    return !!this.cotizacion && this.contactoValido && this.aceptaTerminos && !this.enviando;
+  }
+
+  confirmar(): void {
+    this.intentado = true;
+    if (!this.puedeConfirmar || !this.hotel) return;
+    this.enviando = true;
+    this.error = '';
+
+    this.booking
+      .crear({
+        hotel_id: this.hotel.id,
+        fecha_entrada: this.checkIn,
+        fecha_salida: this.checkOut,
+        adultos: this.adultos,
+        ninos: this.ninos,
+        habitaciones: this.items,
+        servicios: Object.entries(this.extras)
+          .filter(([, n]) => n > 0)
+          .map(([id, n]) => ({ servicio_id: Number(id), cantidad: n })),
+        contacto: { ...this.contacto, telefono: this.contacto.telefono.trim() },
+        observaciones: this.observaciones.trim() || undefined,
+        pago_en_hotel: true,
+      })
+      .subscribe({
+        next: (reserva) => {
+          this.router.navigate(['/reserva-confirmada'], {
+            queryParams: { codigo: reserva.codigo_reserva },
+            state: { reserva },
+          });
+        },
+        error: (e) => {
+          this.enviando = false;
+          const code = e?.error?.code;
+          this.error =
+            code === 'SIN_DISPONIBILIDAD'
+              ? 'Alguien reservó estas habitaciones mientras completabas tus datos. Vuelve al alojamiento y elige otras opciones.'
+              : (e?.error?.message ?? 'No pudimos crear tu reserva. Intenta de nuevo.');
+        },
+      });
+  }
+
+  volver(): void {
+    this.router.navigate(['/hotel', this.slug], {
+      queryParams: { checkIn: this.checkIn, checkOut: this.checkOut, adultos: this.adultos, ninos: this.ninos || null },
+    });
+  }
 }

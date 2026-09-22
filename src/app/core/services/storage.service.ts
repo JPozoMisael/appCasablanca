@@ -2,360 +2,100 @@ import { Injectable } from '@angular/core';
 import { Role } from '../config/roles';
 
 export interface StoredUser {
-
   id: number;
-
-  nombres?: string;
-
-  apellidos?: string;
-
+  nombre?: string;
+  apellido?: string;
   email?: string;
-
   rol?: Role;
-
   roles?: Role[];
+  /** plataforma | hotel | cliente (lo determina el servidor según el rol). */
+  alcance?: 'plataforma' | 'hotel' | 'cliente';
+  /** Hotel al que pertenece el personal (null para clientes y super_admin). */
+  hotel_id?: number | null;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
-
+/**
+ * Persistencia de la sesión en localStorage. Todo acceso está protegido con try/catch
+ * (modo privado, cuota llena, SSR) y nunca escribe el token en consola.
+ */
+@Injectable({ providedIn: 'root' })
 export class StorageService {
-
   private readonly TOKEN_KEY = 'token';
-
   private readonly USER_KEY = 'user';
-
   private readonly ROLE_KEY = 'rol';
 
-  private readonly ROLES_KEY = 'roles';
-
-
-  // =========================================
-  // TOKEN
-  // =========================================
-
-  setToken(token: string): void {
-
-    console.log(
-      '[STORAGE] Guardando token'
-    );
-
-    localStorage.setItem(
-      this.TOKEN_KEY,
-      token
-    );
+  private read(key: string): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
   }
 
+  private write(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      /* sin almacenamiento disponible */
+    }
+  }
+
+  private remove(key: string): void {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      /* sin almacenamiento disponible */
+    }
+  }
+
+  // ---------- token ----------
+  setToken(token: string): void {
+    this.write(this.TOKEN_KEY, token);
+  }
 
   getToken(): string | null {
-
-    const token =
-      localStorage.getItem(
-        this.TOKEN_KEY
-      );
-
-    console.log(
-      '[STORAGE] Token:',
-      token ? 'EXISTE' : 'NO EXISTE'
-    );
-
-    return token;
+    return this.read(this.TOKEN_KEY);
   }
-
 
   clearToken(): void {
-
-    console.log(
-      '[STORAGE] Eliminando token'
-    );
-
-    localStorage.removeItem(
-      this.TOKEN_KEY
-    );
+    this.remove(this.TOKEN_KEY);
   }
 
-
-  // =========================================
-  // USER
-  // =========================================
-
+  // ---------- usuario ----------
   setUser(user: StoredUser): void {
-
-    console.log(
-      '[STORAGE] Guardando usuario:',
-      user
-    );
-
-    if (!user || !user.id) {
-
-      console.warn(
-        '[STORAGE] Usuario inválido'
-      );
-
-      return;
-    }
-
-    localStorage.setItem(
-      this.USER_KEY,
-      JSON.stringify(user)
-    );
-
-
-    if (user.rol) {
-
-      console.log(
-        '[STORAGE] Guardando rol:',
-        user.rol
-      );
-
-      localStorage.setItem(
-        this.ROLE_KEY,
-        user.rol
-      );
-    }
-
-
-    if (
-      user.roles &&
-      user.roles.length > 0
-    ) {
-
-      console.log(
-        '[STORAGE] Guardando roles:',
-        user.roles
-      );
-
-      localStorage.setItem(
-
-        this.ROLES_KEY,
-
-        JSON.stringify(user.roles)
-      );
-    }
+    if (!user?.id) return;
+    this.write(this.USER_KEY, JSON.stringify(user));
+    if (user.rol) this.write(this.ROLE_KEY, user.rol);
   }
-
 
   getUser(): StoredUser | null {
-
-    const raw =
-      localStorage.getItem(
-        this.USER_KEY
-      );
-
-    console.log(
-      '[STORAGE] Obteniendo usuario'
-    );
-
-    if (!raw) {
-
-      console.warn(
-        '[STORAGE] Usuario no encontrado'
-      );
-
-      return null;
-    }
-
+    const raw = this.read(this.USER_KEY);
+    if (!raw) return null;
     try {
-
-      const parsed =
-        JSON.parse(raw) as StoredUser;
-
-      console.log(
-        '[STORAGE] Usuario:',
-        parsed
-      );
-
-      return parsed;
-
+      return JSON.parse(raw) as StoredUser;
     } catch {
-
-      console.error(
-        '[STORAGE] Error parseando usuario'
-      );
-
       return null;
     }
   }
-
-
-  // =========================================
-  // ROLES
-  // =========================================
 
   getRole(): Role | null {
-
-    const raw =
-      localStorage.getItem(
-        this.ROLE_KEY
-      );
-
-    console.log(
-      '[STORAGE] Role:',
-      raw
-    );
-
-    return raw
-      ? (raw as Role)
-      : null;
+    const user = this.getUser();
+    return (user?.rol ?? (this.read(this.ROLE_KEY) as Role | null)) || null;
   }
-
 
   getRoles(): Role[] {
-
-    const raw =
-      localStorage.getItem(
-        this.ROLES_KEY
-      );
-
-    console.log(
-      '[STORAGE] Roles:',
-      raw
-    );
-
-    if (!raw) {
-      return [];
-    }
-
-    try {
-
-      const parsed =
-        JSON.parse(raw);
-
-      return Array.isArray(parsed)
-
-        ? (parsed as Role[])
-
-        : [];
-
-    } catch {
-
-      console.error(
-        '[STORAGE] Error parseando roles'
-      );
-
-      return [];
-    }
+    const rol = this.getRole();
+    return rol ? [rol] : [];
   }
-
-
-  // =========================================
-  // VALIDACIÓN
-  // =========================================
 
   isLoggedIn(): boolean {
-
-    console.log(
-      '[STORAGE] Validando sesión'
-    );
-
-    const token =
-      this.getToken();
-
-    const user =
-      this.getUser();
-
-
-    if (!token || !user) {
-
-      console.warn(
-        '[STORAGE] Sesión inválida'
-      );
-
-      return false;
-    }
-
-
-    // =====================================
-    // VALIDAR JWT
-    // =====================================
-
-    if (
-      this.isTokenExpired(token)
-    ) {
-
-      console.warn(
-        '[STORAGE] Token expirado'
-      );
-
-      this.clearAll();
-
-      return false;
-    }
-
-
-    console.log(
-      '[STORAGE] Sesión válida'
-    );
-
-    return true;
+    return !!this.getToken();
   }
-
-
-  private isTokenExpired(
-    token: string
-  ): boolean {
-
-    try {
-
-      const payload =
-        JSON.parse(
-
-          atob(
-            token.split('.')[1]
-          )
-        );
-
-
-      if (!payload.exp) {
-        return false;
-      }
-
-
-      const now =
-        Math.floor(
-          Date.now() / 1000
-        );
-
-
-      return payload.exp < now;
-
-    } catch {
-
-      console.error(
-        '[STORAGE] Token inválido'
-      );
-
-      return true;
-    }
-  }
-
-
-  // =========================================
-  // CLEAR
-  // =========================================
 
   clearAll(): void {
-
-    console.warn(
-      '[STORAGE] Limpiando sesión'
-    );
-
-    localStorage.removeItem(
-      this.TOKEN_KEY
-    );
-
-    localStorage.removeItem(
-      this.USER_KEY
-    );
-
-    localStorage.removeItem(
-      this.ROLE_KEY
-    );
-
-    localStorage.removeItem(
-      this.ROLES_KEY
-    );
+    this.remove(this.TOKEN_KEY);
+    this.remove(this.USER_KEY);
+    this.remove(this.ROLE_KEY);
+    this.remove('roles');
   }
-
 }

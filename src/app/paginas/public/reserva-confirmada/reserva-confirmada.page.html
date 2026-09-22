@@ -1,149 +1,81 @@
-<div class="rc-container" *ngIf="room; else noData">
-
-  <!-- ================= HEADER ================= -->
-  <section class="rc-header">
-
-    <ion-icon name="checkmark-circle-outline" class="ok"></ion-icon>
-
-    <h1>¡Reserva confirmada!</h1>
-    <p>Tu habitación ha sido reservada exitosamente</p>
-
-    <div class="code">
-      Código de reserva:
-      <strong>{{ reservationCode }}</strong>
+@if (reserva; as r) {
+  <div class="container page">
+    <div class="ok">
+      <ion-icon name="checkmark-circle"></ion-icon>
+      <div>
+        <h1>¡Tu reserva está {{ r.estado === 'confirmada' ? 'confirmada' : 'registrada' }}!</h1>
+        <p>Guarda tu código: lo necesitarás para consultar o cancelar tu reserva.</p>
+      </div>
     </div>
 
-  </section>
+    <div class="codigo">
+      <span>Código de reserva</span>
+      <strong>{{ codigo }}</strong>
+      <button type="button" (click)="copiar()"><ion-icon name="copy-outline"></ion-icon> {{ copiado ? '¡Copiado!' : 'Copiar' }}</button>
+    </div>
 
-  <!-- ================= GRID ================= -->
-  <section class="rc-grid">
+    <div class="cols">
+      <section class="card">
+        <h2>{{ r.hotel?.nombre }}</h2>
+        <p class="sub">{{ r.hotel?.direccion }}</p>
 
-    <!-- ================= LEFT ================= -->
-    <main class="rc-main">
+        <dl class="datos">
+          <div><dt>Entrada</dt><dd>{{ fechaLarga(r.fecha_entrada) }}<small>desde {{ r.hotel?.hora_checkin }}</small></dd></div>
+          <div><dt>Salida</dt><dd>{{ fechaLarga(r.fecha_salida) }}<small>hasta {{ r.hotel?.hora_checkout }}</small></dd></div>
+          <div><dt>Huéspedes</dt><dd>{{ r.num_huespedes }}</dd></div>
+          <div><dt>Estado</dt><dd><span class="estado {{ estados[r.estado].color }}">{{ estados[r.estado].texto }}</span></dd></div>
+        </dl>
 
-      <!-- RESERVA -->
-      <div class="box">
+        <h3>Habitaciones</h3>
+        <ul class="hab">
+          @for (d of r.detalles; track d.id) {
+            <li>
+              <span>{{ d.habitacion?.tipoHabitacion?.nombre }} <small>· {{ d.noches }} {{ d.noches === 1 ? 'noche' : 'noches' }}</small></span>
+              <b>{{ d.subtotal | money }}</b>
+            </li>
+          }
+          @for (s of r.servicios; track s.id) {
+            <li><span>{{ s.servicio?.nombre }} × {{ s.cantidad }}</span><b>{{ s.subtotal | money }}</b></li>
+          }
+        </ul>
+      </section>
 
-        <div class="box-title">
-          Datos de la reserva
+      <aside class="card lado">
+        <h3>Resumen del pago</h3>
+        <ul class="hab">
+          <li><span>Subtotal</span><b>{{ r.subtotal | money }}</b></li>
+          <li><span>Impuestos</span><b>{{ r.impuestos | money }}</b></li>
+        </ul>
+        <div class="total"><span>Total</span><strong>{{ r.precio_total | money }}</strong></div>
+        <p class="nota">Pagas en el alojamiento al llegar.</p>
+
+        <div class="canc" [class.gratis]="r.cancelacion.gratis">
+          @if (r.cancelacion.gratis) {
+            <b>Cancelación gratis</b> hasta el {{ fechaLarga(r.cancelacion.limite_cancelacion_gratis) }}.
+          } @else {
+            La cancelación gratuita ya venció. Si cancelas se cobrarán {{ r.cancelacion.penalizacion | money }}.
+          }
         </div>
 
-        <div class="line">
-          <span>Check-in</span>
-          <strong>{{ checkIn || '-' }}</strong>
+        <div class="btns">
+          @if (whatsapp) {
+            <a class="btn sec" [href]="whatsapp" target="_blank" rel="noopener"><ion-icon name="logo-whatsapp"></ion-icon> Escribir al hotel</a>
+          }
+          <button type="button" class="btn sec" (click)="imprimir()"><ion-icon name="print-outline"></ion-icon> Imprimir</button>
+          @if (logueado) {
+            <a class="btn" routerLink="/mis-reservas">Ver mis reservas</a>
+          } @else {
+            <a class="btn" routerLink="/consultar-reserva" [queryParams]="{ codigo: codigo }">Gestionar esta reserva</a>
+          }
         </div>
+      </aside>
+    </div>
 
-        <div class="line">
-          <span>Check-out</span>
-          <strong>{{ checkOut || '-' }}</strong>
-        </div>
-
-        <div class="line">
-          <span>Noches</span>
-          <strong>{{ nights || 1 }}</strong>
-        </div>
-
-        <div class="line">
-          <span>Huéspedes</span>
-          <strong>{{ guestsLabel }}</strong>
-        </div>
-
-      </div>
-
-      <!-- HUESPED -->
-      <div class="box">
-
-        <div class="box-title">
-          Datos del huésped
-        </div>
-
-        <div class="line">
-          <span>Nombre</span>
-          <strong>{{ guestName || '-' }}</strong>
-        </div>
-
-        <div class="line">
-          <span>Email</span>
-          <strong>{{ guestEmail || '-' }}</strong>
-        </div>
-
-        <div class="line" *ngIf="guestPhone">
-          <span>Teléfono</span>
-          <strong>{{ guestPhone }}</strong>
-        </div>
-
-      </div>
-
-    </main>
-
-    <!-- ================= RIGHT ================= -->
-    <aside class="rc-side">
-
-      <div class="summary">
-
-        <!-- ROOM -->
-        <div class="sum-room">
-
-          <img
-            [src]="room.image || 'assets/img/default.jpg'"
-            [alt]="room.name"
-          />
-
-          <div class="info">
-            <div class="name">{{ room.name }}</div>
-            <div class="loc">{{ room.location }}</div>
-          </div>
-
-        </div>
-
-        <!-- PRICE -->
-        <div class="sum-price">
-
-          <div class="line">
-            <span>Precio por noche</span>
-            <strong>${{ room.pricePerNight || 0 }}</strong>
-          </div>
-
-          <div class="line">
-            <span>Noches</span>
-            <strong>{{ nights || 1 }}</strong>
-          </div>
-
-          <div class="line total">
-            <span>Total pagado</span>
-            <strong>${{ total || 0 }}</strong>
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- ACTIONS -->
-      <div class="actions">
-
-        <ion-button expand="block" routerLink="/mis-reservas">
-          Ver mis reservas
-        </ion-button>
-
-        <ion-button expand="block" fill="outline" routerLink="/inicio">
-          Volver al inicio
-        </ion-button>
-
-      </div>
-
-    </aside>
-
-  </section>
-
-</div>
-
-<!-- ================= EMPTY ================= -->
-<ng-template #noData>
-  <div class="rc-container empty">
-    <h2>No hay datos de reserva</h2>
-
-    <ion-button routerLink="/inicio">
-      Ir al inicio
-    </ion-button>
+    @if (!logueado) {
+      <p class="crear">
+        ¿Reservarás de nuevo?
+        <a routerLink="/registro">Crea tu cuenta</a> para guardar tus próximas reservas, favoritos y opiniones. Esta reserva la puedes gestionar siempre con su código y tu correo.
+      </p>
+    }
   </div>
-</ng-template>
+}

@@ -1,0 +1,72 @@
+<article class="hc" [class.compacta]="compacta">
+  <a class="media" [routerLink]="['/hotel', hotel.slug]" [queryParams]="consulta" [attr.aria-label]="'Ver ' + hotel.nombre">
+    <img [src]="imagen" [alt]="hotel.nombre" loading="lazy" />
+    @if (hotel.destacado) {
+      <span class="tag">Destacado</span>
+    }
+  </a>
+  <button type="button" class="fav" [class.on]="esFavorito" (click)="alFavorito($event)" [attr.aria-pressed]="esFavorito"
+    [attr.aria-label]="esFavorito ? 'Quitar de favoritos' : 'Guardar en favoritos'">
+    <ion-icon [name]="esFavorito ? 'heart' : 'heart-outline'"></ion-icon>
+  </button>
+
+  <div class="body">
+    <div class="top">
+      <div class="info">
+        <h3>
+          <a [routerLink]="['/hotel', hotel.slug]" [queryParams]="consulta">{{ hotel.nombre }}</a>
+        </h3>
+        <div class="meta">
+          <span class="tipo">{{ tipo[hotel.tipo_alojamiento] }}</span>
+          @if (hotel.estrellas) {
+            <span class="stars" [attr.aria-label]="hotel.estrellas + ' estrellas'">
+              @for (n of estrellas.slice(0, hotel.estrellas); track n) {
+                <ion-icon name="star"></ion-icon>
+              }
+            </span>
+          }
+        </div>
+        @if (hotel.zona) {
+          <div class="zona">
+            <ion-icon name="location-outline"></ion-icon>
+            <a [routerLink]="['/buscar']" [queryParams]="{ zona: hotel.zona.slug }">{{ hotel.zona.nombre }}</a>
+            <span>· Salinas</span>
+          </div>
+        }
+      </div>
+      <app-rating-badge [rating]="hotel.rating" [total]="hotel.total_valoraciones" [mostrarTotal]="!compacta" />
+    </div>
+
+    @if (!compacta && hotel.amenidades?.length) {
+      <ul class="amen">
+        @for (a of hotel.amenidades!.slice(0, 4); track a.slug) {
+          <li>
+            @if (a.icono) {
+              <ion-icon [name]="a.icono"></ion-icon>
+            }
+            {{ a.nombre }}
+          </li>
+        }
+      </ul>
+    }
+
+    <div class="foot">
+      @if (pocasHabitaciones && hotel.habitaciones_disponibles) {
+        <span class="poco">¡Solo quedan {{ hotel.habitaciones_disponibles }}!</span>
+      } @else {
+        <span></span>
+      }
+      <div class="precio">
+        @if (hotel.precio_total !== undefined && noches) {
+          <small>{{ noches }} {{ noches === 1 ? 'noche' : 'noches' }}</small>
+          <strong>{{ hotel.precio_total | money }}</strong>
+          <small>+ impuestos · {{ hotel.precio_noche | money }} / noche</small>
+        } @else {
+          <small>Desde</small>
+          <strong>{{ hotel.precio_noche | money }}</strong>
+          <small>por noche</small>
+        }
+      </div>
+    </div>
+  </div>
+</article>

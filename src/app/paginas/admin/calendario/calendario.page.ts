@@ -1,303 +1,188 @@
-import { Component, computed, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ApiService } from '@app/core/services/api.service';
+import { MenuService } from '@app/core/services/menu.service';
+import { ETIQUETA_ESTADO, desdeISO, hoyISO, sumarDias } from '@app/shared/utils/format';
 
-import {
-  IonIcon,
-  IonButton,
-  IonChip
-} from '@ionic/angular/standalone';
+interface HabCal { id: number; numero_habitacion: string; piso?: number | null; estado: string; tipo_habitacion_id: number; tipoHabitacion?: { id: number; nombre: string } }
+interface ResCal { id: number; codigo_reserva: string; estado: string; fecha_entrada: string; fecha_salida: string; num_huespedes: number; canal: string; huesped: string; habitaciones: number[] }
+interface BloqueoCal { id: number; habitacion_id: number; fecha_inicio: string; fecha_fin: string; tipo_bloqueo: string; motivo?: string | null }
+interface Calendario { desde: string; hasta: string; dias: number; habitaciones: HabCal[]; reservas: ResCal[]; bloqueos: BloqueoCal[] }
 
-import { addIcons } from 'ionicons';
-import {
-  chevronBackOutline,
-  chevronForwardOutline,
-  todayOutline,
-  calendarOutline,
-  addCircleOutline,
-  personOutline,
-  informationCircleOutline,
-  closeOutline,
-  createOutline,
-  checkmarkCircleOutline,
-  logInOutline,
-  logOutOutline,
-  trashOutline
-} from 'ionicons/icons';
+interface Dia { iso: string; numero: number; semana: string; mes: string; hoy: boolean; finde: boolean; nuevoMes: boolean }
+interface Barra { clase: string; inicio: number; largo: number; texto: string; titulo: string; reservaId?: number; codigo?: string }
+interface FilaHab { hab: HabCal; barras: Barra[] }
+interface Grupo { tipo: string; filas: FilaHab[] }
 
-import { CalendarioService } from '@app/core/services/calendario.service';
-
-type EstadoReserva =
-  | 'CONFIRMADA'
-  | 'PENDIENTE'
-  | 'CHECKIN'
-  | 'CHECKOUT'
-  | 'CANCELADA';
-
-interface HabitacionRow {
-  id: number;
-  codigo: string;
-  tipo: string;
-  piso?: string;
-}
-
-interface Reserva {
-  id: number;
-  huesped: string;
-  habitacionId: number;
-  checkIn: string;
-  checkOut: string;
-  estado: EstadoReserva;
-  total: number;
-}
-
-interface Bar {
-  reserva: Reserva;
-  colStart: number;
-  colEnd: number;
-  clippedLeft: boolean;
-  clippedRight: boolean;
-}
-
+/** Calendario de ocupación: una fila por habitación y una columna por día. */
 @Component({
   selector: 'app-calendario',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    IonIcon,
-    IonButton,
-    IonChip
-  ],
+  imports: [FormsModule],
   templateUrl: './calendario.page.html',
   styleUrls: ['./calendario.page.scss'],
 })
 export class CalendarioPage implements OnInit {
-  viewDate = signal<Date>(this.startOfMonth(new Date()));
-  selectedReservaId = signal<number | null>(null);
-  loading = signal(true);
+  private api = inject(ApiService);
+  private router = inject(Router);
+  private menu = inject(MenuService);
 
-  selectedReserva = computed(() => {
-    const id = this.selectedReservaId();
-    if (!id) return null;
-    return this.reservas().find(r => r.id === id) || null;
-  });
+  desde = hoyISO();
+  dias = 14;
+  cargando = true;
+  error = '';
 
-  habitaciones = signal<HabitacionRow[]>([]);
-  reservas = signal<Reserva[]>([]);
+  cabecera: Dia[] = [];
+  grupos: Grupo[] = [];
+  ocupacion: { ocupadas: number; pct: number }[] = [];
+  totalHabitaciones = 0;
 
-  constructor(private calendarioService: CalendarioService) {
-    addIcons({
-      chevronBackOutline,
-      chevronForwardOutline,
-      todayOutline,
-      calendarOutline,
-      addCircleOutline,
-      personOutline,
-      informationCircleOutline,
-      closeOutline,
-      createOutline,
-      checkmarkCircleOutline,
-      logInOutline,
-      logOutOutline,
-      trashOutline
+  readonly estados = ETIQUETA_ESTADO;
+  readonly hoy = hoyISO();
+
+  get puedeReservar(): boolean {
+    return this.menu.tiene('reservas.gestionar');
+  }
+
+  get columnas(): string {
+    return `150px repeat(${this.dias}, minmax(34px, 1fr))`;
+  }
+
+  ngOnInit(): void {
+    this.cargar();
+  }
+
+  cargar(): void {
+    this.cargando = true;
+    this.error = '';
+    this.api.get<{ data: Calendario }>('/calendar', { desde: this.desde, dias: this.dias }).subscribe({
+      next: (r) => {
+        this.armar(r.data);
+        this.cargando = false;
+      },
+      error: (e) => {
+        this.error =
+          e?.error?.code === 'HOTEL_REQUERIDO'
+            ? 'Elige un alojamiento en "Operando en" (arriba a la derecha) para ver su calendario.'
+            : (e?.error?.message ?? 'No pudimos cargar el calendario.');
+        this.cargando = false;
+      },
     });
   }
 
-  ngOnInit() {
-    this.loadData();
-  }
-
-  loadData() {
-    this.loading.set(true);
-    Promise.all([
-      this.calendarioService.getHabitaciones().toPromise(),
-      this.calendarioService.getReservas().toPromise()
-    ]).then(([habitaciones, reservas]) => {
-      if (habitaciones) this.habitaciones.set(habitaciones);
-      if (reservas) this.reservas.set(reservas);
-      this.loading.set(false);
-    }).catch(err => {
-      console.error('Error cargando datos del calendario:', err);
-      this.loading.set(false);
+  private armar(c: Calendario): void {
+    this.dias = c.dias;
+    const fmtSemana = new Intl.DateTimeFormat('es-EC', { weekday: 'short' });
+    const fmtMes = new Intl.DateTimeFormat('es-EC', { month: 'short' });
+    this.cabecera = Array.from({ length: c.dias }, (_, i) => {
+      const iso = sumarDias(c.desde, i);
+      const d = desdeISO(iso);
+      return {
+        iso,
+        numero: d.getDate(),
+        semana: fmtSemana.format(d).replace('.', ''),
+        mes: fmtMes.format(d).replace('.', ''),
+        hoy: iso === this.hoy,
+        finde: [0, 6].includes(d.getDay()),
+        nuevoMes: i === 0 || d.getDate() === 1,
+      };
     });
-  }
 
-  // =================== Navegación ===================
-  prevMonth() {
-    const d = new Date(this.viewDate());
-    d.setMonth(d.getMonth() - 1);
-    this.viewDate.set(this.startOfMonth(d));
-    this.selectedReservaId.set(null);
-  }
+    // índice de columna (0..dias-1) de una fecha; se recorta a la ventana visible
+    const indice = (iso: string) => Math.round((desdeISO(iso).getTime() - desdeISO(c.desde).getTime()) / 86400000);
 
-  nextMonth() {
-    const d = new Date(this.viewDate());
-    d.setMonth(d.getMonth() + 1);
-    this.viewDate.set(this.startOfMonth(d));
-    this.selectedReservaId.set(null);
-  }
+    const barrasPorHab = new Map<number, Barra[]>();
+    const ocupadasPorDia = new Array<number>(c.dias).fill(0);
 
-  goToday() {
-    const today = new Date();
-    this.viewDate.set(this.startOfMonth(today));
-    this.selectedReservaId.set(null);
-  }
-
-  // =================== UI Actions ===================
-  selectReserva(id: number) {
-    this.selectedReservaId.set(id);
-  }
-
-  closeDetail() {
-    this.selectedReservaId.set(null);
-  }
-
-  confirmarReserva() {
-    const reserva = this.selectedReserva();
-    if (!reserva) return;
-    this.calendarioService.actualizarEstado(reserva.id, 'CONFIRMADA').subscribe({
-      next: () => this.loadData(),
-      error: (err) => console.error('Error confirmar reserva:', err)
-    });
-  }
-
-  checkinReserva() {
-    const reserva = this.selectedReserva();
-    if (!reserva) return;
-    this.calendarioService.realizarCheckIn(reserva.id).subscribe({
-      next: () => this.loadData(),
-      error: (err) => console.error('Error check-in:', err)
-    });
-  }
-
-  checkoutReserva() {
-    const reserva = this.selectedReserva();
-    if (!reserva) return;
-    this.calendarioService.realizarCheckOut(reserva.id).subscribe({
-      next: () => this.loadData(),
-      error: (err) => console.error('Error check-out:', err)
-    });
-  }
-
-  cancelarReserva() {
-    const reserva = this.selectedReserva();
-    if (!reserva) return;
-    this.calendarioService.cancelarReserva(reserva.id).subscribe({
-      next: () => this.loadData(),
-      error: (err) => console.error('Error cancelar reserva:', err)
-    });
-  }
-
-  private updateReservaEstado(id: number, nuevoEstado: EstadoReserva) {
-    const reservas = this.reservas().map(r => 
-      r.id === id ? { ...r, estado: nuevoEstado } : r
-    );
-    this.reservas.set(reservas);
-    this.closeDetail();
-  }
-
-  isSelected(id: number): boolean {
-    return this.selectedReservaId() === id;
-  }
-
-  getRoomName(habitacionId: number): string {
-    const room = this.habitaciones().find(r => r.id === habitacionId);
-    return room ? `${room.codigo} - ${room.tipo}` : 'No asignada';
-  }
-
-  formatEstado(estado: EstadoReserva): string {
-    const map: Record<EstadoReserva, string> = {
-      CONFIRMADA: 'Confirmada',
-      PENDIENTE: 'Pendiente',
-      CHECKIN: 'Check-in',
-      CHECKOUT: 'Check-out',
-      CANCELADA: 'Cancelada'
-    };
-    return map[estado] || estado;
-  }
-
-  colorEstado(estado: EstadoReserva): string {
-    const map: Record<EstadoReserva, string> = {
-      CHECKIN: 'success',
-      CONFIRMADA: 'primary',
-      PENDIENTE: 'warning',
-      CANCELADA: 'danger',
-      CHECKOUT: 'medium'
-    };
-    return map[estado] || 'medium';
-  }
-
-  // =================== Computed ===================
-  monthLabel = computed(() => this.formatMonthYear(this.viewDate()));
-
-  days = computed(() => {
-    const start = this.startOfMonth(this.viewDate());
-    const daysInMonth = this.daysInMonth(start);
-    const todayIso = this.toISO(new Date());
-    const out: { day: number; iso: string; isToday: boolean }[] = [];
-    for (let d = 1; d <= daysInMonth; d++) {
-      const date = new Date(start.getFullYear(), start.getMonth(), d);
-      const iso = this.toISO(date);
-      out.push({ day: d, iso, isToday: iso === todayIso });
+    for (const r of c.reservas) {
+      const ini = Math.max(0, indice(r.fecha_entrada));
+      const fin = Math.min(c.dias, indice(r.fecha_salida)); // noche de salida no ocupa
+      if (fin <= ini) continue;
+      const estado = this.estados[r.estado]?.texto ?? r.estado;
+      for (const habId of r.habitaciones) {
+        if (!barrasPorHab.has(habId)) barrasPorHab.set(habId, []);
+        barrasPorHab.get(habId)!.push({
+          clase: `res ${r.estado}`,
+          inicio: ini,
+          largo: fin - ini,
+          texto: r.huesped,
+          titulo: `${r.codigo_reserva} · ${r.huesped} · ${r.num_huespedes} huésped(es) · ${estado}`,
+          reservaId: r.id,
+          codigo: r.codigo_reserva,
+        });
+        for (let i = ini; i < fin; i++) ocupadasPorDia[i]++;
+      }
     }
-    return out;
-  });
 
-  daysCount = computed(() => this.days().length);
-  gridTemplate = computed(() => `240px repeat(${this.daysCount()}, minmax(32px, 1fr))`);
-
-  barsMap = computed(() => {
-    const monthStart = this.startOfMonth(this.viewDate());
-    const monthEnd = this.endOfMonth(this.viewDate());
-    const map = new Map<number, Bar[]>();
-
-    for (const room of this.habitaciones()) {
-      const bars = this.reservas()
-        .filter(r => r.habitacionId === room.id && r.estado !== 'CANCELADA')
-        .map(r => {
-          const inD = this.parseISO(r.checkIn);
-          const outD = this.parseISO(r.checkOut);
-          const occupyEnd = new Date(outD);
-          occupyEnd.setDate(occupyEnd.getDate() - 1);
-          const clippedLeft = inD < monthStart;
-          const clippedRight = occupyEnd > monthEnd;
-          const start = clippedLeft ? monthStart : inD;
-          const end = clippedRight ? monthEnd : occupyEnd;
-          const colStart = start.getDate();
-          const colEnd = end.getDate() + 1;
-          return { reserva: r, colStart, colEnd, clippedLeft, clippedRight };
-        })
-        .sort((a, b) => a.colStart - b.colStart);
-      map.set(room.id, bars);
+    for (const b of c.bloqueos) {
+      const ini = Math.max(0, indice(b.fecha_inicio));
+      const fin = Math.min(c.dias, indice(b.fecha_fin) + 1); // el bloqueo incluye su último día
+      if (fin <= ini) continue;
+      if (!barrasPorHab.has(b.habitacion_id)) barrasPorHab.set(b.habitacion_id, []);
+      barrasPorHab.get(b.habitacion_id)!.push({
+        clase: 'bloqueo',
+        inicio: ini,
+        largo: fin - ini,
+        texto: b.motivo || b.tipo_bloqueo,
+        titulo: `Bloqueada: ${b.motivo || b.tipo_bloqueo}`,
+      });
     }
-    return map;
-  });
 
-  // =================== Helpers ===================
-  private toISO(d: Date): string {
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const grupos = new Map<string, FilaHab[]>();
+    for (const h of c.habitaciones) {
+      const nombre = h.tipoHabitacion?.nombre ?? 'Sin tipo';
+      if (!grupos.has(nombre)) grupos.set(nombre, []);
+      grupos.get(nombre)!.push({ hab: h, barras: barrasPorHab.get(h.id) ?? [] });
+    }
+    this.grupos = [...grupos.entries()].map(([tipo, filas]) => ({ tipo, filas }));
+
+    this.totalHabitaciones = c.habitaciones.length;
+    this.ocupacion = ocupadasPorDia.map((n) => ({ ocupadas: n, pct: this.totalHabitaciones ? Math.round((n / this.totalHabitaciones) * 100) : 0 }));
   }
 
-  private parseISO(iso: string): Date {
-    const [y, m, d] = iso.split('-').map(Number);
-    return new Date(y, (m ?? 1) - 1, d ?? 1);
+  // ---------- navegación ----------
+  mover(delta: number): void {
+    this.desde = sumarDias(this.desde, delta * this.dias);
+    this.cargar();
   }
 
-  private startOfMonth(d: Date): Date {
-    return new Date(d.getFullYear(), d.getMonth(), 1);
+  irAHoy(): void {
+    this.desde = hoyISO();
+    this.cargar();
   }
 
-  private endOfMonth(d: Date): Date {
-    return new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  cambiarFecha(v: string): void {
+    if (!v) return;
+    this.desde = v;
+    this.cargar();
   }
 
-  private daysInMonth(d: Date): number {
-    return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  cambiarDias(n: string): void {
+    this.dias = Number(n);
+    this.cargar();
   }
 
-  private formatMonthYear(d: Date): string {
-    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    return `${months[d.getMonth()]} ${d.getFullYear()}`;
+  get rangoTexto(): string {
+    const f = new Intl.DateTimeFormat('es-EC', { day: 'numeric', month: 'long', year: 'numeric' });
+    return `${f.format(desdeISO(this.desde))} – ${f.format(desdeISO(sumarDias(this.desde, this.dias - 1)))}`;
+  }
+
+  // ---------- acciones ----------
+  abrirReserva(b: Barra): void {
+    if (b.codigo) this.router.navigate(['/admin/reservas'], { queryParams: { texto: b.codigo } });
+  }
+
+  nuevaReserva(h: HabCal, iso: string): void {
+    if (!this.puedeReservar || iso < this.hoy) return;
+    this.router.navigate(['/admin/nueva-reserva'], { queryParams: { habitacion: h.id, checkIn: iso } });
+  }
+
+  col(i: number): number {
+    return i + 2; // la columna 1 es el nombre de la habitación
+  }
+
+  ocupacionClase(pct: number): string {
+    return pct >= 90 ? 'alta' : pct >= 60 ? 'media' : pct > 0 ? 'baja' : '';
   }
 }

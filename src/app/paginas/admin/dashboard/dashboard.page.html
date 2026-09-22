@@ -1,317 +1,92 @@
-<div class="db">
+<div class="adm-page">
+  @if (mensaje) { <div class="adm-msg ok" role="status">{{ mensaje }}</div> }
+  @if (error) { <div class="adm-msg err" role="alert">{{ error }}</div> }
 
-  <!-- ======================================================
-       HEADER PROFESIONAL
-  ======================================================= -->
-  <div class="db-header">
-    <div class="db-header-left">
-      <div class="db-breadcrumb">
-        <span class="breadcrumb-item">Panel de Control</span>
-        <ion-icon name="chevron-forward-outline"></ion-icon>
-        <span class="breadcrumb-item active">Dashboard</span>
-      </div>
-      <h1 class="db-title">Dashboard</h1>
-      <p class="db-description">Resumen ejecutivo de la operación del hotel</p>
+  @if (cargando) {
+    <div class="adm-empty">Cargando…</div>
+  } @else if (esPlataforma && plataforma; as p) {
+    <div class="adm-kpis">
+      <div class="adm-kpi"><small>Alojamientos</small><strong>{{ p.hoteles_activos }}</strong><span>{{ p.hoteles }} registrados · {{ p.hoteles_pendientes }} pendientes de aprobar</span></div>
+      <div class="adm-kpi"><small>Reservas</small><strong>{{ p.reservas_totales }}</strong><span>{{ p.clientes_registrados }} huéspedes con cuenta</span></div>
+      <div class="adm-kpi"><small>Ventas totales</small><strong>{{ p.ventas_totales | money }}</strong><span>reservas no canceladas</span></div>
+      <div class="adm-kpi"><small>Comisiones</small><strong>{{ p.comisiones_totales | money }}</strong><span>para la plataforma</span></div>
     </div>
 
-    <div class="db-header-right">
-      <div class="date-badge">
-        <ion-icon name="calendar-outline"></ion-icon>
-        <span>{{ todayDate }}</span>
-      </div>
-      <div class="user-welcome">
-        <div class="user-avatar">{{ userInitials }}</div>
-        <div class="user-greeting">
-          <span class="greeting">Bienvenido,</span>
-          <strong class="user-name">{{ userName }}</strong>
-          <span class="user-role">{{ userRole }}</span>
+    <div class="adm-card">
+      <h3>Alojamientos con más ventas</h3>
+      @if (!p.top_hoteles.length) {
+        <div class="adm-empty">Aún no hay reservas.</div>
+      } @else {
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Alojamiento</th><th class="num">Reservas</th><th class="num">Ventas</th></tr></thead>
+            <tbody>
+              @for (h of p.top_hoteles; track h.hotel_id) {
+                <tr><td>{{ h.nombre }}</td><td class="num">{{ h.reservas }}</td><td class="num">{{ h.ventas | money }}</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
-      </div>
+      }
+      <p class="adm-empty"><a class="adm-btn out" routerLink="/admin/hoteles">Administrar alojamientos</a> · Elige un alojamiento arriba ("Operando en") para gestionar sus reservas.</p>
     </div>
-  </div>
+  } @else {
+    @if (data; as d) {
+      <div class="adm-kpis">
+        <div class="adm-kpi"><small>Ocupación hoy</small><strong>{{ d.ocupacion_hoy.porcentaje }}%</strong><span>{{ d.ocupacion_hoy.ocupadas }} de {{ d.total_habitaciones }} habitaciones</span></div>
+        <div class="adm-kpi"><small>Llegadas hoy</small><strong>{{ d.llegadas_hoy }}</strong><span>{{ d.huespedes_en_casa }} reservas en casa</span></div>
+        <div class="adm-kpi"><small>Salidas hoy</small><strong>{{ d.salidas_hoy }}</strong><span>{{ d.reservas_pendientes }} pendientes de pago</span></div>
+        @if (puedeVerFinanzas) {
+        <div class="adm-kpi"><small>Cobrado este mes</small><strong>{{ d.ingresos_mes | money }}</strong><span>{{ d.reservas_mes }} reservas · ventas {{ d.ventas_mes | money }}</span></div>
+        }
+      </div>
+    }
 
-  <!-- ======================================================
-       KPIs
-  ======================================================= -->
-  <div class="kpis">
+    @for (bloque of [
+      { t: 'Llegadas de hoy', l: llegadas, a: 'checkin', txt: 'Registrar llegada' },
+      { t: 'Salidas de hoy', l: salidas, a: 'checkout', txt: 'Registrar salida' }
+    ]; track bloque.t) {
+      <div class="adm-card">
+        <h3>{{ bloque.t }} ({{ bloque.l.length }})</h3>
+        @if (!bloque.l.length) {
+          <div class="adm-empty">Nada por ahora.</div>
+        } @else {
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead><tr><th>Código</th><th>Huésped</th><th>Habitaciones</th><th>Estadía</th><th></th></tr></thead>
+              <tbody>
+                @for (r of bloque.l; track r.id) {
+                  <tr>
+                    <td><b>{{ r.codigo_reserva }}</b></td>
+                    <td>{{ r.cliente?.nombres }} {{ r.cliente?.apellidos }}<br /><small>{{ r.cliente?.telefono }}</small></td>
+                    <td>{{ habitaciones(r) }}</td>
+                    <td>{{ fechaCorta(r.fecha_entrada) }} → {{ fechaCorta(r.fecha_salida) }}</td>
+                    <td class="num">@if (puedeOperar) {<button type="button" class="adm-btn sm" (click)="accion(r, $any(bloque.a))">{{ bloque.txt }}</button>}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
 
-    <!-- Ocupación -->
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="kpi-label">Ocupación hoy</span>
-        <div class="kpi-icon kpi-icon--blue">
-          <ion-icon name="bed-outline"></ion-icon>
+    <div class="adm-card">
+      <h3>Huéspedes en el alojamiento ({{ enCasa.length }})</h3>
+      @if (!enCasa.length) {
+        <div class="adm-empty">No hay huéspedes alojados.</div>
+      } @else {
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Código</th><th>Huésped</th><th>Habitaciones</th><th>Sale</th></tr></thead>
+            <tbody>
+              @for (r of enCasa; track r.id) {
+                <tr><td><b>{{ r.codigo_reserva }}</b></td><td>{{ r.cliente?.nombres }} {{ r.cliente?.apellidos }}</td><td>{{ habitaciones(r) }}</td><td>{{ fechaCorta(r.fecha_salida) }}</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
-      </div>
-
-      <div class="kpi-value">{{ ocupacionPorcentaje() }}%</div>
-      <div class="kpi-sub">
-        {{ habitacionesOcupadas() }} ocupadas / {{ totalHabitaciones() }} total
-      </div>
-
-      <div class="kpi-bar">
-        <div class="kpi-bar-fill" [style.width]="ocupacionPorcentaje() + '%'"></div>
-      </div>
+      }
     </div>
-
-    <!-- Reservas hoy -->
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="kpi-label">Reservas hoy</span>
-        <div class="kpi-icon kpi-icon--purple">
-          <ion-icon name="clipboard-outline"></ion-icon>
-        </div>
-      </div>
-
-      <div class="kpi-value">{{ reservasHoyCount() }}</div>
-      <div class="kpi-sub">
-        {{ checkins().length }} check-ins · {{ checkouts().length }} check-outs
-      </div>
-
-      <div *ngIf="tendenciaReservas() !== null" class="kpi-trend" 
-           [class.kpi-trend--up]="tendenciaReservas()! >= 0"
-           [class.kpi-trend--down]="tendenciaReservas()! < 0">
-        <ion-icon [name]="tendenciaReservas()! >= 0 ? 'trending-up-outline' : 'trending-down-outline'"></ion-icon>
-        {{ labelTendencia(tendenciaReservas(), ' vs ayer') }}
-      </div>
-    </div>
-
-    <!-- Disponibles -->
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="kpi-label">Disponibles</span>
-        <div class="kpi-icon kpi-icon--green">
-          <ion-icon name="people-outline"></ion-icon>
-        </div>
-      </div>
-
-      <div class="kpi-value">{{ habitacionesDisponibles() }}</div>
-      <div class="kpi-sub">Habitaciones libres hoy</div>
-
-      <div *ngIf="tendenciaDisponibles() !== null" class="kpi-trend"
-           [class.kpi-trend--up]="tendenciaDisponibles()! >= 0"
-           [class.kpi-trend--down]="tendenciaDisponibles()! < 0">
-        <ion-icon [name]="tendenciaDisponibles()! >= 0 ? 'trending-up-outline' : 'trending-down-outline'"></ion-icon>
-        {{ labelTendencia(tendenciaDisponibles(), ' vs ayer') }}
-      </div>
-    </div>
-
-    <!-- Ingresos -->
-    <div class="kpi">
-      <div class="kpi-head">
-        <span class="kpi-label">Ingresos (mes)</span>
-        <div class="kpi-icon kpi-icon--amber">
-          <ion-icon name="cash-outline"></ion-icon>
-        </div>
-      </div>
-
-      <div class="kpi-value">${{ ingresosMesFormateado() }}</div>
-      <div class="kpi-sub">Facturación acumulada del mes</div>
-
-      <div *ngIf="tendenciaIngresos() !== null" class="kpi-trend"
-           [class.kpi-trend--up]="tendenciaIngresos()! >= 0"
-           [class.kpi-trend--down]="tendenciaIngresos()! < 0">
-        <ion-icon [name]="tendenciaIngresos()! >= 0 ? 'trending-up-outline' : 'trending-down-outline'"></ion-icon>
-        {{ labelTendencia(tendenciaIngresos(), '% vs mes ant.') }}
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ======================================================
-       QUICK CARDS
-  ======================================================= -->
-  <div class="quick">
-
-    <a class="qcard" routerLink="/admin/habitaciones">
-      <div class="qcard-left">
-        <div class="qcard-icon qcard-icon--blue">
-          <ion-icon name="bed-outline"></ion-icon>
-        </div>
-        <div>
-          <strong>Gestionar habitaciones</strong>
-          <span>Estados, tarifas y mantenimiento</span>
-        </div>
-      </div>
-      <ion-icon class="go" name="chevron-forward-outline"></ion-icon>
-    </a>
-
-    <a class="qcard" routerLink="/admin/tarifas">
-      <div class="qcard-left">
-        <div class="qcard-icon qcard-icon--green">
-          <ion-icon name="pricetag-outline"></ion-icon>
-        </div>
-        <div>
-          <strong>Gestionar tarifas</strong>
-          <span>Precios por temporada y tipo de habitación</span>
-        </div>
-      </div>
-      <ion-icon class="go" name="chevron-forward-outline"></ion-icon>
-    </a>
-
-    <a class="qcard" routerLink="/admin/servicios">
-      <div class="qcard-left">
-        <div class="qcard-icon qcard-icon--purple">
-          <ion-icon name="restaurant-outline"></ion-icon>
-        </div>
-        <div>
-          <strong>Servicios adicionales</strong>
-          <span>Desayuno, spa, traslados, etc.</span>
-        </div>
-      </div>
-      <ion-icon class="go" name="chevron-forward-outline"></ion-icon>
-    </a>
-
-    <a class="qcard" routerLink="/admin/pagos">
-      <div class="qcard-left">
-        <div class="qcard-icon qcard-icon--amber">
-          <ion-icon name="card-outline"></ion-icon>
-        </div>
-        <div>
-          <strong>Pagos y facturación</strong>
-          <span>Historial de pagos y facturas</span>
-        </div>
-      </div>
-      <ion-icon class="go" name="chevron-forward-outline"></ion-icon>
-    </a>
-
-    <a class="qcard" routerLink="/admin/huespedes">
-      <div class="qcard-left">
-        <div class="qcard-icon qcard-icon--blue">
-          <ion-icon name="people-outline"></ion-icon>
-        </div>
-        <div>
-          <strong>Huéspedes</strong>
-          <span>Registro e historial de estadías</span>
-        </div>
-      </div>
-      <ion-icon class="go" name="chevron-forward-outline"></ion-icon>
-    </a>
-
-    <a class="qcard" routerLink="/admin/reportes">
-      <div class="qcard-left">
-        <div class="qcard-icon qcard-icon--purple">
-          <ion-icon name="analytics-outline"></ion-icon>
-        </div>
-        <div>
-          <strong>Reportes</strong>
-          <span>Ocupación, ingresos, exportaciones</span>
-        </div>
-      </div>
-      <ion-icon class="go" name="chevron-forward-outline"></ion-icon>
-    </a>
-
-  </div>
-
-  <!-- ======================================================
-       RESERVAS DE HOY
-  ======================================================= -->
-  <div class="card">
-
-    <div class="card-head">
-      <div>
-        <h3>Reservas de hoy</h3>
-        <p>Últimos movimientos del día</p>
-      </div>
-      <a class="link" routerLink="/admin/reservas">
-        Ver todas
-        <ion-icon name="chevron-forward-outline"></ion-icon>
-      </a>
-    </div>
-
-    <!-- Estado de carga -->
-    <div *ngIf="loadingReservas()" class="table-empty">
-      <p>Cargando reservas...</p>
-    </div>
-
-    <!-- Estado vacío -->
-    <div *ngIf="!loadingReservas() && !hayReservas()" class="table-empty">
-      <ion-icon name="clipboard-outline"></ion-icon>
-      <p>No hay movimientos registrados para hoy.</p>
-    </div>
-
-    <!-- Tabla con datos -->
-    <div *ngIf="!loadingReservas() && hayReservas()" class="table">
-
-      <div class="thead">
-        <div>ID</div>
-        <div>Huésped</div>
-        <div>Habitación</div>
-        <div>Fechas</div>
-        <div>Total</div>
-        <div>Estado</div>
-      </div>
-
-      <!-- Grupo: Check-ins -->
-      <ng-container *ngIf="checkins().length > 0">
-        <div class="group-divider">
-          <ion-icon name="log-in-outline"></ion-icon>
-          <span>Check-ins ({{ checkins().length }})</span>
-        </div>
-        <div class="trow" *ngFor="let r of checkins()">
-          <ng-container *ngTemplateOutlet="filaReserva; context: { r: r }"></ng-container>
-        </div>
-      </ng-container>
-
-      <!-- Grupo: Check-outs -->
-      <ng-container *ngIf="checkouts().length > 0">
-        <div class="group-divider">
-          <ion-icon name="log-out-outline"></ion-icon>
-          <span>Check-outs ({{ checkouts().length }})</span>
-        </div>
-        <div class="trow" *ngFor="let r of checkouts()">
-          <ng-container *ngTemplateOutlet="filaReserva; context: { r: r }"></ng-container>
-        </div>
-      </ng-container>
-
-      <!-- Grupo: Pendientes / Confirmadas -->
-      <ng-container *ngIf="pendientes().length > 0">
-        <div class="group-divider">
-          <ion-icon name="time-outline"></ion-icon>
-          <span>Pendientes ({{ pendientes().length }})</span>
-        </div>
-        <div class="trow" *ngFor="let r of pendientes()">
-          <ng-container *ngTemplateOutlet="filaReserva; context: { r: r }"></ng-container>
-        </div>
-      </ng-container>
-
-      <!-- Grupo: Canceladas -->
-      <ng-container *ngIf="canceladas().length > 0">
-        <div class="group-divider group-divider--danger">
-          <ion-icon name="alert-circle-outline"></ion-icon>
-          <span>Canceladas ({{ canceladas().length }})</span>
-        </div>
-        <div class="trow" *ngFor="let r of canceladas()">
-          <ng-container *ngTemplateOutlet="filaReserva; context: { r: r }"></ng-container>
-        </div>
-      </ng-container>
-
-    </div>
-  </div>
-
+  }
 </div>
-
-<!-- ==========================================
-     TEMPLATE REUTILIZABLE — fila de reserva
-=========================================== -->
-<ng-template #filaReserva let-r="r">
-  <div class="mono">#{{ r.id }}</div>
-
-  <div class="guest">
-    <div class="avatar">{{ iniciales(r.huesped) }}</div>
-    <span class="guest-name">{{ r.huesped }}</span>
-  </div>
-
-  <div>{{ r.habitacion }}</div>
-
-  <div class="dates">
-    <ion-icon name="time-outline"></ion-icon>
-    <span>{{ formatoFechaCorta(r.entrada) }} → {{ formatoFechaCorta(r.salida) }}</span>
-  </div>
-
-  <div class="money">${{ r.total }}</div>
-
-  <div>
-    <ion-chip [color]="colorEstado(r.estado)">{{ r.estado }}</ion-chip>
-  </div>
-</ng-template>

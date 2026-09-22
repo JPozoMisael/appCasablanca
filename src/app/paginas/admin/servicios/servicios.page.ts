@@ -1,116 +1,77 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonIcon, IonButton, IonChip, IonContent } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { 
-  restaurantOutline, 
-  searchOutline, 
-  addCircleOutline,
-  createOutline,
-  trashOutline,
-  constructOutline,
-  saveOutline,
-  closeOutline,
-  wifiOutline,
-  waterOutline,
-  carOutline,
-  snowOutline,
-  beerOutline, refreshOutline } from 'ionicons/icons';
-import { ServiciosService, Servicio } from '@app/core/services/servicios.service';
+import { ApiService } from '@app/core/services/api.service';
 
+interface Servicio { id: number; nombre: string; descripcion?: string | null; precio: number | string; estado: 'activo' | 'inactivo' }
+
+/** Extras que el huésped puede agregar al reservar (desayuno, traslado, tours…). */
 @Component({
   selector: 'app-servicios',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon, IonButton, IonChip, IonContent],
+  imports: [FormsModule],
   templateUrl: './servicios.page.html',
-  styleUrls: ['./servicios.page.scss'],
 })
 export class ServiciosPage implements OnInit {
-  searchTerm = '';
-  modalAbierto = false;
-  editando = false;
-  loading = signal(true);
-  
-  servicios = signal<Servicio[]>([]);
+  private api = inject(ApiService);
 
-  formData = { nombre: '', descripcion: '', precio: 0, icono: 'restaurant-outline' };
-  editId = 0;
+  servicios: Servicio[] = [];
+  nuevo = { nombre: '', descripcion: '', precio: null as number | null };
+  cargando = true;
+  error = '';
+  mensaje = '';
 
-  serviciosFiltrados = computed(() => {
-    if (!this.searchTerm) return this.servicios();
-    return this.servicios().filter(s => s.nombre.toLowerCase().includes(this.searchTerm.toLowerCase()));
-  });
-
-  constructor(private serviciosService: ServiciosService) {
-    addIcons({addCircleOutline,refreshOutline,searchOutline,restaurantOutline,createOutline,trashOutline,closeOutline,constructOutline,saveOutline,wifiOutline,waterOutline,carOutline,snowOutline,beerOutline});
+  ngOnInit(): void {
+    this.cargar();
   }
 
-  ngOnInit() {
-    this.cargarServicios();
-  }
-
-  cargarServicios() {
-    this.loading.set(true);
-    this.serviciosService.getAll().subscribe({
-      next: (servicios) => {
-        this.servicios.set(servicios);
-        this.loading.set(false);
+  cargar(): void {
+    this.api.get<{ data: Servicio[] }>('/services').subscribe({
+      next: (r) => {
+        this.servicios = r.data;
+        this.cargando = false;
       },
-      error: (err) => {
-        console.error('Error cargar servicios:', err);
-        this.loading.set(false);
-      }
+      error: (e) => {
+        this.error = e?.error?.message ?? 'No pudimos cargar los servicios.';
+        this.cargando = false;
+      },
     });
   }
 
-  abrirModal() {
-    this.editando = false;
-    this.formData = { nombre: '', descripcion: '', precio: 0, icono: 'restaurant-outline' };
-    this.modalAbierto = true;
-  }
-
-  editar(s: Servicio) {
-    this.editando = true;
-    this.editId = s.id;
-    this.formData = { 
-      nombre: s.nombre, 
-      descripcion: s.descripcion, 
-      precio: s.precio, 
-      icono: s.icono 
-    };
-    this.modalAbierto = true;
-  }
-
-  cerrarModal() {
-    this.modalAbierto = false;
-  }
-
-  guardar() {
-    if (this.formData.nombre && this.formData.precio > 0) {
-      if (this.editando) {
-        this.serviciosService.update(this.editId, this.formData).subscribe({
-          next: () => this.cargarServicios(),
-          error: (err) => console.error('Error actualizar:', err)
-        });
-      } else {
-        this.serviciosService.create(this.formData).subscribe({
-          next: () => this.cargarServicios(),
-          error: (err) => console.error('Error crear:', err)
-        });
-      }
+  crear(): void {
+    const n = this.nuevo;
+    if (!n.nombre.trim() || n.precio === null || n.precio < 0) {
+      this.error = 'Indica el nombre y el precio del servicio.';
+      return;
     }
-    this.cerrarModal();
+    this.error = '';
+    this.api.post('/services', { nombre: n.nombre.trim(), descripcion: n.descripcion.trim() || null, precio: Number(n.precio) }).subscribe({
+      next: () => {
+        this.nuevo = { nombre: '', descripcion: '', precio: null };
+        this.mensaje = 'Servicio agregado.';
+        this.cargar();
+      },
+      error: (e) => (this.error = e?.error?.message ?? 'No se pudo guardar (¿ya existe ese nombre?).'),
+    });
   }
 
-  eliminar(s: Servicio) {
-    if (confirm(`¿Eliminar ${s.nombre}?`)) {
-      this.serviciosService.delete(s.id).subscribe({
-        next: (success) => {
-          if (success) this.cargarServicios();
-        },
-        error: (err) => console.error('Error eliminar:', err)
-      });
-    }
+  alternar(s: Servicio): void {
+    this.api.put(`/services/${s.id}`, { estado: s.estado === 'activo' ? 'inactivo' : 'activo' }).subscribe({
+      next: () => this.cargar(),
+      error: (e) => (this.error = e?.error?.message ?? 'No se pudo actualizar.'),
+    });
+  }
+
+  cambiarPrecio(s: Servicio, valor: string): void {
+    const precio = Number(valor);
+    if (!Number.isFinite(precio) || precio < 0) return;
+    this.api.put(`/services/${s.id}`, { precio }).subscribe({
+      next: () => (this.mensaje = 'Precio actualizado.'),
+      error: (e) => (this.error = e?.error?.message ?? 'No se pudo actualizar.'),
+    });
+  }
+
+  borrar(s: Servicio): void {
+    if (!confirm(`¿Eliminar "${s.nombre}"? Si ya se usó en reservas, solo se desactivará.`)) return;
+    this.api.delete(`/services/${s.id}`).subscribe({ next: () => this.cargar(), error: (e) => (this.error = e?.error?.message ?? 'No se pudo eliminar.') });
   }
 }

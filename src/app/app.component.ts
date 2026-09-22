@@ -10,29 +10,12 @@ import { AuthService } from './core/services/auth.service';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent implements OnInit {
-
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
-
-    // Si hay sesión guardada, intentar restaurarla
+    // Restaura la sesión guardada; si el token venció, el interceptor cierra la sesión.
     if (this.authService.isLoggedIn()) {
-
-      this.authService.profile().subscribe({
-
-        next: (user) => {
-          console.log('Sesión restaurada', user);
-        },
-
-        error: () => {
-          console.log('Token inválido o expirado');
-          this.authService.logout();
-        }
-
-      });
-
+      this.authService.refrescarPerfil().subscribe({ error: () => undefined });
     }
-
   }
-
 }

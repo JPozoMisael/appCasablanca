@@ -1,135 +1,66 @@
 <ion-app>
   <div class="admin-shell">
-
-    <!-- SIDEBAR -->
     <aside class="sidebar" [class.collapsed]="sidebarCollapsed" [class.mobile-open]="mobileMenuOpen">
-
-      <!-- Botón toggle dentro del sidebar (visible en móvil) -->
-      <button class="sidebar-toggle" (click)="toggleSidebar()">
+      <button class="sidebar-toggle" (click)="toggleSidebar()" aria-label="Menú">
         <ion-icon [name]="sidebarCollapsed ? 'menu-outline' : 'close-outline'"></ion-icon>
       </button>
 
-      <!-- BRAND -->
       <div class="sb-brand">
-        <div class="logo">
-          <ion-icon name="business-outline"></ion-icon>
-        </div>
-        <div class="txt" *ngIf="!sidebarCollapsed">
-          <strong>Hotel Casa Blanca</strong>
-          <span>Panel administrativo</span>
-        </div>
+        <div class="logo"><ion-icon name="business-outline"></ion-icon></div>
+        @if (!sidebarCollapsed) {
+          <div class="txt">
+            <strong>{{ hotelNombre || 'Salinas Booking' }}</strong>
+            <span>{{ auth.esSuperAdmin() ? 'Plataforma' : 'Panel del alojamiento' }}</span>
+          </div>
+        }
       </div>
 
-      <!-- SCROLLABLE NAVIGATION -->
       <div class="sb-nav-wrapper">
         <nav class="sb-nav">
-          <a routerLink="/admin/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-            <ion-icon name="grid-outline"></ion-icon>
-            <span>Dashboard</span>
-          </a>
-
-          <a routerLink="/admin/calendario" routerLinkActive="active">
-            <ion-icon name="calendar-outline"></ion-icon>
-            <span>Calendario</span>
-          </a>
-
-          <a routerLink="/admin/reservas" routerLinkActive="active">
-            <ion-icon name="clipboard-outline"></ion-icon>
-            <span>Reservas</span>
-          </a>
-
-          <a routerLink="/admin/checkin-out" routerLinkActive="active">
-            <ion-icon name="swap-horizontal-outline"></ion-icon>
-            <span>Check-in/out</span>
-          </a>
-
-          <div class="nav-divider" *ngIf="!sidebarCollapsed">
-            <span>Gestión hotelera</span>
-          </div>
-          <div class="nav-divider-icon" *ngIf="sidebarCollapsed">
-            <ion-icon name="ellipse-outline"></ion-icon>
-          </div>
-
-          <a routerLink="/admin/habitaciones" routerLinkActive="active">
-            <ion-icon name="bed-outline"></ion-icon>
-            <span>Habitaciones</span>
-          </a>
-
-          <a *ngIf="canAccess('super_admin','admin') "routerLink="/admin/tarifas" routerLinkActive="active">
-            <ion-icon name="pricetag-outline"></ion-icon>
-            <span>Tarifas</span>
-          </a>
-
-          <a routerLink="/admin/servicios" routerLinkActive="active">
-            <ion-icon name="restaurant-outline"></ion-icon>
-            <span>Servicios</span>
-          </a>
-
-          <a routerLink="/admin/huespedes" routerLinkActive="active">
-            <ion-icon name="people-outline"></ion-icon>
-            <span>Huéspedes</span>
-          </a>
-
-          <div class="nav-divider" *ngIf="!sidebarCollapsed">
-            <span>Administración</span>
-          </div>
-          <div class="nav-divider-icon" *ngIf="sidebarCollapsed">
-            <ion-icon name="ellipse-outline"></ion-icon>
-          </div>
-
-          <a routerLink="/admin/pagos" routerLinkActive="active">
-            <ion-icon name="card-outline"></ion-icon>
-            <span>Pagos</span>
-          </a>
-
-          <a routerLink="/admin/reportes" routerLinkActive="active">
-            <ion-icon name="analytics-outline"></ion-icon>
-            <span>Reportes</span>
-          </a>
-
-          <a *ngIf="isSuperAdmin" routerLink="/admin/usuarios" routerLinkActive="active">
-            <ion-icon name="shield-checkmark-outline"></ion-icon>
-            <span>Usuarios</span>
-          </a>
-
-          <a *ngIf="isSuperAdmin" routerLink="/admin/configuracion" routerLinkActive="active">
-            <ion-icon name="settings-outline"></ion-icon>
-            <span>Configuración</span>
+          @for (s of menu.secciones(); track s.nombre) {
+            @if (!sidebarCollapsed) {
+              <div class="nav-divider"><span>{{ s.nombre }}</span></div>
+            }
+            @for (i of s.opciones; track i.clave) {
+              <a [routerLink]="i.ruta" routerLinkActive="active">
+                <ion-icon [name]="i.icono || 'ellipse-outline'"></ion-icon>
+                <span>{{ i.texto }}</span>
+              </a>
+            }
+          }
+          <div class="nav-divider"><span>Sitio público</span></div>
+          <a routerLink="/inicio">
+            <ion-icon name="globe-outline"></ion-icon>
+            <span>Ver el sitio</span>
           </a>
         </nav>
       </div>
 
-      <!-- FOOTER DEL SIDEBAR -->
       <div class="sb-foot">
-        <div class="user-info" *ngIf="!sidebarCollapsed">
-          <div class="user-avatar">{{ userInitials }}</div>
-          <div class="user-details">
-            <strong>{{ userName }}</strong>
-            <span>{{ userRole }}</span>
+        @if (!sidebarCollapsed) {
+          <div class="user-info">
+            <div class="user-avatar">{{ auth.iniciales() }}</div>
+            <div class="user-details">
+              <strong>{{ nombreUsuario }}</strong>
+              <span>{{ etiquetaRol }}</span>
+            </div>
           </div>
-        </div>
-        <div class="user-info-collapsed" *ngIf="sidebarCollapsed">
-          <div class="user-avatar small">{{ userInitials }}</div>
-        </div>
-
+        }
         <button class="logout-btn" (click)="logout()">
           <ion-icon name="log-out-outline"></ion-icon>
-          <span *ngIf="!sidebarCollapsed">Cerrar sesión</span>
+          @if (!sidebarCollapsed) { <span>Cerrar sesión</span> }
         </button>
       </div>
-
     </aside>
 
-    <!-- OVERLAY para móvil -->
-    <div class="sidebar-overlay" *ngIf="mobileMenuOpen" (click)="closeMobileMenu()"></div>
+    @if (mobileMenuOpen) {
+      <div class="sidebar-overlay" (click)="mobileMenuOpen = false"></div>
+    }
 
-    <!-- MAIN -->
     <section class="main">
-
-      <!-- TOPBAR -->
       <header class="topbar">
         <div class="tb-left">
-          <button class="mobile-toggle" (click)="toggleMobileMenu()">
+          <button class="mobile-toggle" (click)="mobileMenuOpen = !mobileMenuOpen" aria-label="Abrir menú">
             <ion-icon name="menu-outline"></ion-icon>
           </button>
           <div class="page-info">
@@ -139,22 +70,30 @@
         </div>
 
         <div class="tb-right">
+          @if (auth.esSuperAdmin()) {
+            <label class="scope">
+              <span>Operando en</span>
+              <select [value]="scope.hotelId() ?? ''" (change)="cambiarHotel($any($event.target).value)" aria-label="Alojamiento">
+                <option value="" [selected]="!scope.hotelId()">Toda la plataforma</option>
+                @for (h of hoteles; track h.id) {
+                  <option [value]="h.id" [selected]="h.id === scope.hotelId()">{{ h.nombre }}</option>
+                }
+              </select>
+            </label>
+          }
           <div class="user">
             <ion-icon name="person-circle-outline"></ion-icon>
             <div class="u-txt">
-              <strong>{{ userName }}</strong>
-              <span>{{ userRole }}</span>
+              <strong>{{ nombreUsuario }}</strong>
+              <span>{{ etiquetaRol }}</span>
             </div>
           </div>
         </div>
       </header>
 
-      <!-- CONTENT -->
       <main class="content">
-        <router-outlet (activate)="onRouteActivate($event)"></router-outlet>
+        <router-outlet></router-outlet>
       </main>
-
     </section>
-
   </div>
 </ion-app>

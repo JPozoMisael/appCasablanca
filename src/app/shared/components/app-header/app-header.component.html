@@ -1,162 +1,61 @@
 <header class="bhdr" [class.hide]="hiddenOnScroll">
-
   <div class="wrap">
-
-    <!-- BRAND -->
-    <a class="brand" routerLink="/inicio">
-
-      <div class="logo">
-        {{ logoText }}
-      </div>
-
-      <div class="txt">
-
-        <div class="t">
-          {{ title }}
-        </div>
-
-        <div class="s">
-          <ion-icon name="location-outline"></ion-icon>
-          {{ subtitle }}
-        </div>
-
-      </div>
-
+    <a class="brand" routerLink="/inicio" (click)="cerrarMenus()">
+      <span class="logo">{{ logoText }}</span>
+      <span class="txt">
+        <span class="t">{{ title }}</span>
+        <span class="s"><ion-icon name="location-outline"></ion-icon> {{ subtitle }}</span>
+      </span>
     </a>
 
-    <!-- NAV DESKTOP -->
-    <nav class="nav">
-
-      <a
-        routerLink="/inicio"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        <ion-icon name="home-outline"></ion-icon>
-        Inicio
-      </a>
-
-      <a routerLink="/inicio#sucursales">
-        <ion-icon name="business-outline"></ion-icon>
-        Sucursales
-      </a>
-
-      <a routerLink="/habitaciones">
-        <ion-icon name="bed-outline"></ion-icon>
-        Habitaciones
-      </a>
-
-      <a routerLink="/ofertas">
-        <ion-icon name="pricetag-outline"></ion-icon>
-        Ofertas
-      </a>
-
+    <nav class="nav" aria-label="Principal">
+      <a routerLink="/inicio" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+      <a routerLink="/buscar" routerLinkActive="active">Alojamientos</a>
+      <a routerLink="/consultar-reserva" routerLinkActive="active">Consultar reserva</a>
     </nav>
 
-    <!-- ACTIONS (Login/User) -->
     <div class="actions">
-
-      <!-- Usuario NO logueado -->
-      <ng-container *ngIf="!isLoggedIn">
-        <a class="login-btn" routerLink="/login">
-          <ion-icon name="person-outline"></ion-icon>
-          Iniciar sesión
-        </a>
-      </ng-container>
-
-      <!-- Usuario logueado -->
-      <ng-container *ngIf="isLoggedIn">
-        <div class="user-menu" (click)="toggleUserMenu()">
-          <div class="user-avatar">
-            {{ userInitials }}
-          </div>
-          <div class="user-dropdown" *ngIf="userMenuOpen">
-            <a routerLink="/perfil" (click)="closeAllMenus()">
-              <ion-icon name="person-outline"></ion-icon>
-              Mi perfil
-            </a>
-            <a routerLink="/mis-reservas" (click)="closeAllMenus()">
-              <ion-icon name="calendar-outline"></ion-icon>
-              Mis reservas
-            </a>
-            <a *ngIf="isAdmin" routerLink="/admin" (click)="closeAllMenus()">
-              <ion-icon name="shield-outline"></ion-icon>
-              Panel admin
-            </a>
-            <button class="logout-btn" (click)="logout()">
-              <ion-icon name="log-out-outline"></ion-icon>
-              Cerrar sesión
-            </button>
-          </div>
+      @if (!auth.estaLogueado()) {
+        <a class="link" routerLink="/registro">Crear cuenta</a>
+        <a class="login-btn" routerLink="/login"><ion-icon name="person-outline"></ion-icon> Iniciar sesión</a>
+      } @else {
+        <div class="user-menu">
+          <button type="button" class="user-avatar" (click)="toggleUserMenu()" [attr.aria-expanded]="userMenuOpen" aria-label="Menú de usuario">
+            {{ auth.iniciales() }}
+          </button>
+          @if (userMenuOpen) {
+            <div class="user-dropdown">
+              <a routerLink="/mis-reservas" (click)="cerrarMenus()"><ion-icon name="calendar-outline"></ion-icon> Mis reservas</a>
+              <a routerLink="/perfil" (click)="cerrarMenus()"><ion-icon name="person-outline"></ion-icon> Mi perfil</a>
+              @if (auth.esStaff()) {
+                <a routerLink="/admin" (click)="cerrarMenus()"><ion-icon name="shield-outline"></ion-icon> Panel de gestión</a>
+              }
+              <button type="button" class="logout-btn" (click)="salir()"><ion-icon name="log-out-outline"></ion-icon> Cerrar sesión</button>
+            </div>
+          }
         </div>
-      </ng-container>
-
+      }
     </div>
 
-    <!-- MOBILE BUTTON -->
-    <button class="menu-btn" (click)="toggleMenu()">
-      <ion-icon
-        [name]="menuOpen ? 'close-outline' : 'menu-outline'">
-      </ion-icon>
+    <button type="button" class="menu-btn" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Menú">
+      <ion-icon [name]="menuOpen ? 'close-outline' : 'menu-outline'"></ion-icon>
     </button>
-
   </div>
-
 </header>
 
-<!-- MOBILE DRAWER -->
 <div class="drawer" [class.open]="menuOpen">
-
   <div class="drawer-content">
-
-    <a routerLink="/inicio" (click)="closeMenu()">
-      <ion-icon name="home-outline"></ion-icon>
-      Inicio
-    </a>
-
-    <a routerLink="/inicio#sucursales" (click)="closeMenu()">
-      <ion-icon name="business-outline"></ion-icon>
-      Sucursales
-    </a>
-
-    <a routerLink="/habitaciones" (click)="closeMenu()">
-      <ion-icon name="bed-outline"></ion-icon>
-      Habitaciones
-    </a>
-
-    <a routerLink="/ofertas" (click)="closeMenu()">
-      <ion-icon name="pricetag-outline"></ion-icon>
-      Ofertas
-    </a>
-
-    <!-- Usuario NO logueado -->
-    <ng-container *ngIf="!isLoggedIn">
-      <a routerLink="/login" (click)="closeMenu()">
-        <ion-icon name="person-outline"></ion-icon>
-        Iniciar sesión
-      </a>
-    </ng-container>
-
-    <!-- Usuario logueado -->
-    <ng-container *ngIf="isLoggedIn">
-      <a routerLink="/perfil" (click)="closeMenu()">
-        <ion-icon name="person-outline"></ion-icon>
-        Mi perfil
-      </a>
-      <a routerLink="/mis-reservas" (click)="closeMenu()">
-        <ion-icon name="calendar-outline"></ion-icon>
-        Mis reservas
-      </a>
-      <a *ngIf="isAdmin" routerLink="/admin" (click)="closeMenu()">
-        <ion-icon name="shield-outline"></ion-icon>
-        Panel admin
-      </a>
-      <button class="logout-btn-mobile" (click)="logout()">
-        <ion-icon name="log-out-outline"></ion-icon>
-        Cerrar sesión
-      </button>
-    </ng-container>
-
+    <a routerLink="/inicio" (click)="cerrarMenus()">Inicio</a>
+    <a routerLink="/buscar" (click)="cerrarMenus()">Alojamientos</a>
+    <a routerLink="/consultar-reserva" (click)="cerrarMenus()">Consultar reserva</a>
+    @if (auth.estaLogueado()) {
+      <a routerLink="/mis-reservas" (click)="cerrarMenus()">Mis reservas</a>
+      <a routerLink="/perfil" (click)="cerrarMenus()">Mi perfil</a>
+      @if (auth.esStaff()) { <a routerLink="/admin" (click)="cerrarMenus()">Panel de gestión</a> }
+      <button type="button" class="logout-btn-mobile" (click)="salir()">Cerrar sesión</button>
+    } @else {
+      <a routerLink="/login" (click)="cerrarMenus()">Iniciar sesión</a>
+      <a routerLink="/registro" (click)="cerrarMenus()">Crear cuenta</a>
+    }
   </div>
-
 </div>

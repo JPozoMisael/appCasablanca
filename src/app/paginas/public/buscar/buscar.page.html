@@ -1,0 +1,153 @@
+<section class="bar">
+  <div class="container">
+    <app-search-form [valor]="valorForm" (buscar)="nuevaBusqueda($event)" />
+  </div>
+</section>
+
+<div class="container layout">
+  <!-- FILTROS -->
+  <aside class="filtros" [class.abierto]="filtrosAbiertos">
+    <div class="f-head">
+      <h2>Filtrar por</h2>
+      @if (hayFiltros) {
+        <button type="button" class="link" (click)="limpiar()">Borrar filtros</button>
+      }
+      <button type="button" class="cerrar" (click)="filtrosAbiertos = false" aria-label="Cerrar filtros">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+
+    @if (facets.precio.max > facets.precio.min) {
+      <div class="grupo">
+        <h3>Precio por noche</h3>
+        <input
+          type="range"
+          [min]="facets.precio.min"
+          [max]="facets.precio.max"
+          [value]="q['precioMax'] || facets.precio.max"
+          (change)="precioMax($any($event.target).value)"
+          aria-label="Precio máximo por noche"
+        />
+        <div class="rango"><span>US$ {{ facets.precio.min }}</span><b>hasta US$ {{ q['precioMax'] || facets.precio.max }}</b></div>
+      </div>
+    }
+
+    <div class="grupo">
+      <h3>Estrellas</h3>
+      @for (n of [5, 4, 3, 2]; track n) {
+        <label class="chk">
+          <input type="checkbox" [checked]="q['estrellas'] === '' + n" (change)="estrellas(n)" />
+          <span>{{ n }} ★ o más</span>
+        </label>
+      }
+    </div>
+
+    <div class="grupo">
+      <h3>Puntuación</h3>
+      @for (r of [{ v: 9, t: 'Excepcional: 9+' }, { v: 8, t: 'Muy bueno: 8+' }, { v: 7, t: 'Bueno: 7+' }]; track r.v) {
+        <label class="chk">
+          <input type="checkbox" [checked]="q['rating'] === '' + r.v" (change)="rating(r.v)" />
+          <span>{{ r.t }}</span>
+        </label>
+      }
+    </div>
+
+    @if (facets.tipos.length) {
+      <div class="grupo">
+        <h3>Tipo de alojamiento</h3>
+        @for (t of facets.tipos; track t.valor) {
+          <label class="chk">
+            <input type="checkbox" [checked]="lista('tipos').includes('' + t.valor)" (change)="alternar('tipos', '' + t.valor)" />
+            <span>{{ etiquetaTipo['' + t.valor] || t.valor }}</span>
+            <em>{{ t.total }}</em>
+          </label>
+        }
+      </div>
+    }
+
+    @if (filtrables.length) {
+      <div class="grupo">
+        <h3>Servicios</h3>
+        @for (a of filtrables; track a.id) {
+          <label class="chk">
+            <input type="checkbox" [checked]="lista('amenidades').includes(a.slug)" (change)="alternar('amenidades', a.slug)" />
+            <span>{{ a.nombre }}</span>
+            <em>{{ totalFacet(facets.amenidades, a.slug) }}</em>
+          </label>
+        }
+      </div>
+    }
+
+    <button type="button" class="aplicar" (click)="filtrosAbiertos = false">Ver {{ meta?.total ?? 0 }} resultados</button>
+  </aside>
+
+  <!-- RESULTADOS -->
+  <main class="res">
+    <div class="res-head">
+      <div>
+        <h1>{{ titulo }}</h1>
+        @if (fechasTexto) {
+          <p>{{ fechasTexto }} · {{ noches }} {{ noches === 1 ? 'noche' : 'noches' }} · precios para el grupo, sin impuestos</p>
+        } @else {
+          <p>Agrega fechas para ver disponibilidad y el precio total de tu estadía.</p>
+        }
+      </div>
+      <div class="acciones">
+        <button type="button" class="btn-filtros" (click)="filtrosAbiertos = true">
+          <ion-icon name="funnel-outline"></ion-icon> Filtros
+        </button>
+        <label class="orden">
+          <ion-icon name="swap-vertical-outline"></ion-icon>
+          <select [value]="q['orden'] || 'recomendado'" (change)="ordenar($any($event.target).value)" aria-label="Ordenar por">
+            @for (o of ordenes; track o.v) {
+              <option [value]="o.v">{{ o.t }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    </div>
+
+    @if (cargando) {
+      @for (n of [1, 2, 3]; track n) {
+        <div class="sk"></div>
+      }
+    } @else if (error) {
+      <div class="vacio">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <h3>No pudimos completar la búsqueda</h3>
+        <p>{{ mensajeError || 'Revisa tu conexión e intenta de nuevo.' }}</p>
+      </div>
+    } @else if (!resultados.length) {
+      <div class="vacio">
+        <ion-icon name="bed-outline"></ion-icon>
+        <h3>No hay alojamientos con esos criterios</h3>
+        <p>Prueba con otras fechas, otra zona o quita algunos filtros.</p>
+        @if (hayFiltros) {
+          <button type="button" class="aplicar" (click)="limpiar()">Borrar filtros</button>
+        }
+      </div>
+    } @else {
+      <div class="lista">
+        @for (h of resultados; track h.id) {
+          <app-hotel-card
+            [hotel]="h"
+            [noches]="noches"
+            [consulta]="consulta"
+            [esFavorito]="favoritos.has(h.id)"
+            (favorito)="alternarFavorito($event)"
+          />
+        }
+      </div>
+
+      @if (paginas.length > 1) {
+        <nav class="pags" aria-label="Paginación">
+          @for (p of paginas; track p) {
+            <button type="button" [class.on]="p === meta?.page" (click)="pagina(p)" [attr.aria-current]="p === meta?.page ? 'page' : null">
+              {{ p }}
+            </button>
+          }
+        </nav>
+      }
+    }
+  </main>
+</div>

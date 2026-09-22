@@ -1,0 +1,147 @@
+<div class="adm-page">
+  @if (mensaje) { <div class="adm-msg ok" role="status">{{ mensaje }}</div> }
+  @if (error) { <div class="adm-msg err" role="alert">{{ error }} <button type="button" class="adm-btn sm out" (click)="error = ''">Cerrar</button></div> }
+
+  @if (cargando) {
+    <div class="adm-empty">Cargando…</div>
+  } @else if (!conexion && !error) {
+    <div class="adm-card">
+      <h3>Conecta tu alojamiento con SiteMinder / Little Hotelier</h3>
+      <p style="margin: 0 0 12px; color: var(--muted); line-height: 1.55">
+        Si ya administras tus habitaciones y tarifas en Little Hotelier (o en otro sistema de SiteMinder), esta plataforma puede funcionar como <b>un canal de venta más</b>:
+        tu disponibilidad y tus precios llegan desde allí, y las reservas que recibas aquí se envían de vuelta. Así evitas vender dos veces la misma habitación.
+      </p>
+      <ul style="margin: 0 0 14px; padding-left: 18px; color: var(--muted); line-height: 1.6">
+        <li>Al conectar se genera un <b>código de alojamiento</b> que debes entregar a SiteMinder.</li>
+        <li>Las habitaciones conectadas se venden <b>solo</b> con la disponibilidad y tarifas que envíe SiteMinder.</li>
+        <li>Registra aquí al menos tantas habitaciones de cada tipo como tengas en SiteMinder.</li>
+      </ul>
+      <button type="button" class="adm-btn" (click)="conectar()">Conectar con SiteMinder</button>
+    </div>
+  } @else if (conexion; as c) {
+    <div class="adm-head">
+      <div>
+        <h2>SiteMinder / Little Hotelier
+          <span class="adm-badge {{ claseEstado(c.estado) }}">{{ c.estado === 'pendiente' ? 'esperando la primera disponibilidad' : c.estado }}</span>
+        </h2>
+        <p>
+          @if (c.ultima_entrada_en) { Última actualización recibida: {{ c.ultima_entrada_en.slice(0, 16).replace('T', ' ') }}. }
+          @else { Todavía no llegó nada desde SiteMinder: mientras tanto se vende con el inventario de esta plataforma. }
+        </p>
+      </div>
+      <div class="acc">
+        @if (c.estado === 'activa') { <button type="button" class="adm-btn out danger" (click)="cambiarEstado('pausada')">Pausar ventas</button> }
+        @if (c.estado === 'pausada') { <button type="button" class="adm-btn ok" (click)="cambiarEstado('activa')">Reactivar</button> }
+      </div>
+    </div>
+
+    <div class="adm-card">
+      <h3>1. Entrega este código a SiteMinder</h3>
+      <div class="adm-toolbar">
+        <code style="font-size: 22px; font-weight: 800; letter-spacing: 1px; padding: 6px 14px; background: #eef5ff; border-radius: 8px">{{ c.codigo_hotel }}</code>
+        <button type="button" class="adm-btn sm out" (click)="copiar(c.codigo_hotel, 'codigo')">{{ copiado === 'codigo' ? '¡Copiado!' : 'Copiar' }}</button>
+      </div>
+      <p class="adm-empty" style="padding: 8px 0 0; text-align: left">
+        Es el <i>HotelCode</i> con el que SiteMinder identifica tu alojamiento en este canal. La conexión pasa a «activa» sola cuando llega la primera disponibilidad.
+      </p>
+      @if (config) {
+        <details style="margin-top: 10px">
+          <summary style="cursor: pointer; font-weight: 700">Datos técnicos (para el contacto técnico de SiteMinder)</summary>
+          <ul style="line-height: 1.7; color: var(--muted)">
+            <li>Dirección del canal (SOAP 1.1, HTTPS): <code>{{ config.endpoint_entrada }}</code>
+              <button type="button" class="adm-btn sm out" (click)="copiar(config.endpoint_entrada, 'url')">{{ copiado === 'url' ? '¡Copiado!' : 'Copiar' }}</button></li>
+            <li>Recepción de disponibilidad y tarifas:
+              <span class="adm-badge {{ config.entrada_configurada ? 'ok' : 'danger' }}">{{ config.entrada_configurada ? 'configurada' : 'faltan credenciales en el servidor' }}</span></li>
+            <li>Envío de reservas a SiteMinder:
+              <span class="adm-badge {{ config.envio_configurado ? 'ok' : 'warn' }}">{{ config.envio_configurado ? 'configurado' : 'pendiente de datos del acuerdo con SiteMinder' }}</span></li>
+          </ul>
+        </details>
+      }
+    </div>
+
+    <div class="adm-card">
+      <div class="adm-head">
+        <h3 style="margin: 0">2. Habitaciones conectadas</h3>
+        <button type="button" class="adm-btn sm out" (click)="actualizarTipos()">Incluir tipos nuevos</button>
+      </div>
+      <p class="adm-empty" style="padding: 6px 0 10px; text-align: left">
+        El código de cada tipo debe ser el mismo que usa SiteMinder para esa habitación. Por omisión se genera uno; cámbialo si tu SiteMinder ya usa otro.
+      </p>
+      <div class="adm-table-wrap">
+        <table class="adm-table">
+          <thead><tr><th>Tipo de habitación</th><th>Código en SiteMinder</th></tr></thead>
+          <tbody>
+            @for (m of c.mapeos; track m.id) {
+              <tr>
+                <td><b>{{ m.tipoHabitacion?.nombre }}</b></td>
+                <td>
+                  <input class="adm-input" [(ngModel)]="codigos[m.id]" [name]="'cod' + m.id" maxlength="40" style="width: 200px" (change)="guardarCodigo(m)" [attr.aria-label]="'Código de ' + m.tipoHabitacion?.nombre" />
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <label class="adm-check" style="margin-top: 12px">
+        <input type="checkbox" [checked]="c.precios_incluyen_impuestos" (change)="cambiarImpuestos(!c.precios_incluyen_impuestos)" />
+        Las tarifas que envía SiteMinder ya incluyen impuestos (se convierten a precio sin IVA para mostrarlas)
+      </label>
+    </div>
+
+    <div class="adm-kpis">
+      <div class="adm-kpi"><small>Fechas con datos</small><strong>{{ c.resumen.fechas_cargadas }}</strong><span>desde hoy, todas las habitaciones</span></div>
+      <div class="adm-kpi"><small>Reservas por enviar</small><strong>{{ c.resumen.salidas_pendientes }}</strong><span>se reintentan solas</span></div>
+      <div class="adm-kpi"><small>Envíos con error</small><strong>{{ c.resumen.salidas_con_error }}</strong><span>requieren revisión</span></div>
+    </div>
+    @if (c.ultimo_error) { <div class="adm-msg err" role="alert">Último error: {{ c.ultimo_error }}</div> }
+
+    <div class="adm-card">
+      <h3>3. Reservas enviadas a SiteMinder</h3>
+      @if (!salidas.length) {
+        <div class="adm-empty">Aún no hay reservas para enviar.</div>
+      } @else {
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Reserva</th><th>Estadía</th><th>Acción</th><th>Estado</th><th class="num">Intentos</th><th></th></tr></thead>
+            <tbody>
+              @for (s of salidas; track s.id) {
+                <tr>
+                  <td><b>{{ s.reserva?.codigo_reserva }}</b></td>
+                  <td>@if (s.reserva) { {{ fechaCorta(s.reserva.fecha_entrada) }} → {{ fechaCorta(s.reserva.fecha_salida) }} }</td>
+                  <td>{{ s.accion === 'Commit' ? 'Nueva reserva' : 'Cancelación' }}</td>
+                  <td><span class="adm-badge {{ claseEstado(s.estado) }}">{{ s.estado }}</span>@if (s.ultimo_error) { <br /><small>{{ s.ultimo_error }}</small> }</td>
+                  <td class="num">{{ s.intentos }}</td>
+                  <td class="num">@if (s.estado === 'error') { <button type="button" class="adm-btn sm" (click)="reintentar(s)">Reintentar</button> }</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <div class="adm-card">
+      <h3>Actividad reciente</h3>
+      @if (!mensajes.length) {
+        <div class="adm-empty">Sin actividad todavía.</div>
+      } @else {
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Hora</th><th>Dirección</th><th>Mensaje</th><th>Resultado</th><th>Detalle</th></tr></thead>
+            <tbody>
+              @for (m of mensajes; track m.id) {
+                <tr>
+                  <td>{{ m.createdAt.slice(5, 16).replace('T', ' ') }}</td>
+                  <td>{{ m.direccion === 'entrada' ? 'SiteMinder → aquí' : 'Aquí → SiteMinder' }}</td>
+                  <td><small>{{ m.tipo }}</small></td>
+                  <td><span class="adm-badge {{ claseEstado(m.resultado) }}">{{ m.resultado }}</span></td>
+                  <td><small>{{ m.detalle }}</small></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</div>

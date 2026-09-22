@@ -1,115 +1,116 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { 
-  IonIcon, 
-  IonButton, 
-  IonChip, 
-  IonContent, 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { 
-  pricetagOutline, 
-  searchOutline, 
-  addCircleOutline,
-  createOutline,
-  trashOutline,
-  constructOutline,
-  saveOutline,
-  closeOutline, refreshOutline } from 'ionicons/icons';
-import { TarifasService, Tarifa } from '@app/core/services/tarifas.service';
+import { ApiService } from '@app/core/services/api.service';
+import { GestionService, TipoHab } from '@app/core/services/gestion.service';
+import { fechaCorta } from '@app/shared/utils/format';
 
+interface Temporada { id: number; nombre: string; fecha_inicio: string; fecha_fin: string; tipo: 'alta' | 'media' | 'baja' }
+interface Tarifa { id: number; tipo_habitacion_id: number; temporada_id: number; tipo_dia: 'entre_semana' | 'fin_semana'; precio: number | string }
+
+/**
+ * Precios por temporada. Regla de precio (la misma que usa el buscador y la reserva):
+ * tarifa (tipo × temporada × entre semana/fin de semana) → si falta el fin de semana, la de entre semana →
+ * precio base del tipo. Si dos temporadas se cruzan gana la que empieza más tarde.
+ */
 @Component({
   selector: 'app-tarifas',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon, IonButton, IonChip, IonContent, IonHeader, IonToolbar, IonTitle],
+  imports: [FormsModule],
   templateUrl: './tarifas.page.html',
-  styleUrls: ['./tarifas.page.scss'],
 })
 export class TarifasPage implements OnInit {
-  searchTerm: string = '';
-  modalAbierto = false;
-  editando = false;
-  loading = signal(true);
-  
-  tarifas = signal<Tarifa[]>([]);
+  private api = inject(ApiService);
+  private gestion = inject(GestionService);
 
-  formData = { tipo: '', temporada: '', precio: 0 };
-  editId = 0;
+  temporadas: Temporada[] = [];
+  tipos: TipoHab[] = [];
+  tarifas: Tarifa[] = [];
+  cargando = true;
+  error = '';
+  mensaje = '';
 
-  tarifasFiltradas = computed(() => {
-    if (!this.searchTerm) return this.tarifas();
-    const term = this.searchTerm.toLowerCase();
-    return this.tarifas().filter(t => t.tipo.toLowerCase().includes(term));
-  });
+  nueva = { nombre: '', fecha_inicio: '', fecha_fin: '', tipo: 'alta' };
+  readonly fechaCorta = fechaCorta;
 
-  constructor(private tarifasService: TarifasService) {
-    addIcons({addCircleOutline,refreshOutline,searchOutline,pricetagOutline,createOutline,trashOutline,closeOutline,constructOutline,saveOutline});
+  ngOnInit(): void {
+    this.cargar();
   }
 
-  ngOnInit() {
-    this.cargarTarifas();
-  }
-
-  cargarTarifas() {
-    this.loading.set(true);
-    this.tarifasService.getAll().subscribe({
-      next: (tarifas) => {
-        this.tarifas.set(tarifas);
-        this.loading.set(false);
+  cargar(): void {
+    this.cargando = true;
+    this.gestion.tipos().subscribe({ next: (t) => (this.tipos = t.filter((x) => x.estado === 'activo')), error: (e) => this.fallo(e) });
+    this.api.get<{ data: Temporada[] }>('/temporadas').subscribe({
+      next: (r) => (this.temporadas = r.data),
+      error: (e) => this.fallo(e),
+    });
+    this.api.get<{ data: Tarifa[] }>('/tarifas').subscribe({
+      next: (r) => {
+        this.tarifas = r.data;
+        this.cargando = false;
       },
-      error: (err) => {
-        console.error('Error cargar tarifas:', err);
-        this.loading.set(false);
-      }
+      error: (e) => this.fallo(e),
     });
   }
 
-  abrirModal() {
-    this.editando = false;
-    this.formData = { tipo: '', temporada: '', precio: 0 };
-    this.modalAbierto = true;
+  private fallo(e: { error?: { message?: string } }): void {
+    this.error = e?.error?.message ?? 'Ocurrió un error.';
+    this.cargando = false;
   }
 
-  editar(t: Tarifa) {
-    this.editando = true;
-    this.editId = t.id;
-    this.formData = { tipo: t.tipo, temporada: t.temporada, precio: t.precio };
-    this.modalAbierto = true;
-  }
-
-  cerrarModal() {
-    this.modalAbierto = false;
-  }
-
-  guardar() {
-    if (this.formData.tipo && this.formData.precio > 0) {
-      if (this.editando) {
-        this.tarifasService.update(this.editId, this.formData).subscribe({
-          next: () => this.cargarTarifas(),
-          error: (err) => console.error('Error actualizar:', err)
-        });
-      } else {
-        this.tarifasService.create(this.formData).subscribe({
-          next: () => this.cargarTarifas(),
-          error: (err) => console.error('Error crear:', err)
-        });
-      }
+  crearTemporada(): void {
+    const n = this.nueva;
+    if (!n.nombre.trim() || !n.fecha_inicio || !n.fecha_fin) {
+      this.error = 'Completa el nombre y las fechas de la temporada.';
+      return;
     }
-    this.cerrarModal();
+    if (n.fecha_fin < n.fecha_inicio) {
+      this.error = 'La fecha final no puede ser anterior a la inicial.';
+      return;
+    }
+    this.error = '';
+    this.api.post('/temporadas', { ...n, nombre: n.nombre.trim() }).subscribe({
+      next: () => {
+        this.nueva = { nombre: '', fecha_inicio: '', fecha_fin: '', tipo: 'alta' };
+        this.mensaje = 'Temporada creada. Ahora fija los precios en la tabla.';
+        this.cargar();
+      },
+      error: (e) => this.fallo(e),
+    });
   }
 
-  eliminar(t: Tarifa) {
-    if (confirm(`¿Eliminar tarifa para ${t.tipo} - ${t.temporada}?`)) {
-      this.tarifasService.delete(t.id).subscribe({
-        next: (success) => {
-          if (success) this.cargarTarifas();
-        },
-        error: (err) => console.error('Error eliminar:', err)
-      });
+  borrarTemporada(t: Temporada): void {
+    if (!confirm(`¿Eliminar la temporada "${t.nombre}" y sus tarifas?`)) return;
+    this.api.delete(`/temporadas/${t.id}`).subscribe({ next: () => this.cargar(), error: (e) => this.fallo(e) });
+  }
+
+  precio(tipoId: number, tempId: number, dia: Tarifa['tipo_dia']): string {
+    const t = this.tarifas.find((x) => x.tipo_habitacion_id === tipoId && x.temporada_id === tempId && x.tipo_dia === dia);
+    return t ? String(Number(t.precio)) : '';
+  }
+
+  guardarCelda(tipoId: number, tempId: number, dia: Tarifa['tipo_dia'], valor: string): void {
+    const existente = this.tarifas.find((x) => x.tipo_habitacion_id === tipoId && x.temporada_id === tempId && x.tipo_dia === dia);
+    const v = valor.trim();
+    this.error = this.mensaje = '';
+
+    if (v === '') {
+      if (existente) this.api.delete(`/tarifas/${existente.id}`).subscribe({ next: () => this.cargar(), error: (e) => this.fallo(e) });
+      return;
     }
+    const precio = Number(v);
+    if (!Number.isFinite(precio) || precio < 0) {
+      this.error = 'Ingresa un precio válido.';
+      return;
+    }
+    const op = existente
+      ? this.api.put(`/tarifas/${existente.id}`, { precio })
+      : this.api.post('/tarifas', { tipo_habitacion_id: tipoId, temporada_id: tempId, tipo_dia: dia, precio });
+    op.subscribe({
+      next: () => {
+        this.mensaje = 'Precio guardado.';
+        this.cargar();
+      },
+      error: (e) => this.fallo(e),
+    });
   }
 }

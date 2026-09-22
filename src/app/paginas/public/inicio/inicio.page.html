@@ -1,582 +1,76 @@
-<div class="home">
-
-  <!-- ======================================================
-       SEARCH
-  ======================================================= -->
-
-  <section class="search-section">
-
-    <div class="container">
-      <app-search-bar></app-search-bar>
-    </div>
-
-  </section>
-
-  <!-- ======================================================
-       HERO
-  ======================================================= -->
-
-  <section class="hero">
-
-    <div class="hero-overlay"></div>
-
-    <div class="hero-content">
-
-      <!-- LEFT -->
-
-      <div class="hero-left">
-
-        <div class="hero-tag">
-
-          <ion-icon name="sparkles-outline"></ion-icon>
-
-          Hospedajes premium frente al mar
-
-        </div>
-
-        <h1>
-          Descubre la mejor forma de hospedarte en
-          <em>Salinas</em>
-        </h1>
-
-        <p>
-          Hoteles, suites y experiencias únicas en Chipipe,
-          Salinas y Ballenita con la calidad Casa Blanca.
-        </p>
-
-        <!-- QUICK STATS -->
-
-        <div class="hero-stats">
-
-          <div class="hero-stat">
-
-            <strong>9.1</strong>
-
-            <span>Calificación promedio</span>
-
-          </div>
-
-          <div class="hero-stat">
-
-            <strong>+3</strong>
-
-            <span>Ubicaciones premium</span>
-
-          </div>
-
-          <div class="hero-stat">
-
-            <strong>24/7</strong>
-
-            <span>Atención personalizada</span>
-
-          </div>
-
-        </div>
-
-        <!-- BENEFITS -->
-
-        <div class="hero-benefits">
-
-          <div class="hero-benefit">
-
-            <ion-icon name="shield-checkmark-outline"></ion-icon>
-
-            <span>
-              Reserva segura
-            </span>
-
-          </div>
-
-          <div class="hero-benefit">
-
-            <ion-icon name="flash-outline"></ion-icon>
-
-            <span>
-              Confirmación inmediata
-            </span>
-
-          </div>
-
-          <div class="hero-benefit">
-
-            <ion-icon name="pricetag-outline"></ion-icon>
-
-            <span>
-              Mejor precio garantizado
-            </span>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- RIGHT -->
-
-      <div class="hero-card">
-
-        <div class="hero-card-image">
-
-          <img src="assets/img/1.PNG" />
-
-          <div class="hero-card-overlay"></div>
-
-          <div class="hero-card-badge">
-
-            Más reservado esta semana
-
-          </div>
-
-        </div>
-
-        <div class="hero-card-body">
-
-          <div class="hero-card-header">
-
-            <div>
-
-              <h3>
-                Casa Blanca Chipipe
-              </h3>
-
-              <div class="hero-location">
-
-                <ion-icon name="location-outline"></ion-icon>
-
-                <span>
-                  Chipipe · Salinas
-                </span>
-
-              </div>
-
-            </div>
-
-            <div class="hero-rating">
-
-              <strong>9.1</strong>
-
-              <span>Fantástico</span>
-
-            </div>
-
-          </div>
-
-          <!-- FEATURES -->
-
-          <div class="hero-features">
-
-            <span>Frente al mar</span>
-            <span>Piscina</span>
-            <span>Desayuno</span>
-            <span>WiFi gratis</span>
-
-          </div>
-
-          <!-- FOOTER -->
-
-          <div class="hero-card-footer">
-
-            <div class="hero-price">
-
-              <small>
-                Desde
-              </small>
-
-              <strong>
-                $89
-              </strong>
-
-              <span>
-                / noche
-              </span>
-
-            </div>
-
-            <button>
-
-              Ver disponibilidad
-
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- ======================================================
-       POPULAR HOTELS
-  ======================================================= -->
-
-  <section class="popular-hotels">
-
-    <div class="container">
-
-      <div class="section-head">
-
-        <div>
-
-          <h2>
-            Hoteles más buscados
-          </h2>
-
-          <p class="subtitle">
-            Las mejores opciones para hospedarte frente al mar
-          </p>
-
-        </div>
-
-      </div>
-
-      <div class="hotel-list">
-
-        <!-- HOTEL -->
-
-        <div
-          class="hotel-item"
-          *ngFor="let h of hoteles"
-          [routerLink]="['/hotel', h.slug]"
-        >
-
-          <!-- IMAGE -->
-
-          <div class="hotel-image">
-
-            <img [src]="getImage(h.imagen)" />
-
-          </div>
-
-          <!-- CONTENT -->
-
-          <div class="hotel-content">
-
-            <div class="hotel-top">
-
-              <div>
-
-                <h3>
-                  {{ h.nombre }}
-                </h3>
-
-                <div class="hotel-location">
-
-                  <ion-icon name="location-outline"></ion-icon>
-
-                  <span>
-                    Salinas · Ecuador
-                  </span>
-
-                </div>
-
-              </div>
-
-              <div class="hotel-score">
-
-                <strong>
-                  {{ h.rating || '9.1' }}
-                </strong>
-
-              </div>
-
-            </div>
-
-            <!-- FEATURES -->
-
-            <div class="hotel-features">
-
-              <span>WiFi gratis</span>
-              <span>Piscina</span>
-              <span>Frente al mar</span>
-              <span>Parking</span>
-
-            </div>
-
-            <!-- DESCRIPTION -->
-
-            <p class="hotel-description">
-
-              Disfruta una experiencia premium frente al mar
-              con habitaciones cómodas y excelente ubicación.
-
-            </p>
-
-            <!-- BOTTOM -->
-
-            <div class="hotel-bottom">
-
-              <div class="hotel-price">
-
-                <small>
-                  Desde
-                </small>
-
-                <strong>
-                  ${{ h.precio_desde }}
-                </strong>
-
-                <span>
-                  / noche
-                </span>
-
-              </div>
-
-              <button>
-
-                Ver disponibilidad
-
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- ======================================================
-       POPULAR SERVICES
-  ======================================================= -->
-
-  <section class="services">
-
-    <div class="container">
-
-      <div class="section-head">
-
-        <div>
-
-          <h2>
-            Servicios más populares
-          </h2>
-
-          <p class="subtitle">
-            Todo lo necesario para una estadía perfecta
-          </p>
-
-        </div>
-
-      </div>
-
-      <div class="services-list">
-
-        <div
-          class="service-chip"
-          *ngFor="let s of services"
-        >
-
-          <ion-icon [name]="s.icon"></ion-icon>
-
-          <span>
-            {{ s.name }}
-          </span>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- ======================================================
-       EXPERIENCE
-  ======================================================= -->
-
-  <section class="experience-section">
-
-    <div class="container">
-
-      <div class="section-head">
-
-        <div>
-
-          <h2>
-            Vive la experiencia Casa Blanca
-          </h2>
-
-          <p class="subtitle">
-            Mucho más que solo hospedarte
-          </p>
-
-        </div>
-
-      </div>
-
-      <div class="experience-grid">
-
-        <!-- ITEM -->
-
-        <div class="experience-card">
-
-          <img src="assets/img/1.PNG" />
-
-          <div class="experience-overlay"></div>
-
-          <div class="experience-content">
-
-            <span class="experience-badge">
-              Más reservado
-            </span>
-
-            <h3>
-              Frente al mar
-            </h3>
-
-            <p>
-              Despierta con vistas únicas y acceso directo a la playa.
-            </p>
-
-          </div>
-
-        </div>
-
-        <!-- ITEM -->
-
-        <div class="experience-card">
-
-          <img src="assets/img/9.PNG" />
-
-          <div class="experience-overlay"></div>
-
-          <div class="experience-content">
-
-            <span class="experience-badge blue">
-              Relax premium
-            </span>
-
-            <h3>
-              Piscina & relax
-            </h3>
-
-            <p>
-              Suites diseñadas para desconectarte completamente.
-            </p>
-
-          </div>
-
-        </div>
-
-        <!-- ITEM -->
-
-        <div class="experience-card">
-
-          <img src="assets/img/4.PNG" />
-
-          <div class="experience-overlay"></div>
-
-          <div class="experience-content">
-
-            <span class="experience-badge dark">
-              Experiencia top
-            </span>
-
-            <h3>
-              Gastronomía
-            </h3>
-
-            <p>
-              Restaurantes y experiencias frente al mar.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- ======================================================
-       MAP
-  ======================================================= -->
-
-  <!-- ======================================================
-     FEATURED LOCATIONS (Reemplaza el mapa)
-======================================================= -->
-
-<section class="featured-locations">
-  <div class="container">
-
-    <div class="section-head">
-      <div>
-        <h2>Descubre nuestras ubicaciones</h2>
-        <p class="subtitle">Tres experiencias únicas frente al mar</p>
-      </div>
-    </div>
-
-    <div class="locations-grid">
-
-      <!-- Chipipe -->
-      <div class="location-card" (click)="goToHotel('chipipe')">
-        <div class="location-image">
-          <img src="assets/img/chipipe.jpg" alt="Chipipe">
-          <div class="location-badge">⭐ 4.8</div>
-          <div class="location-overlay"></div>
-        </div>
-        <div class="location-content">
-          <h3>Chipipe</h3>
-          <p>Playa tranquila ideal para familias. Aguas calmadas y excelente vista al mar.</p>
-          <div class="location-features">
-            <span><ion-icon name="water-outline"></ion-icon> Playa tranquila</span>
-            <span><ion-icon name="restaurant-outline"></ion-icon> Restaurantes</span>
-            <span><ion-icon name="car-outline"></ion-icon> Fácil acceso</span>
-          </div>
-          <button class="location-btn">Ver hoteles →</button>
-        </div>
-      </div>
-
-      <!-- Palmeras -->
-      <div class="location-card" (click)="goToHotel('palmeras')">
-        <div class="location-image">
-          <img src="assets/img/palmeras.jpg" alt="Palmeras">
-          <div class="location-badge">⭐ 4.9</div>
-          <div class="location-overlay"></div>
-        </div>
-        <div class="location-content">
-          <h3>Palmeras</h3>
-          <p>Zona vibrante cerca del malecón. Ideal para disfrutar la vida nocturna.</p>
-          <div class="location-features">
-            <span><ion-icon name="sunny-outline"></ion-icon> Malecón</span>
-            <span><ion-icon name="beer-outline"></ion-icon> Bares</span>
-            <span><ion-icon name="walk-outline"></ion-icon> Zona peatonal</span>
-          </div>
-          <button class="location-btn">Ver hoteles →</button>
-        </div>
-      </div>
-
-      <!-- Ballenita -->
-      <div class="location-card" (click)="goToHotel('ballenita')">
-        <div class="location-image">
-          <img src="assets/img/ballenita.jpg" alt="Ballenita">
-          <div class="location-badge">⭐ 4.7</div>
-          <div class="location-overlay"></div>
-        </div>
-        <div class="location-content">
-          <h3>Ballenita</h3>
-          <p>Atardeceres espectaculares y vistas panorámicas. Perfecto para desconectar.</p>
-          <div class="location-features">
-            <span><ion-icon name="boat-outline"></ion-icon> Vistas únicas</span>
-            <span><ion-icon name="fish-outline"></ion-icon> Gastronomía</span>
-            <span><ion-icon name="moon-outline"></ion-icon> Relax total</span>
-          </div>
-          <button class="location-btn">Ver hoteles →</button>
-        </div>
-      </div>
-
-    </div>
-
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="container hero-in">
+    <h1>Encuentra dónde dormir en Salinas</h1>
+    <p>Hoteles, hosterías, cabañas y apartamentos frente al mar en todo el cantón. Compara y reserva directo.</p>
+    <app-search-form (buscar)="buscar($event)" />
   </div>
 </section>
-</div>
+
+<section class="container section">
+  <header class="sec-head">
+    <h2>Explora por zona</h2>
+    <p>Del malecón a las playas del sur: elige el ambiente que buscas.</p>
+  </header>
+
+  @if (cargando) {
+    <div class="zonas">
+      @for (n of [1, 2, 3, 4]; track n) {
+        <div class="zona sk"></div>
+      }
+    </div>
+  } @else if (zonas.length) {
+    <div class="zonas">
+      @for (z of zonas; track z.id) {
+        <a class="zona" [routerLink]="['/buscar']" [queryParams]="{ zona: z.slug }">
+          <span class="zona-nombre">{{ z.nombre }}</span>
+          <span class="zona-desc">{{ z.descripcion }}</span>
+          <span class="zona-foot">
+            <b>{{ z.total_hoteles }}</b> {{ z.total_hoteles === 1 ? 'alojamiento' : 'alojamientos' }}
+            @if (z.precio_desde) {
+              · desde <b>{{ z.precio_desde | money }}</b>
+            }
+          </span>
+        </a>
+      }
+    </div>
+  }
+</section>
+
+<section class="container section">
+  <header class="sec-head">
+    <h2>Alojamientos destacados</h2>
+    <a routerLink="/buscar" class="ver-todos">Ver todos <ion-icon name="arrow-forward-outline"></ion-icon></a>
+  </header>
+
+  @if (cargando) {
+    <div class="grid">
+      @for (n of [1, 2, 3, 4]; track n) {
+        <div class="card-sk"></div>
+      }
+    </div>
+  } @else if (destacados.length) {
+    <div class="grid">
+      @for (h of destacados; track h.id) {
+        <app-hotel-card [hotel]="h" [compacta]="true" />
+      }
+    </div>
+  } @else {
+    <div class="vacio">
+      <ion-icon name="cloud-offline-outline"></ion-icon>
+      <p>{{ error ? 'No pudimos cargar los alojamientos. Intenta de nuevo en unos minutos.' : 'Pronto tendremos alojamientos disponibles.' }}</p>
+    </div>
+  }
+</section>
+
+<section class="benef">
+  <div class="container benef-grid">
+    @for (b of beneficios; track b.titulo) {
+      <div class="benef-item">
+        <ion-icon [name]="b.icono"></ion-icon>
+        <h3>{{ b.titulo }}</h3>
+        <p>{{ b.texto }}</p>
+      </div>
+    }
+  </div>
+</section>

@@ -1,0 +1,93 @@
+<div class="adm-page">
+  @if (mensaje) { <div class="adm-msg ok" role="status">{{ mensaje }}</div> }
+  @if (error) { <div class="adm-msg err" role="alert">{{ error }}</div> }
+
+  @if (cargando) {
+    <div class="adm-empty">Cargando…</div>
+  } @else if (hotel; as h) {
+    <div class="adm-head">
+      <div>
+        <h2>{{ h.nombre }}</h2>
+        <p>Así aparece tu alojamiento en Salinas Booking. Estado: <span class="adm-badge {{ h.estado === 'activo' ? 'ok' : 'warn' }}">{{ h.estado === 'pendiente' ? 'pendiente de aprobación' : h.estado }}</span>
+          · <a href="/hotel/{{ h.slug }}" target="_blank" rel="noopener">Ver página pública</a></p>
+      </div>
+      <button type="button" class="adm-btn" [disabled]="guardando" (click)="guardar()">{{ guardando ? 'Guardando…' : 'Guardar cambios' }}</button>
+    </div>
+
+    <div class="adm-card">
+      <h3>Información general</h3>
+      <div class="adm-grid">
+        <label class="adm-field">Nombre <input [(ngModel)]="h.nombre" name="nombre" maxlength="100" /></label>
+        <label class="adm-field">Tipo de alojamiento
+          <select [(ngModel)]="h.tipo_alojamiento" name="tipo">@for (t of tipos; track t.v) { <option [value]="t.v">{{ t.t }}</option> }</select>
+        </label>
+        <label class="adm-field">Zona
+          <select [(ngModel)]="h.zona_id" name="zona"><option [ngValue]="null">— Sin zona —</option>@for (z of zonas; track z.id) { <option [ngValue]="z.id">{{ z.nombre }}</option> }</select>
+        </label>
+        <label class="adm-field">Estrellas
+          <select [(ngModel)]="h.estrellas" name="est"><option [ngValue]="null">Sin clasificar</option>@for (n of [1, 2, 3, 4, 5]; track n) { <option [ngValue]="n">{{ n }}</option> }</select>
+        </label>
+        <label class="adm-field">Dirección <input [(ngModel)]="h.direccion" name="dir" maxlength="200" /></label>
+      </div>
+      <label class="adm-field" style="margin-top: 12px">Descripción <textarea rows="5" [(ngModel)]="h.descripcion" name="desc" placeholder="Cuenta qué hace especial a tu alojamiento…"></textarea></label>
+    </div>
+
+    <div class="adm-card">
+      <h3>Contacto y ubicación</h3>
+      <div class="adm-grid">
+        <label class="adm-field">Teléfono <input [(ngModel)]="h.telefono" name="tel" /></label>
+        <label class="adm-field">WhatsApp <input [(ngModel)]="h.whatsapp" name="wa" placeholder="593999999999" /><small>Con código de país, sin +.</small></label>
+        <label class="adm-field">Correo <input type="email" [(ngModel)]="h.email" name="mail" /></label>
+        <label class="adm-field">Sitio web <input [(ngModel)]="h.sitio_web" name="web" /></label>
+        <label class="adm-field">Latitud <input type="number" step="any" [(ngModel)]="h.latitud" name="lat" /></label>
+        <label class="adm-field">Longitud <input type="number" step="any" [(ngModel)]="h.longitud" name="lng" /></label>
+      </div>
+    </div>
+
+    <div class="adm-card">
+      <h3>Políticas</h3>
+      <div class="adm-grid">
+        <label class="adm-field">Hora de entrada <input type="time" [(ngModel)]="h.hora_checkin" name="ci" /></label>
+        <label class="adm-field">Hora de salida <input type="time" [(ngModel)]="h.hora_checkout" name="co" /></label>
+        <label class="adm-field">Cancelación
+          <select [(ngModel)]="h.politica_cancelacion" name="pol">
+            <option value="flexible">Flexible: gratis hasta 1 día antes</option>
+            <option value="moderada">Moderada: gratis hasta 3 días antes</option>
+            <option value="estricta">Estricta: gratis hasta 7 días antes</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="adm-card">
+      <h3>Servicios del alojamiento</h3>
+      <div class="adm-checks">
+        @for (a of amenidades; track a.id) {
+          <label class="adm-check"><input type="checkbox" [checked]="elegidas.has(a.id)" (change)="alternar(a.id)" /> {{ a.nombre }}</label>
+        }
+      </div>
+    </div>
+
+    <div class="adm-card">
+      <h3>Fotos</h3>
+      <p class="adm-empty" style="padding: 0 0 10px; text-align: left">Pega la dirección (URL) de cada foto. La marcada como principal es la que se ve en los resultados.</p>
+      <div class="adm-photos">
+        @for (f of h.imagenes; track f.id) {
+          <figure>
+            <img [src]="url(f.url)" [alt]="f.alt || h.nombre" loading="lazy" />
+            <figcaption>
+              <button type="button" class="adm-btn sm {{ h.imagen_principal === f.url ? '' : 'out' }}" (click)="comoPrincipal(f.url)">{{ h.imagen_principal === f.url ? 'Principal' : 'Hacer principal' }}</button>
+              <button type="button" class="adm-btn sm danger out" (click)="quitarFoto(f.id)" aria-label="Quitar foto">×</button>
+            </figcaption>
+          </figure>
+        }
+      </div>
+      <div class="adm-toolbar" style="margin-top: 12px">
+        <input class="adm-input" [(ngModel)]="nuevaFoto.url" name="furl" placeholder="https://… o assets/img/foto.jpg" style="flex: 1; min-width: 220px" aria-label="URL de la foto" />
+        <input class="adm-input" [(ngModel)]="nuevaFoto.alt" name="falt" placeholder="Descripción (opcional)" aria-label="Descripción" />
+        <button type="button" class="adm-btn" (click)="agregarFoto()">Agregar foto</button>
+      </div>
+      <p class="adm-empty" style="padding: 8px 0 0; text-align: left">Recuerda pulsar «Guardar cambios» si cambias la foto principal.</p>
+    </div>
+  }
+</div>
