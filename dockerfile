@@ -1,16 +1,40 @@
-FROM node:20
+# =========================
+# 1. BUILD STAGE
+# =========================
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
+# instalar dependencias
 COPY package*.json ./
 RUN npm install
 
+# copiar proyecto
 COPY . .
 
-RUN npm run build
+# build Angular (el proyecto se llama "app")
+RUN npx ng build app --configuration production
 
-RUN npm install -g serve
+# DEBUG (IMPORTANTE para evitar errores de ruta)
+RUN ls -R www
 
-EXPOSE 3000
 
-CMD ["serve", "-s", "www", "-l", "3000"]
+# =========================
+# 2. NGINX STAGE
+# =========================
+FROM nginx:alpine
+
+# limpiar nginx default
+RUN rm -rf /usr/share/nginx/html/*
+
+# copiar build generado
+# ⚠️ angular.json genera output en "www"
+COPY --from=build /app/www /usr/share/nginx/html
+
+# nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# puerto
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
