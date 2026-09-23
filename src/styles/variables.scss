@@ -2,7 +2,7 @@
    Variables globales + puente para Ionic (ion-color-*).
 */
 
-@import './_tokens.scss';
+@use './tokens';
 
 /* Base global */
 :root {

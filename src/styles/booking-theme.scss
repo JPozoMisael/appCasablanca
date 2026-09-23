@@ -2,7 +2,7 @@
    Estilos globales tipo Booking/PMS: cards, tablas, chips, botones, inputs.
 */
 
-@import './_tokens.scss';
+@use './tokens';
 
 /* Layout helpers */
 .page-shell {

@@ -3,6 +3,13 @@
  * Responsive foundation for entire application
  */
 
+/* @use debe ir antes que cualquier otra regla (incluidos los @import de abajo) */
+@use "./styles/tokens";
+@use "./styles/variables";
+@use "./styles/typography";
+@use "./styles/booking-theme";
+@use "./styles/admin";
+
 /* =========================================================
     IONIC CORE (NO TOCAR)
 ========================================================= */
@@ -21,13 +28,6 @@
 
 /* ❌ SIN dark.system.css */
 /* ❌ SIN light.css */
-
-/* Tus estilos */
-@import "./styles/tokens";
-@import "./styles/variables.scss";
-@import "./styles/typography.scss";
-@import "./styles/booking-theme.scss";
-@import "./styles/admin.scss";
 
 
 /* =========================================================
